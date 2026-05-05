@@ -1,15 +1,18 @@
-import { useContext, useEffect, useRef, useState } from 'react'
+import { lazy, Suspense, useContext, useEffect, useRef, useState } from 'react'
 import { ColorSchemeContext, SettingsContext, ThemeContext } from './contexts/Settings'
 import { useReset, useStateSelector, useUpdate } from './contexts/Store'
 import { AnimatePresence, motion} from 'framer-motion'
 import ActiveElements from './components/ActiveElements/ActiveElements'
 import QueryField from './components/QueryField/QueryField'
-import Settings from './components/Settings/Settings'
 import LayoutButton from './components/LayoutButton/LayoutButton'
+
+// The Settings panel pulls in MUI Joy + the color picker + every setting
+// type editor; defer the chunk until the user actually opens settings.
+const Settings = lazy(() => import('./components/Settings/Settings'))
 import { BsGearFill, BsChevronRight } from 'react-icons/bs'
 import { RiMenu5Fill } from 'react-icons/ri'
 import { allowedModes } from './rules'
-import { isMobile } from 'react-device-detect'
+import { isMobile } from './functions/webUtils/isMobile'
 import classes from './App.module.css'
 import './App.css'
 
@@ -135,9 +138,11 @@ function App() {
           ? <AnimatePresence>
               {
                 showSettings
-                  ? <Settings key='settings' onClose={() => {
-                    setShowSettings(false) 
-                    resetStore()}}/>
+                  ? <Suspense key='settings' fallback={null}>
+                      <Settings onClose={() => {
+                        setShowSettings(false)
+                        resetStore()}}/>
+                    </Suspense>
                   : 
                   <motion.div 
                     key={timestamp}

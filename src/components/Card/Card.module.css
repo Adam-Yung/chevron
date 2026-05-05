@@ -37,7 +37,16 @@ body[data-color-scheme=light] .card:active::before {
 }
 
 .card, .card * {
-  transition: all .25s;
+  /* `transition: all` is expensive: every changed property (including
+     layout-affecting ones like width/height/font-size) animates. We only
+     actually animate filter/opacity/transform/background here, so be
+     explicit. */
+  transition:
+    filter .25s,
+    opacity .25s,
+    transform .25s,
+    background-size .25s,
+    background-color .25s;
   cursor: pointer;
 }
 .card > * {
@@ -67,7 +76,7 @@ body[data-color-scheme=light] .card:active::before {
   font-size: 250%;
   opacity: 0;
   transform: rotate(35deg) translate(-10%);
-  transition: all .2s;
+  transition: opacity .2s, transform .2s, filter .2s;
 }
 /* dark theme (default) */
 .hint {
@@ -80,7 +89,7 @@ body[data-color-scheme=light] .hint {
 .hint.active {
   transform: rotate(35deg) translate(20%);
   opacity: 1;
-  transition: all 2.5s ease;
+  transition: opacity 2.5s ease, transform 2.5s ease;
 }
 
 .plate {

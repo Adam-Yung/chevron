@@ -43,6 +43,7 @@
   - [config.js](#configjs)
     </font>
 - [TODO](#todo)
+- [Roadmap](#roadmap)
 - [Technologies](#technologies)
 
 ## Features
@@ -173,21 +174,56 @@ After you register the server, you will be able to access Chevron on **_localhos
 
 ## Build
 
-> **Note** > [Node.js and npm](https://nodejs.org/en/download/) are required
+> **Note** > [Node.js and npm](https://nodejs.org/en/download/) (Node 18+ recommended) are required.
 
-1. Install dependencies
+### Static build
+
+The static build is the recommended distribution: a self-contained `dist/` folder you can drop on any web server, on GitHub Pages, or open as a `file://` URL.
+
+1. Install dependencies (only needed once):
 
    ```bash
    npm install
    ```
 
-1. Build
+2. Produce the static build:
 
    ```bash
    npm run build
    ```
 
-After building, you can find all the necessary files in the `/dist` folder
+   The bundle is emitted to `dist/`. Because `vite-plugin-singlefile` is enabled, `dist/index.html` inlines the CSS and JS, so it works as a single file you can copy anywhere.
+
+3. (Optional) Set Chevron as your homepage / new tab page:
+   - In your browser settings, point the homepage / new-tab URL at the absolute path of `dist/index.html` (e.g. `file:///Users/you/chevron/dist/index.html`).
+
+### Local serving (development)
+
+For day-to-day development with hot module reload:
+
+```bash
+npm install      # once
+npm run dev      # starts the Vite dev server with HMR
+```
+
+Vite prints a local URL (default `http://localhost:5173`). Editing source files will reload the page automatically.
+
+### Local serving (production preview)
+
+To preview the production build over HTTP (useful for testing service worker / fetch behavior, or for hosting on your LAN):
+
+```bash
+npm run build
+npm run preview  # serves dist/ at http://localhost:4173 by default
+```
+
+If you want a long-running local server (e.g. as your homepage on `http://localhost:8000`), use the bundled hosted-mode workflow described under [Hosted](#hosted), or run any static file server against `dist/`:
+
+```bash
+# any of these work
+npx http-server dist -p 8000
+python3 -m http.server 8000 --directory dist
+```
 
 ## Usage
 
@@ -343,6 +379,40 @@ Because of the limitations of the CORS policy, macros icons must be stored in `/
 - [x] LocalStorage reset buttons
 - [ ] Refactor search engines system
 - [ ] Time settings
+
+## Roadmap
+
+The roadmap below tracks larger refactors that are too disruptive to land as drive-by fixes. Smaller changes are landed directly.
+
+### Stability & UX (in progress)
+
+- [x] **Phase 0 — Stability safety net**: ErrorBoundary, listener-leak fix, autocomplete/currency error handling, debounced settings persistence
+- [x] **Phase 1 — User-reported UX fixes**: Tab/Shift+Tab cycling in suggestions, return-to-blank after search (popstate/pageshow), animation perf quick wins (`will-change`, rAF-debounced resize, memoized marquee, `onAnimationComplete` instead of `setTimeout`)
+- [x] **Phase 1.5 — Performance hardening**: drop `axios` and `react-device-detect`, lazy-load Settings panel and `AIcompletion`, tighten `transition: all` to specific properties, respect `prefers-reduced-motion`, remove per-chunk `console.log` from streaming completions
+- [ ] **Phase 2 — Local LLM (Ollama) support**: make completion provider-agnostic; add Ollama preset (with no-config guardrail so Ollama is never auto-invoked unless the user has filled in `baseURL` and `model`)
+
+### Accessibility & keyboard UX
+
+- [ ] **Phase 3 — A11y pass**: combobox/listbox ARIA on the query input + suggestions; visible focus rings; `aria-activedescendant`; less aggressive focus-stealing; double-Esc full reset
+
+### Major refactors (Phase 4+)
+
+These items each warrant their own commit / PR because they touch broad surfaces or change the dependency footprint significantly:
+
+- [ ] **Dependency modernization**: Vite 3 → 5; Framer Motion 7 → 11; `@mui/joy` `5.0.0-alpha.64` → stable v5
+- [ ] **Settings schema + migration**: validate persisted settings on load and migrate old shapes instead of trusting whatever is in `localStorage`
+- [ ] **Bundle splitting**: keep `vite-plugin-singlefile` for the static-zip release only; enable code-splitting for the hosted/dev build for better caching and faster first load
+- [ ] **Replace `react-fast-marquee`** with a pure CSS keyframe scroller (saves a dep + lets the marquee run on the compositor only)
+- [ ] **Replace `react-markdown`** with a lighter streaming-friendly renderer for AI completions
+- [ ] **Replace `colorjs.io`** in the contrast / theme paths with a small APCA helper (~10 KB → <2 KB)
+- [ ] **Replace `dateformat`** with `Intl.DateTimeFormat` (need to translate the existing format strings)
+- [ ] **SVG `d`-attribute morphing** (in `Chevron` and `QuickLook`) is not GPU-composited. Replace with a stack of pre-computed paths cross-faded by `opacity`/`transform` so the entire animation runs on the compositor
+- [ ] **Encrypted API key storage**: WebCrypto + passphrase, or a backend proxy, instead of plaintext in `localStorage`
+- [ ] **Mobile / touch first-class support**: replace the "mobile not supported" banner with a real touch layout
+- [ ] **TypeScript migration** (incremental: `allowJs: true`, port file by file)
+- [ ] **Test coverage**: Vitest + React Testing Library smoke tests for search submit, suggestion cycling, settings save/load, redirect
+- [ ] **PWA / offline**: service worker for the static build so the page works offline as a true new-tab replacement
+- [ ] **Refactor search-engines system** (already in TODO above; bigger than it looks because templates are interpolated at multiple sites)
 
 ## Technologies
 

@@ -39,6 +39,9 @@ function createCompletion(stateSetter, messages, temperature, key) {
 function fetchStream(stream, parser) {
   let content = null
   const reader = stream.getReader()
+  // Hoist the decoder so we don't allocate one per chunk and so it can
+  // correctly handle multi-byte sequences split across chunks.
+  const decoder = new TextDecoder('utf-8')
 
   // read() returns a promise that resolves
   // when a value has been received
@@ -47,12 +50,14 @@ function fetchStream(stream, parser) {
       // Result objects contain two properties:
       // done  - true if the stream has already given you all its data.
       // value - some data. Always undefined when done is true.
-      if (done)
+      if (done) {
+        // flush any buffered bytes before completing
+        const tail = decoder.decode()
+        if (tail) content = parser(tail, content)
         return content
-      
-      const decoded = new TextDecoder('utf-8').decode(value)
-      console.log(decoded)
+      }
 
+      const decoded = decoder.decode(value, { stream: true })
       content = parser(decoded, content)
 
       return reader.read().then(processText)

@@ -1,12 +1,15 @@
-import { useContext, useCallback, useEffect, memo, useRef } from 'react'
+import { lazy, Suspense, useContext, useCallback, useEffect, memo, useRef } from 'react'
 import useSuggestions from '../../hooks/useSuggestions'
 import useParseQuery from '../../hooks/useParseQuery'
 import useRedirect from '../../hooks/useRedirect'
 import { SettingsContext } from '../../contexts/Settings'
 import { useStateSelector, useUpdate } from '../../contexts/Store'
 import Suggestions from '../Suggestions/Suggestions'
-import AIcompletion from '../AIcompletion/AIcompletion'
 import { allowedModes, activeKeys } from '../../rules'
+
+// AIcompletion drags in react-markdown (~20KB) and the streaming completion
+// client; defer the chunk until the user double-taps space to invoke AI.
+const AIcompletion = lazy(() => import('../AIcompletion/AIcompletion'))
 import googleAutocomplete from '../../autocomplete/googleAutocomplete'
 import History from '../../classes/localStorage/history'
 import gC from '../../functions/generationUtils/getClasses'
@@ -170,9 +173,13 @@ function QueryField () {
 
   return (
     <div
-      className={classes['container']} 
+      className={classes['container']}
       style={variables}>
-        <AIcompletion query={aiQuery} className={classes['ai-completion']} />
+        {aiQuery && (
+          <Suspense fallback={null}>
+            <AIcompletion query={aiQuery} className={classes['ai-completion']} />
+          </Suspense>
+        )}
         { input }
         { parsedQuery.value && <Suggestions
             queryMode={settings.appearance.style}

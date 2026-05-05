@@ -57,3 +57,16 @@ code {
 .JoyTooltip-root {
   z-index: 10000 !important;
 }
+
+/* Honor the OS-level "reduce motion" preference. Framer Motion has its
+   own opt-in for this, but we also collapse all CSS transitions /
+   animations / smooth-scroll so the page is instantly usable for users
+   who can't tolerate motion. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}

@@ -1,7 +1,6 @@
 import { useState, useCallback, useRef, useEffect, useContext } from 'react'
 import { SettingsContext } from '../contexts/Settings'
 import History from '../classes/localStorage/history'
-import axios from 'axios'
 import copyObj from '../functions/dataUtils/copyObj'
 import currencyCodes from '../currencies'
 
@@ -120,11 +119,15 @@ async function fetchCurrency(query) {
         to = codes[1].toUpperCase()
 
   if (currencyCodes.includes(from) && currencyCodes.includes(to)) {
+    const params = new URLSearchParams({ from, to, amount: String(amount[0]) })
+    const controller = new AbortController()
+    const timeoutId = setTimeout(() => controller.abort(), 5000)
+
     try {
-      const response = await axios.get(
-        'https://api.exchangerate.host/convert',
-        { params: { from, to, amount }, timeout: 5000 })
-      const { data } = response
+      const response = await fetch(
+        `https://api.exchangerate.host/convert?${params.toString()}`,
+        { signal: controller.signal })
+      const data = await response.json()
 
       if (data.success && data.result)
         return ({
@@ -135,6 +138,8 @@ async function fetchCurrency(query) {
     } catch (err) {
       // eslint-disable-next-line no-console
       console.warn('[Chevron] currency request failed:', err.message || err)
+    } finally {
+      clearTimeout(timeoutId)
     }
 
     return null
