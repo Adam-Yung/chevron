@@ -1,14 +1,14 @@
-import { useContext } from 'react'
+import { useContext, useMemo } from 'react'
 import { SettingsContext } from '../../contexts/Settings'
 import Marquee from 'react-fast-marquee'
 import getCssGradient from '../../functions/generationUtils/getCssGradient'
 import classes from './InteractiveBackground.module.css'
 
-function InteractiveBackground({ 
+function InteractiveBackground({
   width,
   height,
   color, // background color (can be a single string or an array of 2 strings for gradient)
-  marqueeText='', 
+  marqueeText='',
   marqueeSpeed=25,
   marqueeAngle=330,
   lineDensity=15, // space between lines
@@ -22,36 +22,36 @@ function InteractiveBackground({
   const settings = useContext(SettingsContext)
   const enableMarquee = settings.chevron.quickLook.marquee
 
-  let marquee = null
-  if (marqueeText && enableMarquee) {
+  // Memoize the row/line tree (~90 elements) so it isn't reallocated on
+  // every render (e.g. on every resize-driven re-render of the parent).
+  const marquee = useMemo(() => {
+    if (!marqueeText || !enableMarquee) return null
     /*
-      Marquee system consists of {rowDensity} of rows 
+      Marquee system consists of {rowDensity} of rows
       and each row consists of {lineDensity} of lines
     */
-    const rows = []
     const lines = []
-
-    // lines generation
     for (let i = 0; i < lineDensity; i++) {
       lines.push(<div key={i}>{marqueeText}</div>)
     }
-    // rows generation
-    // duble density if {marqueeText} is too short
-    for (let i = 0; i < ((marqueeText.length < 5) ? rowDensity * 2 : rowDensity); i++) {
+    const totalRows = (marqueeText.length < 5) ? rowDensity * 2 : rowDensity
+    const rows = []
+    for (let i = 0; i < totalRows; i++) {
       rows.push(
         <div key={i} className={classes['row']}>
-          {[...lines]}
+          {lines}
         </div>
       )
     }
-
-    marquee = <Marquee 
-      className={classes['marquee']} 
-      gradient={false}
-      speed={marqueeSpeed}>
-        {[...rows]}
+    return (
+      <Marquee
+        className={classes['marquee']}
+        gradient={false}
+        speed={marqueeSpeed}>
+        {rows}
       </Marquee>
-  }
+    )
+  }, [marqueeText, enableMarquee, lineDensity, rowDensity, marqueeSpeed])
   
   /*
     find the diagonal of the window for propper scale of .container

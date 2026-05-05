@@ -94,6 +94,7 @@ body[data-color-scheme=light] .hint {
   background-size: 200% 200%;
   background-position: right top;
   transition: background-size .6s, opacity .3s ease-out;
+  will-change: transform, opacity;
 }
 .card:hover .plate, .card:active .plate, .plate.detached {
   background-size: 100% 100%;
@@ -131,6 +132,7 @@ body[data-color-scheme=light] .plate.detached::before {
   width: 40%;
   margin: 10%;
   z-index: 10001;
+  will-change: transform;
 }
 
 .logo svg {

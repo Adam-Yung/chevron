@@ -42,7 +42,7 @@ function Card({ active=false, visibility=true, icon, bgColor, textColor, hotKey,
   const logoRef = useRef(null)
   const plateRef = useRef(null)
       
-  const detachableElements = 
+  const detachableElements =
     <>
       <motion.div
         ref={logoRef}
@@ -53,11 +53,18 @@ function Card({ active=false, visibility=true, icon, bgColor, textColor, hotKey,
           { getIcon(icon, textColor) }
       </motion.div>
       <motion.div
-        ref={plateRef} 
+        ref={plateRef}
         className={gC(classes['plate'], active && classes['detached'])}
         style={styles?.plate?.instant}
         animate={styles?.plate?.animate}
-        transition={styles?.plate?.transition}/>
+        transition={styles?.plate?.transition}
+        onAnimationComplete={() => {
+          // Fire the redirect-end callback when the actual plate animation
+          // finishes (the slowest of the two), instead of guessing the
+          // duration with setTimeout. Only fire while in the "active"
+          // (redirecting) state so it doesn't leak on hover transitions.
+          if (active) window.cardRedirectAnimationEnd?.()
+        }}/>
     </>
 
   // state (for transitions)
@@ -138,11 +145,12 @@ function Card({ active=false, visibility=true, icon, bgColor, textColor, hotKey,
                     scale: scales.plate
                   }
                 }
-              })      
+              })
             })
-            setTimeout(() => {
-              window.cardRedirectAnimationEnd?.()
-            }, 1000 * Math.max(PLATE_TRANSITION_DURATION, LOGO_TRANSITION_DELAY + LOGO_TRANSITION_DURATION))
+            // The redirect callback now fires from the plate's
+            // onAnimationComplete handler (declared on the motion.div),
+            // so it tracks the real animation duration instead of a
+            // hard-coded setTimeout that could fire early or late.
           }
         }
       }

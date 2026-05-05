@@ -24,6 +24,7 @@
   align-items: center;
   justify-content: center;
   z-index: 2;
+  will-change: transform;
 }
 .label {
   padding: 0 5px;

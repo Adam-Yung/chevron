@@ -1,4 +1,4 @@
-import { useContext, useEffect, useMemo, useState, useSyncExternalStore } from 'react'
+import { useContext, useEffect, useMemo, useState, useSyncExternalStore, useRef } from 'react'
 import useTransitions from '../../hooks/useTransitions'
 import useParseQuery from '../../hooks/useParseQuery'
 import { SettingsContext, ThemeContext } from '../../contexts/Settings'
@@ -114,26 +114,11 @@ function QuickLook ({ visibility, onAnimationEnd }) {
     }
   ], [bottomCurvature, topCurvature])
 
-  // window width
-  const width = useSyncExternalStore(
-    // subscriber
-    listener => {
-      window.addEventListener('resize', listener)
-      return () => window.removeEventListener('resize', listener)
-    },
-    // listener
-    () => window.innerWidth
-  )
-  // window height
-  const height = useSyncExternalStore(
-    // subscriber
-    listener => {
-      window.addEventListener('resize', listener)
-      return () => window.removeEventListener('resize', listener)
-    },
-    // listener
-    () => window.innerHeight
-  )
+  // window dimensions, batched through a single rAF-debounced resize
+  // subscription so a window drag doesn't fire dozens of recalculations
+  // per second
+  const viewport = useViewportSize()
+  const { width, height } = viewport
 
   // element animation controls
   const pathControls = useAnimationControls(),
@@ -286,6 +271,33 @@ function QuickLook ({ visibility, onAnimationEnd }) {
       </svg>
     </div>
   </>
+}
+
+function useViewportSize() {
+  // Single rAF-coalesced subscription shared between width and height so a
+  // resize event only triggers one React update per frame (instead of two
+  // per pixel of drag).
+  const snapshotRef = useRef({ width: window.innerWidth, height: window.innerHeight })
+
+  const subscribe = (listener) => {
+    let frame = null
+    const onResize = () => {
+      if (frame !== null) return
+      frame = requestAnimationFrame(() => {
+        frame = null
+        snapshotRef.current = { width: window.innerWidth, height: window.innerHeight }
+        listener()
+      })
+    }
+    window.addEventListener('resize', onResize)
+    return () => {
+      window.removeEventListener('resize', onResize)
+      if (frame !== null) cancelAnimationFrame(frame)
+    }
+  }
+  const getSnapshot = () => snapshotRef.current
+
+  return useSyncExternalStore(subscribe, getSnapshot, getSnapshot)
 }
 
 export default QuickLook

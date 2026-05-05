@@ -86,6 +86,15 @@ function QueryField () {
         updateStore({ query: '' })
         setAiQuery('')
         break
+      case 'Tab':
+        // Tab / Shift+Tab cycles through suggestions like a standard
+        // autocomplete combobox, instead of letting focus escape the field.
+        if (allowedModes.get('Suggestions').has(mode) && suggestions.length > 0) {
+          const direction = e.shiftKey ? 'prev' : 'next'
+          updateStore({ selectedSuggestion: getSuggestion(suggestions, selectedSuggestion, direction) })
+          e.preventDefault()
+        }
+        break
       default:
         if (allowedModes.get('Suggestions').has(mode) && activeKeys.get('Suggestions').has(e.key)) {
           switch (e.key) {

@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState, useRef } from 'react'
+import { useContext, useEffect, useRef, useState } from 'react'
 import { ColorSchemeContext, SettingsContext, ThemeContext } from './contexts/Settings'
 import { useReset, useStateSelector, useUpdate } from './contexts/Store'
 import { AnimatePresence, motion} from 'framer-motion'
@@ -32,7 +32,6 @@ function App() {
   // ---
 
   const [showSettings, setShowSettings] = useState(false)
-  const [showReset, setShowReset] = useState(false)
 
   /* handlers */
   const onContextMenuRef = useRef(null)
@@ -100,15 +99,32 @@ function App() {
   }, [colorScheme]) 
   // ---
 
-  /* firefox history back caching fix [#1 issue] */
-  const handleVisibilityChange = useRef(null)
-  handleVisibilityChange.current = () => {
-    // reset store if user went back from a redirected page
-    if (document.visibilityState === 'visible' && redirected)
-      setShowReset(true)
+  /* return-to-blank after navigating away (back button, bfcache, tab refocus)
+     Replaces the old "Cancel" button flow: now we just auto-reset the store
+     so the startpage is blank when the user returns. */
+  const onReturnRef = useRef(null)
+  onReturnRef.current = () => {
+    if (redirected) resetStore()
   }
   useEffect(() => {
-    document.addEventListener('visibilitychange', () => handleVisibilityChange.current())
+    const handleVisibility = () => {
+      if (document.visibilityState === 'visible') onReturnRef.current()
+    }
+    // pageshow fires for bfcache restores (Firefox/Safari back-button)
+    const handlePageShow = (e) => {
+      if (e.persisted) onReturnRef.current()
+    }
+    // popstate covers explicit history navigation within this origin
+    const handlePopState = () => onReturnRef.current()
+
+    document.addEventListener('visibilitychange', handleVisibility)
+    window.addEventListener('pageshow', handlePageShow)
+    window.addEventListener('popstate', handlePopState)
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibility)
+      window.removeEventListener('pageshow', handlePageShow)
+      window.removeEventListener('popstate', handlePopState)
+    }
   }, [])
   // ---
 
@@ -148,9 +164,6 @@ function App() {
                             mode === 'opened' && <BsChevronRight/>
                           }
                       </LayoutButton>
-                      {
-                        showReset && <div className={classes['cancel-button']} onClick={() => location.reload()}>Cancel</div>
-                      }
                   </motion.div>
               }
             </AnimatePresence>
