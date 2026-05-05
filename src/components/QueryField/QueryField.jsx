@@ -4,7 +4,7 @@ import useParseQuery from '../../hooks/useParseQuery'
 import useRedirect from '../../hooks/useRedirect'
 import { SettingsContext } from '../../contexts/Settings'
 import { useStateSelector, useUpdate } from '../../contexts/Store'
-import Suggestions from '../Suggestions/Suggestions'
+import Suggestions, { SUGGESTIONS_LISTBOX_ID, suggestionOptionId } from '../Suggestions/Suggestions'
 import { allowedModes, activeKeys } from '../../rules'
 
 // AIcompletion drags in react-markdown (~20KB) and the streaming completion
@@ -17,6 +17,7 @@ import classes from './QueryField.module.css'
 import { useState } from 'react'
 
 const DOUBLE_PRESS_THRESHOLD = 300
+const ESC_DOUBLE_PRESS_THRESHOLD = 500
 
 function QueryField () {
   // settings
@@ -28,6 +29,7 @@ function QueryField () {
   const enableCarret = settings.query.field.caret
 
   const inputRef = useRef(null)
+  const escLastPressRef = useRef(-1)
 
   /* store */
   const mode = useStateSelector(store => store.mode)
@@ -85,9 +87,20 @@ function QueryField () {
         }
         break
       case 'Escape':
-        // clearing the query
-        updateStore({ query: '' })
-        setAiQuery('')
+        // First Esc clears the visible query; a second Esc within
+        // ESC_DOUBLE_PRESS_THRESHOLD also drops the AI completion,
+        // selected suggestion, and blurs the input for a true reset.
+        if (Date.now() - escLastPressRef.current < ESC_DOUBLE_PRESS_THRESHOLD) {
+          updateStore({ query: '', selectedSuggestion: null })
+          setAiQuery('')
+          if (document.activeElement === inputRef.current)
+            inputRef.current.blur()
+          escLastPressRef.current = -1
+        } else {
+          updateStore({ query: '', selectedSuggestion: null })
+          setAiQuery('')
+          escLastPressRef.current = Date.now()
+        }
         break
       case 'Tab':
         // Tab / Shift+Tab cycles through suggestions like a standard
@@ -138,15 +151,27 @@ function QueryField () {
     return () => window.removeEventListener('keypress', onKeyPress)    
   }, [onKeyPress])
 
-  // focus grabber
+  // Focus grabber: previously this fired on every document click which
+  // stole focus from buttons, settings dialogs and the AI completion
+  // panel - hostile for keyboard / a11y users. Now we only re-grab focus
+  // on mousedown when the click target isn't an interactive element
+  // (button, input, textarea, link, summary, [role=button]) or inside
+  // any focus-trap container marked with [data-keep-focus] (Settings
+  // panel etc). This keeps "type anywhere and it lands in the field"
+  // behavior while letting actual UI controls keep keyboard focus.
   useEffect(() => {
-    const grabFocus = () => {
-      if (document.activeElement !== inputRef.current)
-        inputRef.current.focus()
+    const INTERACTIVE = 'button, input, textarea, select, a[href], summary, [role="button"], [contenteditable="true"], [tabindex]:not([tabindex="-1"]), [data-keep-focus], [data-keep-focus] *'
+    const grabFocus = (e) => {
+      if (!inputRef.current) return
+      if (document.activeElement === inputRef.current) return
+      const target = e.target
+      if (target && target.nodeType === 1 && target.closest && target.closest(INTERACTIVE))
+        return
+      inputRef.current.focus()
     }
 
-    document.addEventListener('click', grabFocus)
-    return () => document.removeEventListener('click', grabFocus)    
+    document.addEventListener('mousedown', grabFocus)
+    return () => document.removeEventListener('mousedown', grabFocus)
   }, [])
 
   // re-focusing the input inputField to focus on the caret
@@ -161,11 +186,25 @@ function QueryField () {
     '--font-size-suggestions': suggestionsFontSize + 'em'
   }
 
-  const input = <input 
+  const expanded = Boolean(parsedQuery.value) && suggestions.length > 0
+  const activeOptionIndex = selectedSuggestion ? suggestions.indexOf(selectedSuggestion) : -1
+  const activeDescendant = activeOptionIndex >= 0 ? suggestionOptionId(activeOptionIndex) : undefined
+
+  const input = <input
     ref={inputRef}
     value={parsedQuery.value}
     className={gC(classes['field'], !selectedSuggestion && classes['selected'])}
     onChange={e => handleQueryChange(e.target.value)}
+    role="combobox"
+    aria-label="Search"
+    aria-autocomplete="list"
+    aria-expanded={expanded}
+    aria-controls={SUGGESTIONS_LISTBOX_ID}
+    aria-activedescendant={activeDescendant}
+    autoComplete="off"
+    autoCorrect="off"
+    autoCapitalize="off"
+    spellCheck={false}
     style={{
       // hide when query is empty
       opacity: parsedQuery.value ? 1 : 0,

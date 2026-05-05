@@ -9,25 +9,35 @@ const prefixes = {
   calculator: <TbEqual strokeWidth='.1em'/>
 }
 
+// Stable id for the listbox so the input's aria-controls/activedescendant
+// can point at it. A single instance of QueryField is rendered, so a
+// constant id is fine.
+export const SUGGESTIONS_LISTBOX_ID = 'chevron-suggestions-listbox'
+export const suggestionOptionId = (index) => `chevron-suggestion-${index}`
+
 function Suggestions({ suggestions, selectedSuggestion, queryMode, buttonMode, onRedirect, setSelected }) {
   return (
-    <div 
+    <div
+      id={SUGGESTIONS_LISTBOX_ID}
+      role="listbox"
+      aria-label="Search suggestions"
       className={gC(classes['container'], classes[queryMode])}>
-      { suggestions.map((suggestion, index) => 
-        <Suggestion 
-          key={suggestion.suggestion + index} 
+      { suggestions.map((suggestion, index) =>
+        <Suggestion
+          key={suggestion.suggestion + index}
+          id={suggestionOptionId(index)}
           suggestion={suggestion}
           selected={suggestion === selectedSuggestion}
           queryMode={queryMode}
           buttonMode={buttonMode}
-          onClick={onRedirect} 
-          setSelected={setSelected}/>) 
+          onClick={onRedirect}
+          setSelected={setSelected}/>)
       }
     </div>
   )
 }
 
-const Suggestion = forwardRef(({ suggestion, selected, queryMode, buttonMode, onClick, setSelected }, ref) => {
+const Suggestion = forwardRef(({ id, suggestion, selected, queryMode, buttonMode, onClick, setSelected }, ref) => {
   const mouseMoved = useRef(false)
 
   function handleMouseMove() {
@@ -43,6 +53,9 @@ const Suggestion = forwardRef(({ suggestion, selected, queryMode, buttonMode, on
 
   const commonProps = {
     ref,
+    id,
+    role: 'option',
+    'aria-selected': selected,
     className: gC(
       classes['suggestion'],
       classes[suggestion.source + '-source'],

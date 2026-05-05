@@ -33,3 +33,11 @@
   font-family: inherit;
   cursor: default;
 }
+
+/* Visible focus ring for keyboard users only - mouse clicks don't get
+   the ring so the minimalist look is preserved for casual use. */
+.field:focus-visible {
+  outline: 2px solid var(--accent, var(--primary));
+  outline-offset: 4px;
+  border-radius: 4px;
+}

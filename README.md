@@ -404,7 +404,7 @@ The roadmap below tracks larger refactors that are too disruptive to land as dri
 
 ### Accessibility & keyboard UX
 
-- [ ] **Phase 3 — A11y pass**: combobox/listbox ARIA on the query input + suggestions; visible focus rings; `aria-activedescendant`; less aggressive focus-stealing; double-Esc full reset
+- [x] **Phase 3 — A11y pass**: combobox/listbox ARIA on the query input + suggestions; `:focus-visible` rings on the field and options; `aria-activedescendant` follows the keyboard-selected suggestion; focus-stealing tamed (mousedown only re-grabs focus when the click target isn't an interactive control or inside `[data-keep-focus]`); double-Esc fully resets (clears query + selection + AI panel and blurs the input)
 
 ### Major refactors (Phase 4+)
 

@@ -59,6 +59,12 @@
   color: var(--secondary);
 }
 
+/* Keyboard focus ring on individual options */
+.suggestion:focus-visible > div {
+  outline: 2px solid var(--accent, var(--primary));
+  outline-offset: 2px;
+}
+
 /* realistic button mode */
 /*
 .suggestion.realistic.selected > div {
