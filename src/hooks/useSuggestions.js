@@ -73,11 +73,16 @@ function useSuggestions(query, autoCompleteEngine) {
     setSuggestions([])
 
     /* autocomplete section */
-    autoCompleteEngine(query, locale).then(suggestions => {
-      // if the suggestions are outdated
-      if (query !== queryRef.current) return
-      addSuggestions(suggestions.slice(0, autocompleteLimit), 'autocomplete')
-    })
+    autoCompleteEngine(query, locale)
+      .then(suggestions => {
+        // if the suggestions are outdated
+        if (query !== queryRef.current) return
+        addSuggestions(suggestions.slice(0, autocompleteLimit), 'autocomplete')
+      })
+      .catch(err => {
+        // eslint-disable-next-line no-console
+        console.warn('[Chevron] autocomplete failed:', err)
+      })
     // ---
 
     /* history section */
@@ -87,11 +92,16 @@ function useSuggestions(query, autoCompleteEngine) {
 
     /* currency section */
     if (currencyCommonRegex.test(query))
-      fetchCurrency(query).then(response => {
-        // if the suggestions are outdated
-        if (query !== queryRef.current) return
-        response && addSuggestions([response], 'currency')
-      })
+      fetchCurrency(query)
+        .then(response => {
+          // if the suggestions are outdated
+          if (query !== queryRef.current) return
+          response && addSuggestions([response], 'currency')
+        })
+        .catch(err => {
+          // eslint-disable-next-line no-console
+          console.warn('[Chevron] currency lookup failed:', err)
+        })
     // ---
     
   }, [query, searchHistory, autoCompleteEngine, autocompleteLimit, historyLimit, addSuggestions, locale])
@@ -110,18 +120,23 @@ async function fetchCurrency(query) {
         to = codes[1].toUpperCase()
 
   if (currencyCodes.includes(from) && currencyCodes.includes(to)) {
-    const response = await axios.get(
-      'https://api.exchangerate.host/convert', 
-      { params: { from, to, amount } })
-    const { data } = response
-    
-    if (data.success && data.result)
-      return ({
-        suggestion: `${Math.round((data.result + Number.EPSILON) * 100) / 100} ${to}`,
-        type: 'currency',
-        relevance: HIGHEST_RELEVANCE
-      })
-      
+    try {
+      const response = await axios.get(
+        'https://api.exchangerate.host/convert',
+        { params: { from, to, amount }, timeout: 5000 })
+      const { data } = response
+
+      if (data.success && data.result)
+        return ({
+          suggestion: `${Math.round((data.result + Number.EPSILON) * 100) / 100} ${to}`,
+          type: 'currency',
+          relevance: HIGHEST_RELEVANCE
+        })
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.warn('[Chevron] currency request failed:', err.message || err)
+    }
+
     return null
   }
 }
