@@ -9,7 +9,10 @@ import LayoutButton from './components/LayoutButton/LayoutButton'
 // The Settings panel pulls in MUI Joy + the color picker + every setting
 // type editor; defer the chunk until the user actually opens settings.
 const Settings = lazy(() => import('./components/Settings/Settings'))
-import { BsGearFill, BsChevronRight } from 'react-icons/bs'
+// Cheatsheet is small but never needed on first paint, so lazy-load it too.
+const Cheatsheet = lazy(() => import('./components/Cheatsheet/Cheatsheet'))
+import OfflineIndicator from './components/OfflineIndicator/OfflineIndicator'
+import { BsGearFill, BsChevronRight, BsQuestionLg } from 'react-icons/bs'
 import { RiMenu5Fill } from 'react-icons/ri'
 import { allowedModes } from './rules'
 import { isMobile } from './functions/webUtils/isMobile'
@@ -28,6 +31,7 @@ function App() {
 
   /* store */
   const mode = useStateSelector(state => state.mode)
+  const query = useStateSelector(state => state.query)
   const redirected = useStateSelector(state => state.redirected)
   const timestamp = useStateSelector(state => state.timestamp)
   const updateStore = useUpdate()
@@ -35,6 +39,7 @@ function App() {
   // ---
 
   const [showSettings, setShowSettings] = useState(false)
+  const [showCheatsheet, setShowCheatsheet] = useState(false)
 
   /* handlers */
   const onContextMenuRef = useRef(null)
@@ -59,6 +64,27 @@ function App() {
         if (allowedModes.get('Chevron').has(mode))
           if (mode === 'default')
             updateStore({ mode: 'opened' })
+
+    // '?' (Shift+/) opens the cheatsheet. Because QueryField always
+    // grabs focus, restricting on `tagName === INPUT` would mean the
+    // shortcut is unreachable. Instead, only fire when the query field
+    // is empty (no in-progress search) AND the active element isn't
+    // some other editor (Settings inputs, contenteditable, etc).
+    if (e.key === '?' && !showCheatsheet) {
+      const ae = document.activeElement
+      const inOtherEditor = ae && ae !== document.body && (
+        (ae.tagName === 'INPUT' && ae.type !== 'text' /* combobox is text */) ||
+        ae.tagName === 'TEXTAREA' ||
+        ae.isContentEditable ||
+        (ae.closest && ae.closest('[data-keep-focus]'))
+      )
+      const isInQueryField = ae && ae.getAttribute && ae.getAttribute('role') === 'combobox'
+      const queryEmpty = !query
+      if (!inOtherEditor && (queryEmpty || !isInQueryField)) {
+        e.preventDefault()
+        setShowCheatsheet(true)
+      }
+    }
   }
   onContextMenuRef.current = e => {
     switchMacrosMenu()
@@ -159,6 +185,13 @@ function App() {
                           <BsGearFill/>
                       </LayoutButton>
                       <LayoutButton
+                        id='cheatsheet'
+                        style={{ left: 0, top: 0 }}
+                        onClick={() => setShowCheatsheet(true)}
+                        aria-label='Keyboard shortcuts'>
+                          <BsQuestionLg/>
+                      </LayoutButton>
+                      <LayoutButton
                         id='macros-menu'
                         style={{ right: 0, bottom: 0 }}
                         onClick={switchMacrosMenu}>
@@ -185,6 +218,10 @@ function App() {
               </div>
             </div>
       }
+      <Suspense fallback={null}>
+        <Cheatsheet open={showCheatsheet} onClose={() => setShowCheatsheet(false)} />
+      </Suspense>
+      <OfflineIndicator />
     </div>
   )
 }

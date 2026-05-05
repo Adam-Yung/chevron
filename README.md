@@ -393,37 +393,15 @@ Because of the limitations of the CORS policy, macros icons must be stored in `/
 
 ## Roadmap
 
-The roadmap below tracks larger refactors that are too disruptive to land as drive-by fixes. Smaller changes are landed directly.
+The phased improvement plan lives in **[Roadmap.md](./Roadmap.md)**.
 
-### Stability & UX (in progress)
+Currently shipped: Phases 0 → 4 (stability safety net, user-reported UX fixes, performance hardening, provider-agnostic LLM with Ollama preset, accessibility + keyboard UX, macros editor + cheatsheet + offline-safe hardening).
 
-- [x] **Phase 0 — Stability safety net**: ErrorBoundary, listener-leak fix, autocomplete/currency error handling, debounced settings persistence
-- [x] **Phase 1 — User-reported UX fixes**: Tab/Shift+Tab cycling in suggestions, return-to-blank after search (popstate/pageshow), animation perf quick wins (`will-change`, rAF-debounced resize, memoized marquee, `onAnimationComplete` instead of `setTimeout`)
-- [x] **Phase 1.5 — Performance hardening**: drop `axios` and `react-device-detect`, lazy-load Settings panel and `AIcompletion`, tighten `transition: all` to specific properties, respect `prefers-reduced-motion`, remove per-chunk `console.log` from streaming completions
-- [ ] **Phase 2 — Local LLM (Ollama) support**: make completion provider-agnostic; add Ollama preset (with no-config guardrail so Ollama is never auto-invoked unless the user has filled in `baseURL` and `model`)
+In planning: per-field macros editor UI (Phase 4.5), dependency modernization (Phase 5), bundle splitting (Phase 6), compositor-friendly visuals (Phase 7), settings schema migration (Phase 8), security hardening (Phase 9), mobile / touch (Phase 10), PWA / offline shell (Phase 11), TypeScript migration (Phase 12), test coverage (Phase 13), search-engines refactor (Phase 14).
 
-### Accessibility & keyboard UX
+> **Note on Phase 11 (PWA)**: although the Phase 4 work makes Chevron *runtime*-resilient when offline, a true service-worker-backed PWA is deliberately deferred until after Phase 6's bundle-splitting refactor. `vite-plugin-singlefile` (used by the static-zip distribution) inlines all JS into one HTML file, which is incompatible with `vite-plugin-pwa`'s service-worker model. Phase 6 introduces a separate `build:hosted` profile where the PWA can land cleanly without breaking the static release.
 
-- [x] **Phase 3 — A11y pass**: combobox/listbox ARIA on the query input + suggestions; `:focus-visible` rings on the field and options; `aria-activedescendant` follows the keyboard-selected suggestion; focus-stealing tamed (mousedown only re-grabs focus when the click target isn't an interactive control or inside `[data-keep-focus]`); double-Esc fully resets (clears query + selection + AI panel and blurs the input)
-
-### Major refactors (Phase 4+)
-
-These items each warrant their own commit / PR because they touch broad surfaces or change the dependency footprint significantly:
-
-- [ ] **Dependency modernization**: Vite 3 → 5; Framer Motion 7 → 11; `@mui/joy` `5.0.0-alpha.64` → stable v5
-- [ ] **Settings schema + migration**: validate persisted settings on load and migrate old shapes instead of trusting whatever is in `localStorage`
-- [ ] **Bundle splitting**: keep `vite-plugin-singlefile` for the static-zip release only; enable code-splitting for the hosted/dev build for better caching and faster first load
-- [ ] **Replace `react-fast-marquee`** with a pure CSS keyframe scroller (saves a dep + lets the marquee run on the compositor only)
-- [ ] **Replace `react-markdown`** with a lighter streaming-friendly renderer for AI completions
-- [ ] **Replace `colorjs.io`** in the contrast / theme paths with a small APCA helper (~10 KB → <2 KB)
-- [ ] **Replace `dateformat`** with `Intl.DateTimeFormat` (need to translate the existing format strings)
-- [ ] **SVG `d`-attribute morphing** (in `Chevron` and `QuickLook`) is not GPU-composited. Replace with a stack of pre-computed paths cross-faded by `opacity`/`transform` so the entire animation runs on the compositor
-- [ ] **Encrypted API key storage**: WebCrypto + passphrase, or a backend proxy, instead of plaintext in `localStorage`
-- [ ] **Mobile / touch first-class support**: replace the "mobile not supported" banner with a real touch layout
-- [ ] **TypeScript migration** (incremental: `allowJs: true`, port file by file)
-- [ ] **Test coverage**: Vitest + React Testing Library smoke tests for search submit, suggestion cycling, settings save/load, redirect
-- [ ] **PWA / offline**: service worker for the static build so the page works offline as a true new-tab replacement
-- [ ] **Refactor search-engines system** (already in TODO above; bigger than it looks because templates are interpolated at multiple sites)
+See [Roadmap.md](./Roadmap.md) for commit SHAs, sub-tasks, and the running list of additional ideas.
 
 ## Technologies
 

@@ -1,4 +1,4 @@
-import { useContext, useRef, useState } from 'react'
+import { useContext, useRef, useState, lazy, Suspense } from 'react'
 import { SettingsContext, SetSettingsContext } from '../../contexts/Settings'
 import { motion } from 'framer-motion'
 import { CssVarsProvider, Card, Box, Button } from '@mui/joy'
@@ -6,6 +6,10 @@ import { FiEye, FiEyeOff } from 'react-icons/fi'
 import Header from './Header/Header'
 import Category from './Category/Category'
 import settings from '../../../settings/settings'
+
+// MacrosEditor is opened from a button inside the Settings panel; keep
+// it lazy so opening Settings doesn't pay for it up front.
+const MacrosEditor = lazy(() => import('../MacrosEditor/MacrosEditor'))
 
 function Settings({ onClose }) {
   const current = useContext(SettingsContext)
@@ -15,6 +19,7 @@ function Settings({ onClose }) {
   const settingsSnapshotRef = useRef(current)
 
   const [showHidden, setShowHidden] = useState(false)
+  const [showMacrosEditor, setShowMacrosEditor] = useState(false)
   const hiddenSettings = showHidden ? [] : settings.hidden
 
   return (
@@ -102,7 +107,22 @@ function Settings({ onClose }) {
                 }  
               </Button>
               <Button
-                sx={theme => ({ 
+                sx={theme => ({
+                  borderRadius: 0,
+                  background: theme.vars.palette.background.level1,
+                  '&:focus': {
+                    outline: 'none',
+                    backgroundColor: theme.vars.palette.primary.outlinedActiveBg
+                  }
+                })}
+                fullWidth
+                variant='soft'
+                color='neutral'
+                onClick={() => setShowMacrosEditor(true)}>
+                  Edit macros
+              </Button>
+              <Button
+                sx={theme => ({
                   borderRadius: 0,
                   background: theme.vars.palette.background.level1,
                   '&:focus': {
@@ -141,6 +161,9 @@ function Settings({ onClose }) {
           </Box>
         </Card>
       </CssVarsProvider>
+      <Suspense fallback={null}>
+        <MacrosEditor open={showMacrosEditor} onClose={() => setShowMacrosEditor(false)} />
+      </Suspense>
     </motion.div>
   )
 }
