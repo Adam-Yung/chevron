@@ -91,12 +91,21 @@ const template = {
     },
     AI: {
       enabled: new types.Switch(true),
-      apiKey: new types.Input('', 'Enter your openai api key'),
+      provider: new types.List('openai', { openai: 'OpenAI', ollama: 'Ollama (local)' }),
+      // Optional override of the provider's default endpoint. Leave blank
+      // to use OpenAI's hosted API. For Ollama, set this to the Ollama
+      // server URL (typically http://localhost:11434). Trailing /v1 is
+      // optional - Chevron appends /v1/chat/completions automatically.
+      baseURL: new types.Input('', 'http://localhost:11434  (Ollama)'),
+      // Model id sent in the request. Required for Ollama (e.g. "llama3",
+      // "qwen2.5", "mistral"). Leave blank for OpenAI to use gpt-3.5-turbo.
+      model: new types.Input('', 'e.g. llama3, gpt-4o-mini'),
+      apiKey: new types.Input('', 'API key (OpenAI). Leave blank for Ollama.'),
       temperature: new types.Range(
         0.4,
         { min: 0, max: 1, step: 0.05 }
       ),
-      language: new types.Input('')      
+      language: new types.Input('')
     }
   },
   menu: {

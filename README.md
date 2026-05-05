@@ -275,13 +275,24 @@ By default, you will be redirected to the search page of the search engine, howe
 
   > macro must be `pinned`
 
-- #### **ChatGPT**:
+- #### **ChatGPT / Local LLM**:
 
-  Before using ChatGPT you need to specify your [OpenAI API key](https://platform.openai.com/account/api-keys) in `Settings` &rarr; `Query` &rarr; `AI` &rarr; `Api key`.
+  Chevron's AI completion talks to any endpoint that exposes the OpenAI v1 chat-completions schema — that includes OpenAI itself, [Ollama](https://ollama.com) in OpenAI-compatible mode, [LM Studio](https://lmstudio.ai), llama.cpp's server, vLLM, etc.
 
-  > the key is stored locally on your computer
+  Configure the provider in `Settings` &rarr; `Query` &rarr; `AI`:
 
-  To use ChatGPT integration double press <kbd><font size=3>Space</font></kbd> after you typed a query.
+  | Field | OpenAI | Ollama (local) |
+  | --- | --- | --- |
+  | **Provider** | `OpenAI` | `Ollama (local)` |
+  | **Base URL** | _(leave blank)_ | `http://localhost:11434` (Chevron appends `/v1/chat/completions` automatically) |
+  | **Model** | _(blank → `gpt-3.5-turbo`)_ or e.g. `gpt-4o-mini` | required, e.g. `llama3`, `qwen2.5`, `mistral` |
+  | **API key** | required | leave blank |
+
+  > **Local-LLM safety guardrail**: when the provider is set to `Ollama`, Chevron will **not** make any request unless **both** Base URL and Model are filled in by you. If either is blank you get a "AI not configured" hint instead of a request to localhost. This prevents Chevron from probing `localhost:11434` on machines that don't have Ollama installed.
+
+  > the API key (when used) is stored locally on your computer.
+
+  To trigger AI on the current query, double-press <kbd><font size=3>Space</font></kbd> after you've typed it.
 
 ## Configuration
 

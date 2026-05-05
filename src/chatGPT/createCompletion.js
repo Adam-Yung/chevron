@@ -1,36 +1,54 @@
-const API_URL = 'https://api.openai.com/v1/chat/completions'
-const PARAMS = {
-    model: 'gpt-3.5-turbo',
-    temperature: 0.4,
-    stream: true,
-    // max_tokens: 4096,
-    // frequency_penalty: 1.0,
+// Provider-agnostic streaming chat completion client. Talks to any
+// endpoint that exposes the OpenAI v1 SSE schema at
+// `${baseURL}/chat/completions` (OpenAI, Ollama in OpenAI-compat mode,
+// LM Studio, llama.cpp server, vLLM, etc.).
+const DEFAULTS = {
+  temperature: 0.4,
+  stream: true,
+  // max_tokens: 4096,
+  // frequency_penalty: 1.0,
 }
 
-function createCompletion(stateSetter, messages, temperature, key) {
+function buildUrl(baseURL) {
+  // Tolerate trailing slashes and trailing `/v1` so users can paste in
+  // either `http://host:port` or `http://host:port/v1`.
+  const trimmed = String(baseURL || '').trim().replace(/\/+$/, '')
+  if (/\/v\d+$/i.test(trimmed)) return `${trimmed}/chat/completions`
+  return `${trimmed}/v1/chat/completions`
+}
+
+function createCompletion(stateSetter, messages, temperature, providerConfig) {
+  const { baseURL, model, apiKey } = providerConfig
   const controller = new AbortController()
-  
-  return ({ 
+
+  const headers = { 'Content-Type': 'application/json' }
+  // Authorization is optional: OpenAI requires it, Ollama / LM Studio
+  // typically don't.
+  if (apiKey) headers['Authorization'] = 'Bearer ' + String(apiKey)
+
+  return ({
     controller,
     promise: new Promise((resolve, reject) => {
-      fetch(API_URL, {
+      fetch(buildUrl(baseURL), {
         signal: controller.signal,
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer ' + String(key)
-        },
-        body: JSON.stringify({ ...PARAMS, messages, temperature })
+        headers,
+        body: JSON.stringify({ ...DEFAULTS, model, messages, temperature })
       })
       .then(result => {
         fetchStream(
-          result.body, 
+          result.body,
           result.ok ? dataParser(stateSetter) : errorParser)
         .then(content => {
           result.ok
             ? resolve({ content, role: 'assistant' })
             : reject(content)
         })
+      })
+      .catch(err => {
+        // network error / DNS / aborted before headers
+        if (err?.name === 'AbortError') return
+        reject({ code: 'network', message: err?.message || String(err) })
       })
     })
   })
@@ -70,17 +88,19 @@ function dataParser(stateSetter) {
     for (const entry of data.split('\n'))
       if (entry) {
         const text = entry.slice(entry.indexOf(':') + 2)
+        // OpenAI/Ollama signal stream end with the literal "[DONE]"
+        if (text === '[DONE]') continue
         let response
         try {
           response = JSON.parse(text)
         } catch (error) { /* pass */ }
-  
-        if (response && typeof response.choices[0].delta.content === 'string') {
+
+        if (response && typeof response.choices?.[0]?.delta?.content === 'string') {
           if (typeof acc === 'string')
             acc += response.choices[0].delta.content
           else
             acc = response.choices[0].delta.content
-          
+
           stateSetter(acc)
         }
       }
@@ -90,16 +110,31 @@ function dataParser(stateSetter) {
 }
 
 function errorParser(data, acc) {
-  const parsed = JSON.parse(data)
-  if (!acc)
-    acc = {}
-  
-  acc.code = parsed.error.code
-  if (typeof acc.message === 'string')
-    acc.message += parsed.error.message
-  else
-    acc.message = parsed.error.message
-  
+  if (!acc) acc = {}
+  let parsed
+  try {
+    parsed = JSON.parse(data)
+  } catch (e) {
+    // non-JSON error body (e.g. Ollama plaintext); just accumulate text
+    acc.code = acc.code || 'error'
+    acc.message = (acc.message || '') + data
+    return acc
+  }
+
+  // OpenAI shape: { error: { code, message } }
+  // Ollama shape: { error: "message" }
+  const err = parsed.error
+  if (err && typeof err === 'object') {
+    acc.code = err.code || acc.code || 'error'
+    acc.message = (acc.message ? acc.message : '') + (err.message || '')
+  } else if (typeof err === 'string') {
+    acc.code = acc.code || 'error'
+    acc.message = (acc.message ? acc.message : '') + err
+  } else {
+    acc.code = acc.code || 'error'
+    acc.message = (acc.message ? acc.message : '') + (data || '')
+  }
+
   return acc
 }
 
