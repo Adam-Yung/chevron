@@ -121,7 +121,9 @@ function MacrosMenu({ visibility, fullVisibility }) {
       data-glassmorphism={glassmorphism || undefined}>
       {isEmpty ? (
         <div className={classes['empty']}>
-          no matches for <span className={classes['empty-filter']}>{macroFilter}</span>
+          <span className={classes['empty-icon']}>🔍</span>
+          <span className={classes['empty-text']}>no matches for</span>
+          <span className={classes['empty-filter']}>{macroFilter}</span>
         </div>
       ) : (
         // Key on macroFilter so Splide remounts on filter change (8a behavior,

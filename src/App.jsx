@@ -91,6 +91,12 @@ function App() {
   }
 
   onKeyDownRef.current = e => {
+    // Never intercept keys while Settings or any [data-keep-focus] panel
+    // owns the keyboard. Without this guard, Shift inside the Settings
+    // password/text fields would toggle the macro menu.
+    const ae = document.activeElement
+    if (ae && ae.closest && ae.closest('[data-keep-focus]')) return
+
     // Phase 8a: Shift = simple toggle. No tap-vs-hold distinction, no
     // peek state to track. `e.repeat` is filtered so a held Shift can't
     // re-fire the toggle while the OS is repeating the key.

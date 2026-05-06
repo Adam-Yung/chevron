@@ -1,32 +1,35 @@
+/* The pill is rendered inside Chevron's .wrapper which has font-size:5em.
+   Use px / rem instead of em so size is independent of the parent scale. */
 .pill {
   display: inline-flex;
   align-items: center;
-  gap: 0.4em;
-  padding: 0.25em 0.75em;
+  gap: 4px;
+  padding: 3px 10px;
   border-radius: 999px;
-  background: color-mix(in srgb, var(--primary) 18%, transparent);
-  border: 1px solid color-mix(in srgb, var(--primary) 30%, transparent);
+  background: color-mix(in srgb, var(--primary) 14%, transparent);
+  border: 1px solid color-mix(in srgb, var(--primary) 22%, transparent);
   color: var(--primary);
-  font-size: 0.85em;
+  font-size: 0.9rem;
   pointer-events: none;
   user-select: none;
   white-space: nowrap;
-  max-width: 100%;
+  max-width: 280px;
+  margin-bottom: 6px;
 }
 
 .query {
   font-weight: 600;
-  letter-spacing: 0.03em;
+  letter-spacing: 0.02em;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 12em;
+  max-width: 10rem;
 }
 
 .sep {
-  opacity: 0.4;
+  opacity: 0.35;
 }
 
 .count {
-  opacity: 0.65;
-  font-size: 0.9em;
+  opacity: 0.6;
+  font-size: 0.85em;
 }

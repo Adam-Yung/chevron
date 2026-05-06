@@ -1,0 +1,214 @@
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 9000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+.modal {
+  position: relative;
+  width: min(480px, 92vw);
+  border-radius: 20px;
+  background: color-mix(in srgb, var(--background, #111) 92%, white);
+  border: 1px solid color-mix(in srgb, white 10%, transparent);
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(255,255,255,0.04) inset;
+  overflow: hidden;
+  outline: none;
+  color: var(--primary, #fff);
+}
+
+/* ── Header ─────────────────────────────────────────────────────────── */
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 18px 20px 0;
+}
+
+.city {
+  font-size: 1.05em;
+  font-weight: 600;
+  opacity: 0.9;
+}
+
+.stale-badge {
+  display: inline-block;
+  margin-top: 4px;
+  font-size: 0.7em;
+  padding: 2px 7px;
+  border-radius: 20px;
+  background: color-mix(in srgb, var(--primary) 15%, transparent);
+  opacity: 0.65;
+}
+
+.close {
+  background: color-mix(in srgb, var(--primary) 12%, transparent);
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8em;
+  opacity: 0.6;
+  transition: opacity 0.15s, background 0.15s;
+  flex-shrink: 0;
+}
+.close:hover { opacity: 1; background: color-mix(in srgb, var(--primary) 22%, transparent); }
+
+/* ── Hero ────────────────────────────────────────────────────────────── */
+.hero {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 12px 20px 16px;
+}
+
+.hero-left {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 100px;
+}
+
+.hero-emoji {
+  font-size: 3.2em;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+
+.hero-temp {
+  font-size: 2.4em;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.hero-desc {
+  font-size: 0.8em;
+  opacity: 0.65;
+  text-transform: capitalize;
+  margin-top: 4px;
+  text-align: center;
+}
+
+.hero-feels {
+  font-size: 0.72em;
+  opacity: 0.4;
+  margin-top: 2px;
+}
+
+.hero-right {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-top: 4px;
+}
+
+/* ── Hi/Lo thermometers ─────────────────────────────────────────────── */
+.hilo {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.hilo-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.thermo {
+  font-size: 1em;
+  line-height: 1;
+}
+
+.hilo-label {
+  font-size: 0.75em;
+  opacity: 0.5;
+  width: 2.8em;
+}
+
+.hilo-val {
+  font-size: 1.05em;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Stats grid ──────────────────────────────────────────────────────── */
+.stats {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: color-mix(in srgb, var(--primary) 8%, transparent);
+  border-radius: 10px;
+  padding: 7px 10px;
+  min-width: 56px;
+  gap: 2px;
+}
+
+.stat-icon { font-size: 1.1em; line-height: 1; }
+.stat-val  { font-size: 0.8em; font-weight: 600; font-variant-numeric: tabular-nums; }
+.stat-label{ font-size: 0.65em; opacity: 0.45; }
+
+/* ── Forecast strip ──────────────────────────────────────────────────── */
+.forecast {
+  display: flex;
+  gap: 8px;
+  padding: 0 16px 16px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.forecast::-webkit-scrollbar { display: none; }
+
+.day-card {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  background: color-mix(in srgb, var(--primary) 7%, transparent);
+  border: 1px solid color-mix(in srgb, var(--primary) 12%, transparent);
+  border-radius: 14px;
+  padding: 10px 12px;
+  min-width: 60px;
+  transition: background 0.15s;
+}
+.day-card:hover {
+  background: color-mix(in srgb, var(--primary) 13%, transparent);
+}
+
+.day-label {
+  font-size: 0.75em;
+  font-weight: 700;
+  opacity: 0.9;
+}
+.day-date {
+  font-size: 0.62em;
+  opacity: 0.4;
+  white-space: nowrap;
+}
+.day-emoji { font-size: 1.6em; line-height: 1; margin: 2px 0; }
+.day-high  { font-size: 0.78em; font-weight: 700; font-variant-numeric: tabular-nums; }
+.day-low   { font-size: 0.72em; font-variant-numeric: tabular-nums; opacity: 0.75; }
+
+@media (prefers-reduced-motion: reduce) {
+  .backdrop, .modal { transition: none !important; animation: none !important; }
+}

@@ -1,99 +1,43 @@
-.root {
-  position: relative;
-  display: flex;
-  flex-direction: column;
+.chip {
+  display: inline-flex;
   align-items: center;
-}
-
-.current {
-  display: flex;
-  align-items: center;
-  gap: 0.3em;
+  gap: 0.15em;
   background: none;
   border: none;
   color: inherit;
   cursor: pointer;
-  padding: 0;
+  padding: 0.1em 0.3em;
+  border-radius: 6px;
   font-size: inherit;
   line-height: 1;
-  opacity: 0.85;
-  transition: opacity 0.15s;
+  opacity: 0.88;
+  transition: opacity 0.15s, background 0.15s;
+  position: relative;
 }
-.current:hover {
+.chip:hover {
   opacity: 1;
+  background: color-mix(in srgb, var(--primary) 10%, transparent);
 }
 
-.icon {
-  width: 1.6em;
-  height: 1.6em;
+.chip-icon {
+  width: 1.5em;
+  height: 1.5em;
   object-fit: contain;
   flex-shrink: 0;
 }
 
-.temp {
-  font-weight: 600;
+.chip-temp {
+  font-weight: 700;
   font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
 }
 
-.hilo {
-  font-size: 0.75em;
-  opacity: 0.6;
-  font-variant-numeric: tabular-nums;
-}
-
-.stale {
-  font-size: 1.4em;
-  line-height: 0;
-  opacity: 0.4;
-  margin-left: 0.1em;
-  color: var(--primary);
-}
-
-/* ── Forecast strip ─────────────────────────────────────────────────────── */
-.strip {
-  position: absolute;
-  top: calc(100% + 0.5em);
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  flex-direction: row;
-  gap: 0.75em;
-  background: color-mix(in srgb, var(--background, #111) 90%, transparent);
-  border: 1px solid color-mix(in srgb, var(--primary) 20%, transparent);
-  border-radius: 10px;
-  padding: 0.5em 0.75em;
-  overflow: hidden;
-  z-index: 10;
-  white-space: nowrap;
-  font-size: 0.75em;
-}
-
-.strip-day {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2px;
-  min-width: 2.5em;
-}
-
-.strip-icon {
-  width: 1.6em;
-  height: 1.6em;
-  object-fit: contain;
-}
-
-.strip-label {
-  opacity: 0.6;
-  font-size: 0.9em;
-}
-
-.strip-temp {
-  font-weight: 600;
-  font-variant-numeric: tabular-nums;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .strip {
-    transition: none !important;
-  }
+.stale-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--primary) 45%, transparent);
+  flex-shrink: 0;
+  align-self: flex-start;
+  margin-top: 2px;
 }
