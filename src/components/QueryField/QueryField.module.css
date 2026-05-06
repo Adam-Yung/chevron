@@ -34,10 +34,9 @@
   cursor: default;
 }
 
-/* Visible focus ring for keyboard users only - mouse clicks don't get
-   the ring so the minimalist look is preserved for casual use. */
+/* No focus ring on the search input — the caret and active state are
+   sufficient indicators. The field is visually dominant enough that a
+   browser-default outline would be noisy and distracting. */
 .field:focus-visible {
-  outline: 2px solid var(--accent, var(--primary));
-  outline-offset: 4px;
-  border-radius: 4px;
+  outline: none;
 }

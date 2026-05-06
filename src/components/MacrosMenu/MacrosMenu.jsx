@@ -62,10 +62,11 @@ function MacrosMenu({ visibility, fullVisibility }) {
   const sliderRef    = useRef(null)
   const containerRef = useRef(null)
 
-  // When the filter is active, collapse to 1 row so the pill never pushes
-  // cards off screen. Splide remounts on every filter change anyway (keyed
-  // on macroFilter), so this takes effect immediately without extra logic.
-  const activeRows     = macroFilter.length > 0 ? 1 : rows
+  // When the filter is active, the MacroFilterPill adds ~40px above the
+  // grid. Keep grid rows unchanged — reducing rows inflates card size.
+  // Instead, the container height is reduced via CSS data attribute so
+  // the pill + cards together fit within the available half-screen space.
+  const activeRows     = rows
   const slideCapacity  = cols * activeRows
   const isVisibleSliderHasMultipleSlides = visibleMacros.length > slideCapacity
 
@@ -159,9 +160,10 @@ function MacrosMenu({ visibility, fullVisibility }) {
   const isEmpty = macroFilter.length > 0 && visibleMacros.length === 0
 
   return (
-    <div
+      <div
       ref={containerRef}
       className={classes['container']}
+      data-filtered={macroFilter.length > 0 || undefined}
       data-glassmorphism={glassmorphism || undefined}>
       {isEmpty ? (
         <div className={classes['empty']}>

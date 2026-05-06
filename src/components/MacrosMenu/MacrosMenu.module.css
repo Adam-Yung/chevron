@@ -1,6 +1,11 @@
 :global(.splide__track) {
   height: calc(50vh - var(--menu-offset) - 44px);
 }
+/* When the filter pill is visible, shrink the grid track so cards
+   stay the same size and nothing overflows. */
+.container[data-filtered] :global(.splide__track) {
+  height: calc(50vh - var(--menu-offset) - 82px);
+}
 :global(.splide__slide__row) {
   justify-content: center;
 }
@@ -38,6 +43,10 @@
   overflow: hidden;
   border-radius: 16px;
   position: relative;
+}
+.container[data-filtered] {
+  height: calc(50vh - var(--menu-offset) - 82px);
+  margin-top: 4px;
 }
 
 @supports (backdrop-filter: blur(1px)) {
