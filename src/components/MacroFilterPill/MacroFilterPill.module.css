@@ -1,35 +1,51 @@
-/* The pill is rendered inside Chevron's .wrapper which has font-size:5em.
-   Use px / rem instead of em so size is independent of the parent scale. */
+/* Filter pill — glass capsule that appears above the macro grid.
+   Uses rem/px so it's independent of the 5em wrapper font-size. */
 .pill {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  padding: 3px 10px;
+  gap: 5px;
+  padding: 4px 12px;
   border-radius: 999px;
-  background: color-mix(in srgb, var(--primary) 14%, transparent);
-  border: 1px solid color-mix(in srgb, var(--primary) 22%, transparent);
+  /* Glass backing */
+  background: color-mix(in srgb, var(--primary) 10%, transparent);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.22), 0 1px 0 rgba(255,255,255,0.06) inset;
   color: var(--primary);
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   pointer-events: none;
   user-select: none;
   white-space: nowrap;
-  max-width: 280px;
+  max-width: 300px;
   margin-bottom: 6px;
+}
+@supports (backdrop-filter: blur(1px)) {
+  .pill {
+    backdrop-filter: blur(16px) saturate(1.4);
+    -webkit-backdrop-filter: blur(16px) saturate(1.4);
+    background: color-mix(in srgb, var(--primary) 8%, transparent);
+  }
+}
+body[data-color-scheme=light] .pill {
+  background: rgba(255,255,255,0.55);
+  border-color: rgba(0,0,0,0.1);
+  box-shadow: 0 2px 12px rgba(0,0,0,0.1);
 }
 
 .query {
-  font-weight: 600;
-  letter-spacing: 0.02em;
+  font-weight: 700;
+  letter-spacing: 0.03em;
   overflow: hidden;
   text-overflow: ellipsis;
   max-width: 10rem;
 }
 
 .sep {
-  opacity: 0.35;
+  opacity: 0.3;
+  font-size: 0.85em;
 }
 
 .count {
-  opacity: 0.6;
-  font-size: 0.85em;
+  opacity: 0.55;
+  font-size: 0.82em;
+  font-variant-numeric: tabular-nums;
 }
