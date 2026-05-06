@@ -135,6 +135,15 @@ const template = {
       ),
       format: new types.Input('h:mm', undefined, { description: "Clock format string. Tokens: HH/H, hh/h, MM/M, mm/m, ss/s, dd/d, TT/tt, yyyy/yy." })
     }
+  },
+  weather: {
+    apiKey:       new types.Input('', undefined, { description: 'OpenWeatherMap API key. Free tier at openweathermap.org — 60 calls/min, no credit card required.' }),
+    city:         new types.Input('', undefined, { description: 'City name. Use the Resolve button to auto-fill coordinates.' }),
+    // lat/lon are auto-filled by the geocoding flow and hidden from the main UI
+    lat:          new types.Input('', undefined, { description: 'Latitude (auto-filled by Resolve).' }),
+    lon:          new types.Input('', undefined, { description: 'Longitude (auto-filled by Resolve).' }),
+    units:        new types.List('metric', ['metric', 'imperial', 'standard'], { description: 'Temperature units: metric (°C), imperial (°F), or standard (K).' }),
+    forecastDays: new types.Range(5, { min: 0, max: 7 }, { description: 'Number of forecast days to show on hover. 0 = current conditions only.' })
   }
 }
 
@@ -142,7 +151,9 @@ const hidden = [
   'general.redirectTarget',
   'appearance.style',
   'chevron.quickLook.topCurvature',
-  'chevron.quickLook.bottomCurvature'
+  'chevron.quickLook.bottomCurvature',
+  'weather.lat',
+  'weather.lon'
 ]
 
 class Settings {

@@ -359,7 +359,7 @@ animations land on top of compositor-only primitives.
        menu, ≥56 px hit targets, optional glassmorphism behind a
        `@supports` query + opt-in settings switch (off by default),
        MacrosEditor icon picker.
-- [ ] **8d Weather widget** — lazy chunk; OpenWeatherMap geocoding +
+- [x] **8d Weather widget** — lazy chunk; OpenWeatherMap geocoding +
        `/weather` + `/forecast`; `LocalStorageObject` TTL cache; new
        `weather` settings tab with a "resolve coordinates" flow; today-
        only by default, slide-down 5-day strip on hover/tap.
