@@ -12,7 +12,7 @@ import { BsSun, BsMoon } from 'react-icons/bs'
 import { Theme } from '../../../../settings/settingTypes'
 import { getPropertyByPath } from '../../../functions/dataUtils/propertyByPath'
 
-function Category({ path, template, current, hidden, onChange, visibility=true }) {
+function Category({ path, template, current, hidden, onChange, visibility=true, hideOwnTitle=false }) {
   const pathArray = path.split('.')
 
   // is the category nested in other category
@@ -25,8 +25,13 @@ function Category({ path, template, current, hidden, onChange, visibility=true }
   const [innerPath, setInnerPath] = useState(isTheme ? (document.body.getAttribute('data-color-scheme') || 'light') : '')
   const itemsPath = innerPath ? path + '.' + innerPath : path
 
+  // The new Settings modal renders its own pane title, so suppress
+  // the top-level header when embedded there. Theme still needs its
+  // light/dark switcher visible in that case.
+  const showHeader = !hideOwnTitle || nested || isTheme
+
   return <>
-    <Box
+    {showHeader && <Box
       onClick={nested ? () => setIsOpened(isOpened => !isOpened) : null}
       sx={{
         display: visibility ? 'flex' : 'none',
@@ -35,20 +40,20 @@ function Category({ path, template, current, hidden, onChange, visibility=true }
         px: 2,
         py: 1
       }}>
-        <Typography
-          level={nested ? 'h5' : 'h4'} 
+        {!hideOwnTitle && <Typography
+          level={nested ? 'h5' : 'h4'}
           sx={{textTransform: isTheme ? undefined : 'capitalize' }}>
             {name}
-        </Typography>
+        </Typography>}
         { isTheme && <ThemeControl selected={innerPath} onSetSelected={() => setInnerPath(si => si === 'light' ? 'dark' : 'light')}/> }
-        { 
+        {
           nested && <Button variant='plain' color='neutral' sx={{ml: 'auto'}}>
               <FiChevronRight
                 size='1.5em'
-                style={isOpened ? { transform: 'rotate(90deg)' } : null}/> 
+                style={isOpened ? { transform: 'rotate(90deg)' } : null}/>
             </Button>
         }
-    </Box>
+    </Box>}
     {
       isOpened && <List
           variant='solid'

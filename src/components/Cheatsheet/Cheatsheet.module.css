@@ -1,6 +1,6 @@
 /* Cheatsheet — full-screen modal overlay listing every hotkey.
-   Keep paint light (transform/opacity only) to play well with Phase 1
-   compositor-friendly defaults. */
+   Visual language matches the MacrosEditor / Settings modal so the
+   two help surfaces feel like one family. */
 
 .backdrop {
   position: fixed;
@@ -17,74 +17,114 @@
   background: var(--secondary, #111);
   color: var(--query, #eee);
   border-radius: 16px;
-  padding: 24px 28px;
-  width: min(560px, 92vw);
-  max-height: 85vh;
-  overflow-y: auto;
+  width: min(720px, 92vw);
+  max-height: 88vh;
+  display: flex;
+  flex-direction: column;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45);
   font-family: inherit;
   outline: none;
+  overflow: hidden;
 }
 
-.title {
-  margin: 0 0 12px 0;
-  font-size: 1.4em;
-  font-weight: 600;
+.header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
+  padding: 18px 22px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.title {
+  margin: 0;
+  font-size: 1.25em;
+  font-weight: 600;
+  line-height: 1.2;
 }
 
 .closeButton {
   background: transparent;
   border: 0;
   color: inherit;
-  font-size: 1em;
   cursor: pointer;
-  padding: 6px 10px;
+  padding: 6px;
   border-radius: 8px;
-  opacity: 0.75;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.7;
+  transition: background 0.15s ease, opacity 0.15s ease;
 }
 .closeButton:hover {
   opacity: 1;
-  background: rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, 0.08);
 }
 .closeButton:focus-visible {
   outline: 2px solid var(--accent, var(--primary));
   outline-offset: 2px;
 }
 
+.body {
+  padding: 12px 22px 22px 22px;
+  overflow-y: auto;
+}
+
 .section {
-  margin-top: 16px;
+  margin-top: 18px;
 }
-.section h3 {
-  margin: 0 0 8px 0;
-  font-size: 0.95em;
+.section:first-child {
+  margin-top: 6px;
+}
+.sectionTitle {
+  margin: 0 0 8px 2px;
+  font-size: 0.78em;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
-  opacity: 0.65;
-  font-weight: 500;
+  letter-spacing: 0.08em;
+  opacity: 0.6;
+  font-weight: 600;
 }
 
-.row {
-  display: flex;
-  align-items: baseline;
-  gap: 12px;
-  padding: 6px 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-}
-.row:last-child {
-  border-bottom: 0;
+.table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 10px;
+  overflow: hidden;
+  table-layout: fixed;
 }
 
-.keys {
-  flex-shrink: 0;
+.row > td {
+  padding: 10px 14px;
+  vertical-align: middle;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+.row:first-child > td {
+  border-top: 0;
+}
+
+.keysCell {
+  width: 38%;
+  background: rgba(255, 255, 255, 0.025);
+}
+
+.comboLine {
   display: flex;
   align-items: center;
-  gap: 4px;
-  min-width: 140px;
   flex-wrap: wrap;
+  gap: 4px;
+  padding: 2px 0;
+}
+.comboLine + .comboLine {
+  margin-top: 2px;
+}
+
+.combo {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
 }
 
 .kbd {
@@ -92,32 +132,27 @@
   padding: 2px 8px;
   border-radius: 5px;
   background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.05) inset, 0 1px 1px rgba(0, 0, 0, 0.25);
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-  font-size: 0.85em;
+  font-size: 0.82em;
   line-height: 1.4;
 }
 
 .plus {
-  opacity: 0.5;
-  font-size: 0.85em;
-}
-
-.label {
-  flex: 1;
-  font-size: 0.95em;
-  opacity: 0.9;
-}
-
-.footer {
-  margin-top: 18px;
-  text-align: center;
-  font-size: 0.8em;
   opacity: 0.55;
+  font-size: 0.85em;
+  padding: 0 1px;
+}
+
+.labelCell {
+  font-size: 0.93em;
+  opacity: 0.92;
+  line-height: 1.4;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .backdrop, .dialog {
+  .backdrop, .dialog, .closeButton {
     transition: none !important;
     animation: none !important;
   }

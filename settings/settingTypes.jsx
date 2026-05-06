@@ -17,6 +17,8 @@ export class SettingType {
     this.defaultValue = defaultValue ?? undefined
     this.format = typeof options.format === 'string' ? options.format : null
     this.scale = typeof options.scale === 'number' ? options.scale : null
+    // Optional one-line hint shown under the field title in the Settings UI.
+    this.description = typeof options.description === 'string' ? options.description : null
   }
 
   static getOtherSetting(location, destination, current) {

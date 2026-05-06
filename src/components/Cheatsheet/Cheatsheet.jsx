@@ -1,4 +1,5 @@
 import { useEffect, useRef, useCallback, memo } from 'react'
+import { FiX } from 'react-icons/fi'
 import classes from './Cheatsheet.module.css'
 
 /**
@@ -6,8 +7,9 @@ import classes from './Cheatsheet.module.css'
  * Adding a new shortcut anywhere in the app should add a row here as
  * well — Phase 13 (test coverage) will assert this stays in sync.
  *
- * `keys` is an array of arrays so multi-key combos render as e.g.
- * [Shift] + [/]. Bare strings render as single keys.
+ * `keys` is an array of arrays: each inner array is one combo
+ * ([key1, key2, …]). Multiple combos render as alternative lines
+ * within the same shortcut cell.
  */
 const SECTIONS = [
   {
@@ -59,18 +61,13 @@ function Kbd({ k }) {
   return <kbd className={classes['kbd']}>{display}</kbd>
 }
 
-function Combo({ keys }) {
+function Combo({ combo }) {
   return (
-    <span className={classes['keys']}>
-      {keys.map((combo, ci) => (
-        <span key={ci} className={classes['keys']}>
-          {ci > 0 && <span className={classes['plus']}>or</span>}
-          {combo.map((key, ki) => (
-            <span key={ki} className={classes['keys']}>
-              {ki > 0 && <span className={classes['plus']}>+</span>}
-              <Kbd k={key} />
-            </span>
-          ))}
+    <span className={classes['combo']}>
+      {combo.map((key, ki) => (
+        <span key={ki} className={classes['combo']}>
+          {ki > 0 && <span className={classes['plus']}>+</span>}
+          <Kbd k={key} />
         </span>
       ))}
     </span>
@@ -149,32 +146,41 @@ function Cheatsheet({ open, onClose }) {
         onClick={(e) => e.stopPropagation()}
         onKeyDown={handleKeyDown}
       >
-        <h2 className={classes['title']}>
-          <span>Keyboard shortcuts</span>
+        <header className={classes['header']}>
+          <h2 className={classes['title']}>Keyboard shortcuts</h2>
           <button
             type="button"
             className={classes['closeButton']}
             onClick={onClose}
             aria-label="Close cheatsheet"
+            title="Close (Esc)"
           >
-            Close (Esc)
+            <FiX size="1.25em" />
           </button>
-        </h2>
+        </header>
 
-        {SECTIONS.map(section => (
-          <section key={section.title} className={classes['section']}>
-            <h3>{section.title}</h3>
-            {section.rows.map((row, ri) => (
-              <div key={ri} className={classes['row']}>
-                <Combo keys={row.keys} />
-                <span className={classes['label']}>{row.label}</span>
-              </div>
-            ))}
-          </section>
-        ))}
-
-        <div className={classes['footer']}>
-          Press <kbd className={classes['kbd']}>?</kbd> to toggle this anytime.
+        <div className={classes['body']}>
+          {SECTIONS.map(section => (
+            <section key={section.title} className={classes['section']}>
+              <h3 className={classes['sectionTitle']}>{section.title}</h3>
+              <table className={classes['table']}>
+                <tbody>
+                  {section.rows.map((row, ri) => (
+                    <tr key={ri} className={classes['row']}>
+                      <td className={classes['keysCell']}>
+                        {row.keys.map((combo, ci) => (
+                          <div key={ci} className={classes['comboLine']}>
+                            <Combo combo={combo} />
+                          </div>
+                        ))}
+                      </td>
+                      <td className={classes['labelCell']}>{row.label}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </section>
+          ))}
         </div>
       </div>
     </div>

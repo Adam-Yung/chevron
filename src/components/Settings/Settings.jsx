@@ -1,170 +1,221 @@
-import { useContext, useRef, useState, lazy, Suspense } from 'react'
+import { useContext, useRef, useState, useEffect, useCallback, useMemo } from 'react'
 import { SettingsContext, SetSettingsContext } from '../../contexts/Settings'
-import { motion } from 'framer-motion'
-import { CssVarsProvider, Card, Box, Button } from '@mui/joy'
-import { FiEye, FiEyeOff } from 'react-icons/fi'
-import Header from './Header/Header'
+import { CssVarsProvider } from '@mui/joy'
+import { FiX, FiEye, FiEyeOff, FiSettings, FiLayout, FiZap, FiSearch, FiGrid, FiCommand, FiRotateCcw, FiTrash2 } from 'react-icons/fi'
 import Category from './Category/Category'
+import MacrosEditorBody from '../MacrosEditor/MacrosEditorBody'
 import settings from '../../../settings/settings'
+import classes from './Settings.module.css'
+import camelCaseToTitle from '../../functions/dataUtils/camelCaseToTitle'
 
-// MacrosEditor is opened from a button inside the Settings panel; keep
-// it lazy so opening Settings doesn't pay for it up front.
-const MacrosEditor = lazy(() => import('../MacrosEditor/MacrosEditor'))
+/**
+ * Centerstage Settings modal.
+ *
+ * Layout:
+ *   ┌─────────────────────────────────────────────┐
+ *   │  Settings                              [X]  │   header
+ *   ├──────────────┬──────────────────────────────┤
+ *   │  General     │   Active pane                │
+ *   │  Appearance  │   (category fields with      │
+ *   │  Chevron     │    inline title + descr.)    │
+ *   │  Query       │                              │
+ *   │  Menu        │                              │
+ *   │  Macros      │                              │
+ *   │  …           │                              │
+ *   │  ─────       │                              │
+ *   │  Show hidden │                              │
+ *   │  Reset       │                              │
+ *   │  Clean hist. │                              │
+ *   └──────────────┴──────────────────────────────┘
+ *
+ * Macros tab embeds MacrosEditorBody directly so the user no longer
+ * needs to open a second modal. All settings auto-persist via the
+ * SettingsProvider's debounced effect, so clicking [X] simply closes.
+ *
+ * The user-facing semantics for "discard": the previous panel offered
+ * apply/cancel buttons. We replaced that with auto-save + the
+ * Reset settings action in the sidebar. The X is a pure close.
+ */
+
+const TAB_ICONS = {
+  general: FiSettings,
+  appearance: FiLayout,
+  chevron: FiZap,
+  query: FiSearch,
+  menu: FiGrid,
+  macros: FiCommand
+}
 
 function Settings({ onClose }) {
   const current = useContext(SettingsContext)
   const setCurrent = useContext(SetSettingsContext)
 
-  // to restore settings if user wants to decline changes
-  const settingsSnapshotRef = useRef(current)
+  const dialogRef = useRef(null)
+  const lastFocusedRef = useRef(null)
 
   const [showHidden, setShowHidden] = useState(false)
-  const [showMacrosEditor, setShowMacrosEditor] = useState(false)
   const hiddenSettings = showHidden ? [] : settings.hidden
 
+  // Tabs: every top-level category from the settings template, plus a
+  // synthetic "macros" tab that hosts the MacrosEditor body.
+  const tabs = useMemo(() => {
+    const categories = Object.keys(settings.template).filter(k => !hiddenSettings.includes(k))
+    return [...categories, 'macros']
+  }, [hiddenSettings])
+
+  const [activeTab, setActiveTab] = useState(tabs[0] || 'general')
+
+  // If the active tab disappears (showHidden toggle pruning), fall back.
+  useEffect(() => {
+    if (!tabs.includes(activeTab)) setActiveTab(tabs[0])
+  }, [tabs, activeTab])
+
+  // Focus + Esc handling.
+  useEffect(() => {
+    lastFocusedRef.current = document.activeElement
+    const id = window.requestAnimationFrame(() => dialogRef.current?.focus())
+    return () => {
+      window.cancelAnimationFrame(id)
+      if (lastFocusedRef.current?.focus)
+        try { lastFocusedRef.current.focus() } catch { /* ignore */ }
+    }
+  }, [])
+
+  const handleKeyDown = useCallback((e) => {
+    if (e.key === 'Escape') {
+      e.stopPropagation()
+      e.preventDefault()
+      onClose()
+    }
+  }, [onClose])
+
+  const handleResetSettings = useCallback(() => {
+    if (!confirm('Reset all settings to defaults? This will reload the page.')) return
+    localStorage.removeItem('settings')
+    location.reload()
+  }, [])
+
+  const handleCleanHistory = useCallback(() => {
+    if (!confirm('Clear search history? This will reload the page.')) return
+    localStorage.removeItem('history')
+    location.reload()
+  }, [])
+
+  const renderPane = () => {
+    if (activeTab === 'macros') {
+      return (
+        <>
+          <h3 className={classes['paneTitle']}>Macros</h3>
+          <p className={classes['paneSubtitle']}>
+            Edit macros, commands, and search engines. Saved to localStorage; bundled config is the fallback.
+          </p>
+          <MacrosEditorBody />
+        </>
+      )
+    }
+    return (
+      <>
+        <h3 className={classes['paneTitle']}>{camelCaseToTitle(activeTab, true)}</h3>
+        <Category
+          path={activeTab}
+          hidden={hiddenSettings}
+          template={settings.template}
+          current={current}
+          onChange={setCurrent}
+          hideOwnTitle
+        />
+      </>
+    )
+  }
+
   return (
-    <motion.div
-      key='settings'
-      transition={{duration: .25}}
-      initial={{x: '100%'}}
-      animate={{x: 0}}
-      exit={{x: '100%'}}
-      style={{
-        position: 'absolute',
-        height: '100vh',
-        display: 'flex',
-        alignItems: 'center',
-        top: 0,
-        right: 0,
-        zIndex: 99
-      }}>
-      <CssVarsProvider>
-        <Card
-          sx={theme => ({
-            p: 0,
-            m: '0 1em',
-            height: 'calc(100vh - 1em * 2)',
-            overflow: 'hidden',
-            minWidth: '300px',
-            borderRadius: '15px',
-            boxShadow: '-5px 5px 10px #0003',
-            background: theme.vars.palette.background.body
-          })}>
-          <Header 
-            title='Settings' 
-            onCancel={() => {
-              // restore settings
-              setCurrent(settingsSnapshotRef.current)
-              onClose()
-            }} 
-            onApply={onClose}/>
-          <Box sx={{
-            overflowX: 'hidden',
-            overflowY: 'auto',
-            px: 2,
-            '&::-webkit-scrollbar': {
-              width: 0
-            }
-          }}>
-            <Header title='Settings' isPlaceholder/>
-            {
-              Object.entries(settings.template).map(([category]) => {
-                if (hiddenSettings.includes(category))
-                  return null
-                return <Category
-                  key={category}
-                  path={category}
-                  hidden={hiddenSettings}
-                  template={settings.template}
-                  current={current}
-                  onChange={setCurrent}/>
-              })
-            }
-            <Box 
-            sx={{
-              display: 'flex',
-              justifyContent: 'space-evenly',
-              borderRadius: '12px 12px 0 0',
-              overflow: 'hidden'
-            }}>
-              <Button
-                sx={theme => ({ 
-                  borderRadius: 0,
-                  background: theme.vars.palette.background.level1,
-                  '&:focus': {
-                    outline: 'none',
-                    backgroundColor: theme.vars.palette.primary.outlinedActiveBg
-                  }
-                })}
-                fullWidth
-                variant='soft'
-                color='neutral'
-                onClick={() => setShowHidden(sH => !sH)}>
-                {
-                  showHidden
-                    ? <FiEye size='1.5em'/>
-                    : <FiEyeOff size='1.5em'/>
-                }  
-              </Button>
-              <Button
-                sx={theme => ({
-                  borderRadius: 0,
-                  background: theme.vars.palette.background.level1,
-                  '&:focus': {
-                    outline: 'none',
-                    backgroundColor: theme.vars.palette.primary.outlinedActiveBg
-                  }
-                })}
-                fullWidth
-                variant='soft'
-                color='neutral'
-                onClick={() => setShowMacrosEditor(true)}>
-                  Edit macros
-              </Button>
-              <Button
-                sx={theme => ({
-                  borderRadius: 0,
-                  background: theme.vars.palette.background.level1,
-                  '&:focus': {
-                    outline: 'none',
-                    backgroundColor: theme.vars.palette.primary.outlinedActiveBg
-                  }
-                })}
-                fullWidth
-                variant='soft'
-                color='neutral'
-                onClick={() => {
-                  localStorage.removeItem('settings')
-                  location.reload()
-                }}>
-                  Reset settings
-              </Button>
-              <Button
-                sx={theme => ({ 
-                  borderRadius: 0,
-                  background: theme.vars.palette.background.level1,
-                  '&:focus': {
-                    outline: 'none',
-                    backgroundColor: theme.vars.palette.primary.outlinedActiveBg
-                  }
-                })}
-                fullWidth
-                variant='soft'
-                color='neutral'
-                onClick={() => {
-                  localStorage.removeItem('history')
-                  location.reload()
-                }}>
-                  Clean history
-              </Button>
-            </Box>
-          </Box>
-        </Card>
-      </CssVarsProvider>
-      <Suspense fallback={null}>
-        <MacrosEditor open={showMacrosEditor} onClose={() => setShowMacrosEditor(false)} />
-      </Suspense>
-    </motion.div>
+    <div
+      className={classes['backdrop']}
+      onClick={onClose}
+      data-keep-focus="true"
+    >
+      <div
+        ref={dialogRef}
+        role="dialog"
+        aria-modal="true"
+        aria-label="Settings"
+        tabIndex={-1}
+        className={classes['dialog']}
+        onClick={(e) => e.stopPropagation()}
+        onKeyDown={handleKeyDown}
+      >
+        <div className={classes['header']}>
+          <h2 className={classes['title']}>Settings</h2>
+          <button
+            type="button"
+            className={classes['closeButton']}
+            onClick={onClose}
+            aria-label="Close settings"
+            title="Close (Esc)"
+          >
+            <FiX size="1.25em" />
+          </button>
+        </div>
+
+        <div className={classes['body']}>
+          <nav className={classes['sidebar']} aria-label="Settings sections">
+            {tabs.map(tab => {
+              const Icon = TAB_ICONS[tab]
+              const isActive = tab === activeTab
+              return (
+                <button
+                  key={tab}
+                  type="button"
+                  role="tab"
+                  aria-selected={isActive}
+                  className={`${classes['tab']}${isActive ? ' ' + classes['active'] : ''}`}
+                  onClick={() => setActiveTab(tab)}
+                >
+                  {Icon && <span className={classes['tabIcon']}><Icon /></span>}
+                  {camelCaseToTitle(tab, true)}
+                </button>
+              )
+            })}
+
+            <hr className={classes['sidebarDivider']} />
+
+            <button
+              type="button"
+              className={classes['sidebarAction']}
+              onClick={() => setShowHidden(s => !s)}
+              title={showHidden ? 'Hide advanced fields' : 'Show advanced fields'}
+            >
+              <span className={classes['tabIcon']}>
+                {showHidden ? <FiEye /> : <FiEyeOff />}
+              </span>
+              {showHidden ? 'Hide advanced' : 'Show advanced'}
+            </button>
+            <button
+              type="button"
+              className={classes['sidebarAction']}
+              onClick={handleResetSettings}
+            >
+              <span className={classes['tabIcon']}><FiRotateCcw /></span>
+              Reset settings
+            </button>
+            <button
+              type="button"
+              className={`${classes['sidebarAction']} ${classes['danger']}`}
+              onClick={handleCleanHistory}
+            >
+              <span className={classes['tabIcon']}><FiTrash2 /></span>
+              Clean history
+            </button>
+          </nav>
+
+          <CssVarsProvider>
+            <main className={classes['pane']} role="tabpanel">
+              {renderPane()}
+            </main>
+          </CssVarsProvider>
+        </div>
+      </div>
+    </div>
   )
 }
 

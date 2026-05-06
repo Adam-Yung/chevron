@@ -51,6 +51,13 @@ function App() {
   // visual artifacts. We also use it to make sure pressing Shift while the
   // menu is already open via the button or context menu does NOT close it.
   const shiftPeekingRef = useRef(false)
+  // Live mirror of `mode` so handlers don't read a stale value from their
+  // captured render closure. The previous bug: keydown dispatched
+  // mode→'opened', then keyup fired before the next render — keyup's
+  // closure still saw mode==='default' so its `mode === 'opened'` guard
+  // failed and the menu was left stuck open.
+  const modeRef = useRef(mode)
+  useEffect(() => { modeRef.current = mode }, [mode])
 
   function switchMacrosMenu() {
     if (mode === 'default')
@@ -63,14 +70,18 @@ function App() {
     if (e.key !== 'Shift') return
     if (!shiftPeekingRef.current) return
     shiftPeekingRef.current = false
-    if (allowedModes.get('Chevron').has(mode) && mode === 'opened')
-      updateStore({ mode: 'default' })
+    // We opened the menu via peek, so close it. Don't gate on `mode`
+    // here — by the time keyup arrives the dispatched keydown update
+    // may not have rendered yet, and the stale mode would block the
+    // close. setting mode to 'default' is idempotent.
+    updateStore({ mode: 'default' })
   }
   onKeyDownRef.current = e => {
     // Ignore OS-level key auto-repeat so a long-held Shift doesn't keep
     // re-triggering the open animation.
     if (e.key === 'Shift' && !e.repeat && !shiftPeekingRef.current) {
-      if (allowedModes.get('Chevron').has(mode) && mode === 'default') {
+      const liveMode = modeRef.current
+      if (allowedModes.get('Chevron').has(liveMode) && liveMode === 'default') {
         shiftPeekingRef.current = true
         updateStore({ mode: 'opened' })
       }
@@ -179,50 +190,48 @@ function App() {
     <div className='app'>
       {
         !isMobile || ignoreMobile
-          ? <AnimatePresence>
-              {
-                showSettings
-                  ? <Suspense key='settings' fallback={null}>
-                      <Settings onClose={() => {
-                        setShowSettings(false)
-                        resetStore()}}/>
-                    </Suspense>
-                  : 
-                  <motion.div 
-                    key={timestamp}
-                    className={classes['container']} 
-                    initial={{ opacity: 0 }} 
-                    animate={{ opacity: 1 }} 
-                    exit={redirected || { opacity: 0 }}>
-                      <ActiveElements/>
-                      <QueryField/>
-                      <LayoutButton
-                        id='settings'
-                        style={{ right: 0, top: 0 }}
-                        onClick={() => setShowSettings(state => !state)}>
-                          <BsGearFill/>
-                      </LayoutButton>
-                      <LayoutButton
-                        id='cheatsheet'
-                        style={{ left: 0, top: 0 }}
-                        onClick={() => setShowCheatsheet(true)}
-                        aria-label='Keyboard shortcuts'>
-                          <BsQuestionLg/>
-                      </LayoutButton>
-                      <LayoutButton
-                        id='macros-menu'
-                        style={{ right: 0, bottom: 0 }}
-                        onClick={switchMacrosMenu}>
-                          {
-                            mode === 'default' && <RiMenu5Fill/>
-                          }
-                          {
-                            mode === 'opened' && <BsChevronRight/>
-                          }
-                      </LayoutButton>
-                  </motion.div>
-              }
-            </AnimatePresence>
+          ? <>
+              <AnimatePresence>
+                <motion.div
+                  key={timestamp}
+                  className={classes['container']}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={redirected || { opacity: 0 }}>
+                    <ActiveElements/>
+                    <QueryField/>
+                    <LayoutButton
+                      id='settings'
+                      style={{ right: 0, top: 0 }}
+                      onClick={() => setShowSettings(state => !state)}>
+                        <BsGearFill/>
+                    </LayoutButton>
+                    <LayoutButton
+                      id='cheatsheet'
+                      style={{ left: 0, top: 0 }}
+                      onClick={() => setShowCheatsheet(true)}
+                      aria-label='Keyboard shortcuts'>
+                        <BsQuestionLg/>
+                    </LayoutButton>
+                    <LayoutButton
+                      id='macros-menu'
+                      style={{ right: 0, bottom: 0 }}
+                      onClick={switchMacrosMenu}>
+                        {
+                          mode === 'default' && <RiMenu5Fill/>
+                        }
+                        {
+                          mode === 'opened' && <BsChevronRight/>
+                        }
+                    </LayoutButton>
+                </motion.div>
+              </AnimatePresence>
+              {showSettings && (
+                <Suspense fallback={null}>
+                  <Settings onClose={() => setShowSettings(false)} />
+                </Suspense>
+              )}
+            </>
           : <div className={classes['mobile-warning']}>
               <div>
                 Mobile devices are not supported :( <br />
