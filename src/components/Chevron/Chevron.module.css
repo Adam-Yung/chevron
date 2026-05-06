@@ -9,8 +9,6 @@
 .wrapper {
   display: flex;
   justify-content: center;
-  flex-direction: column;
-  align-items: center;
   width: 100%;
   height: calc(50vh - var(--menu-offset));
   font-size: 5em;
@@ -18,9 +16,14 @@
   overflow: hidden;
   z-index: 1;
 }
+/* Top wrapper: ChevronTop sits at the bottom edge so translateY('100%')
+   slides it just below the overflow:hidden boundary when menu is closed. */
 .wrapper:first-child {
   align-items: end;
 }
+/* Bottom wrapper: MacroFilterPill + MacrosMenu sit at the top edge so
+   translateY('-100%') slides them just above the boundary when closed.
+   The pill and menu are block elements and stack naturally. */
 .wrapper:last-child {
   align-items: start;
 }
@@ -28,7 +31,7 @@
   width: 100%;
   text-align: center;
 }
-/* The filter pill is inline and should not be stretched to full width. */
+/* The filter pill is inline — don't stretch it to full width. */
 .wrapper > :global([data-keep-focus]) {
   width: auto;
 }

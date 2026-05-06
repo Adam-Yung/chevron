@@ -7,27 +7,9 @@ import { Grid } from '@splidejs/splide-extension-grid'
 import { motion } from 'framer-motion'
 import Card from '../Card/Card'
 import { allowedModes } from '../../rules'
+import { pinnedMacros, score } from './macroData'
 import classes from './MacrosMenu.module.css'
 import '@splidejs/react-splide/css'
-
-export const pinnedMacros = window.CONFIG.macros.filter(m => m.pinned)
-
-// Phase 8c: ranked prefix+substring scorer replacing the plain .includes()
-// check from 8a. Exported so MacroFilterPill can compute the result count
-// without duplicating the logic.
-export function score(macro, needle) {
-  const name     = (macro.name     || '').toLowerCase()
-  const category = (macro.category || '').toLowerCase()
-  const triggers = (macro.triggers || []).map(t => t.toLowerCase())
-
-  if (name === needle)                          return 100
-  if (name.startsWith(needle))                  return 80
-  if (triggers.includes(needle))                return 70
-  if (triggers.some(t => t.startsWith(needle))) return 60
-  if (name.includes(needle))                    return 40
-  if (category.includes(needle))                return 20
-  return 0
-}
 
 // Phase 8c: framer-motion stagger variants for the card grid.
 // Built on opacity+translateY only (compositor-safe, Phase 7 spirit).

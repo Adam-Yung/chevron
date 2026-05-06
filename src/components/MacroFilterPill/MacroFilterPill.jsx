@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { useStateSelector } from '../../contexts/Store'
 import { AnimatePresence, motion } from 'framer-motion'
-import { pinnedMacros, score } from '../MacrosMenu/MacrosMenu'
+import { pinnedMacros, score } from '../MacrosMenu/macroData'
 import classes from './MacroFilterPill.module.css'
 
 // Phase 8c: floating pill that appears above the macros menu whenever the
