@@ -156,7 +156,10 @@ function QueryField () {
         spacebarLastPressRef.current = Date.now()
       }
 
-      if (document.activeElement !== inputRef.current)
+      // Phase 8e: don't steal focus from touch devices — the user is
+      // tapping the screen, not typing with a hardware keyboard.
+      if (document.activeElement !== inputRef.current &&
+          !window.matchMedia('(pointer: coarse)').matches)
         inputRef.current.focus()
     }
   }, [query, mode])
@@ -195,7 +198,10 @@ function QueryField () {
   }, [])
 
   // re-focusing the input inputField to focus on the caret
+  // Phase 8e: skip on touch/coarse-pointer devices so the on-screen
+  // keyboard doesn't pop up unbidden on page load.
   useEffect(() => {
+    if (window.matchMedia('(pointer: coarse)').matches) return
     inputRef.current.blur()
     inputRef.current.focus()
   }, [])

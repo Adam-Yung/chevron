@@ -33,7 +33,8 @@ function MacrosMenu({ visibility, fullVisibility }) {
   const rows       = settings.menu.rows
   const cols       = settings.menu.columns
   const gap        = settings.menu.gap
-  const glassmorphism = settings.appearance?.macroMenu?.glassmorphism ?? false
+  const glassmorphism  = settings.appearance?.macroMenu?.glassmorphism  ?? false
+  const enableTrackpad = settings.appearance?.gestures?.enableTrackpad ?? true
 
   const mode             = useStateSelector(store => store.mode)
   const macroFilter      = useStateSelector(store => store.macroFilter)
@@ -130,6 +131,7 @@ function MacrosMenu({ visibility, fullVisibility }) {
     const DECAY_MS  = 380  // ms of no scroll before resetting accumulator
 
     const onWheel = (e) => {
+      if (!enableTrackpad) return
       // Only handle primarily-horizontal scroll; let vertical pass through
       // to the App-level handler for open/close.
       if (Math.abs(e.deltaY) > Math.abs(e.deltaX) * 1.5) return
@@ -151,7 +153,7 @@ function MacrosMenu({ visibility, fullVisibility }) {
       el.removeEventListener('wheel', onWheel)
       clearTimeout(decayTimer)
     }
-  }, []) // containerRef and sliderRef are stable refs
+  }, [enableTrackpad]) // containerRef and sliderRef are stable refs
 
   // Phase 8c: empty state when filter matches nothing.
   const isEmpty = macroFilter.length > 0 && visibleMacros.length === 0

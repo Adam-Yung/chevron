@@ -363,7 +363,7 @@ animations land on top of compositor-only primitives.
        `/weather` + `/forecast`; `LocalStorageObject` TTL cache; new
        `weather` settings tab with a "resolve coordinates" flow; today-
        only by default, slide-down 5-day strip on hover/tap.
-- [ ] **8e Gestures** — `useGestures` hook (swipe up/down + trackpad
+- [x] **8e Gestures** — `useGestures` hook (swipe up/down + trackpad
        horizontal pagination); the mobile banner stays as-is in this
        phase (touch-banner restructure remains Phase 10's job).
 

@@ -2,6 +2,7 @@ import { lazy, Suspense, useContext, useEffect, useRef, useState } from 'react'
 import { ColorSchemeContext, SettingsContext, ThemeContext } from './contexts/Settings'
 import { useReset, useStateSelector, useUpdate } from './contexts/Store'
 import useMacroFilter from './hooks/useMacroFilter'
+import useGestures from './hooks/useGestures'
 import { AnimatePresence, motion} from 'framer-motion'
 import ActiveElements from './components/ActiveElements/ActiveElements'
 import QueryField from './components/QueryField/QueryField'
@@ -37,6 +38,9 @@ function App() {
   const theme = useContext(ThemeContext)
   // color scheme
   const colorScheme = useContext(ColorSchemeContext)
+
+  const enableSwipe    = settings.appearance?.gestures?.enableSwipe    ?? true
+  const enableTrackpad = settings.appearance?.gestures?.enableTrackpad ?? true
 
   /* store */
   const mode = useStateSelector(state => state.mode)
@@ -163,6 +167,18 @@ function App() {
   // (matters during the open transition).
   useMacroFilter()
 
+  // Phase 8e: touch swipe gestures.
+  // Left/right are intentionally omitted — Splide handles in-menu
+  // horizontal swipes natively and we don't want to double-fire.
+  useGestures({
+    onSwipeUp:   enableSwipe
+      ? () => { if (modeRef.current === 'default') switchMacrosMenuRef.current(false) }
+      : undefined,
+    onSwipeDown: enableSwipe
+      ? () => { if (modeRef.current !== 'default') updateStore({ mode: 'default' }) }
+      : undefined,
+  })
+
   // adding event listeners
   useEffect(() => {
     const onContextMenu = e => onContextMenuRef.current(e)
@@ -190,6 +206,8 @@ function App() {
     const DECAY_MS        = 450   // ms of no scroll before accumulator resets
 
     const onWheel = (e) => {
+      // Respect the enableTrackpad setting.
+      if (!enableTrackpad) return
       // Skip when a [data-keep-focus] panel (Settings, Cheatsheet, Weather
       // modal, etc.) owns the pointer.
       const ae = document.activeElement
@@ -224,9 +242,7 @@ function App() {
       window.removeEventListener('wheel', onWheel)
       clearTimeout(wheelAccRef.current.timer)
     }
-  }, [updateStore]) // updateStore is stable (from context)
-
-  /* setting document title */
+  }, [updateStore, enableTrackpad]) // updateStore is stable; enableTrackpad gates the handler
   useEffect(() => {
     document.title = settings.general.tabTitle
   }, [settings.general.tabTitle]) 

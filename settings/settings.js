@@ -38,6 +38,10 @@ const template = {
     style: new types.List('default', ['default']),
     macroMenu: {
       glassmorphism: new types.Switch(false, undefined, { description: 'Frost the macros menu backdrop with a blur effect. Disable on slow GPUs.' })
+    },
+    gestures: {
+      enableSwipe:    new types.Switch(true, undefined, { description: 'Swipe up to open the macros menu, swipe down to close.' }),
+      enableTrackpad: new types.Switch(true, undefined, { description: 'Trackpad scroll paginates the macros menu horizontally.' })
     }
   },
   chevron: {
