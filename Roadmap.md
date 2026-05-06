@@ -315,12 +315,13 @@ Full design + sub-commit breakdown lives in `Macro_menu_redesign.md`.
 Sequencing interleaves Phase 7 between 8b and 8c so the new
 animations land on top of compositor-only primitives.
 
-- [~] **8a Decoupling** — new `macroFilter` slice; right-click in any
+- [x] **8a Decoupling** — new `macroFilter` slice; right-click in any
        non-default mode = full reset; Shift = pure toggle (no tap/hold
        distinction); QueryField yields focus while macro mode is
        active; `MacrosMenu` reads `macroFilter` and narrows the visible
-       cards.
-- [ ] **8b Time singleton + ChevronTop shell** — `useSyncExternalStore`-
+       cards. Card hints became always-on (touch-suppressed) with a
+       dynamic "next char to narrow" character driven by the filter.
+- [x] **8b Time singleton + ChevronTop shell** — `useSyncExternalStore`-
        backed module-scope time store so the clock keeps ticking across
        any unmount/remount churn; new `ChevronTop` component hosting
        the clock with a future slot for the weather widget.

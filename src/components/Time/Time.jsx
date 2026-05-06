@@ -1,8 +1,13 @@
-import { useContext, useEffect, useRef, useState } from 'react'
+import { useContext, useSyncExternalStore } from 'react'
 import { SettingsContext } from '../../contexts/Settings'
 import formatDate from '../../functions/generationUtils/formatDate'
+import { getTime, subscribeTime } from './timeStore'
 import classes from './Time.module.css'
 
+// Phase 8b: subscribes to the singleton timeStore so the displayed
+// time keeps ticking even if this component unmounts/remounts (which
+// happens when the AnimatePresence container is keyed off `timestamp`
+// and the store is reset).
 function Time() {
   /* settings */
   const settings = useContext(SettingsContext)
@@ -10,19 +15,7 @@ function Time() {
   const fontSize = settings.menu.time.fontSize
   const format = settings.menu.time.format
 
-  const [time, setTime] = useState(new Date())
-
-  const timerRef = useRef(null)
-
-  useEffect(() => {
-    // set initial time
-    setTime(new Date())
-
-    updateTime(setTime, timerRef)
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    return () => clearTimeout(timerRef.current)
-  }, [])
+  const time = useSyncExternalStore(subscribeTime, getTime)
 
   const variables = {
     '--font-size': fontSize + 'em'
@@ -33,17 +26,6 @@ function Time() {
       {formatDate(time, format)}
     </div>
   )
-}
-
-function updateTime(callback, timerRef) {
-  timerRef.current = setTimeout(() => {
-    callback(new Date())
-    updateTime(callback, timerRef)
-  }, 1000 - getCurrentMs())
-}
-
-function getCurrentMs() {
-  return Date.now() % 1000
 }
 
 export default Time

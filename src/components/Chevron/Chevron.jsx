@@ -2,7 +2,9 @@ import { lazy, Suspense, useMemo, useContext, useRef, useEffect, useState } from
 import { SettingsContext, ThemeContext } from '../../contexts/Settings'
 import { useStateSelector } from '../../contexts/Store'
 import useTransitions from '../../hooks/useTransitions'
-import Time from '../Time/Time'
+// Phase 8b: the top wrapper now hosts a layout shell that owns the
+// clock and (in Phase 8d) the weather widget.
+import ChevronTop from '../ChevronTop/ChevronTop'
 // MacrosMenu drags Splide + the grid extension (~25 KB gzipped) into the
 // initial chunk. Defer it: the menu is only meaningful once the user
 // actually opens the Chevron in `opened` mode, so a Suspense boundary
@@ -282,10 +284,10 @@ function Chevron({ visibility, onAnimationEnd }) {
           visibility: visibility ? 'visible' : 'hidden'
         }}>
         <div className={classes['wrapper']}>
-            <motion.div 
+            <motion.div
               initial={{ translateY: '100%'}}
               animate={controls.topMenu}>
-              <Time/>
+              <ChevronTop/>
             </motion.div>
         </div>
         <motion.svg
