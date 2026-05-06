@@ -35,8 +35,6 @@ function MacrosMenu({ visibility, fullVisibility }) {
   const gap        = settings.menu.gap
   const glassmorphism = settings.appearance?.macroMenu?.glassmorphism ?? false
 
-  const slideCapacity = cols * rows
-
   const mode             = useStateSelector(store => store.mode)
   const macroFilter      = useStateSelector(store => store.macroFilter)
   const macroHintsKeyboard = useStateSelector(store => store.macroHintsKeyboard)
@@ -52,8 +50,6 @@ function MacrosMenu({ visibility, fullVisibility }) {
       .map(({ m }) => m)
   }, [macroFilter])
 
-  const isVisibleSliderHasMultipleSlides = visibleMacros.length > slideCapacity
-
   const [selected, setSelected]         = useState(null)
   const [isPointerCoarse] = useState(() =>
     typeof window !== 'undefined' &&
@@ -68,8 +64,9 @@ function MacrosMenu({ visibility, fullVisibility }) {
   // When the filter is active, collapse to 1 row so the pill never pushes
   // cards off screen. Splide remounts on every filter change anyway (keyed
   // on macroFilter), so this takes effect immediately without extra logic.
-  const activeRows = macroFilter.length > 0 ? 1 : rows
-  const slideCapacity = cols * activeRows
+  const activeRows     = macroFilter.length > 0 ? 1 : rows
+  const slideCapacity  = cols * activeRows
+  const isVisibleSliderHasMultipleSlides = visibleMacros.length > slideCapacity
 
   const updateValue = useUpdate()
   const redirect    = useRedirect()
