@@ -99,6 +99,22 @@ function MacrosMenu({ visibility, fullVisibility }) {
     return () => document.removeEventListener('keypress', handleKeypress)
   }, [mode, activateCard])
 
+  // Enter while the menu is open activates the first visible result.
+  // Uses keydown (not keypress) so it fires reliably for Enter.
+  // preventDefault stops any upstream handler (e.g. QueryField) from also
+  // reacting. No-op when isEmpty or there is nothing to activate.
+  useEffect(() => {
+    const handleKeydown = e => {
+      if (e.code !== 'Enter') return
+      if (!allowedModes.get('Chevron').has(mode)) return
+      if (visibleMacros.length === 0) return
+      e.preventDefault()
+      activateCard(visibleMacros[0])
+    }
+    document.addEventListener('keydown', handleKeydown)
+    return () => document.removeEventListener('keydown', handleKeydown)
+  }, [mode, visibleMacros, activateCard])
+
   const splideOptions = {
     ref: sliderRef,
     tag: 'section',
@@ -163,6 +179,7 @@ function MacrosMenu({ visibility, fullVisibility }) {
       <div
       ref={containerRef}
       className={classes['container']}
+      style={{ '--grid-rows': activeRows }}
       data-filtered={macroFilter.length > 0 || undefined}
       data-glassmorphism={glassmorphism || undefined}>
       {isEmpty ? (

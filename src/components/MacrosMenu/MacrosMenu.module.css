@@ -6,28 +6,27 @@
 .container[data-filtered] :global(.splide__track) {
   height: calc(50vh - var(--menu-offset) - 82px);
 }
-/* Ensure the slide list and each slide fill (not overflow) the track */
-:global(.splide__list) {
-  height: 100% !important;
-}
-:global(.splide__slide) {
-  height: 100% !important;
-}
 :global(.splide__slide__row) {
   justify-content: center;
-  height: 100% !important;
 }
+/* Cap cell size so N rows never overflow the track height.
+   Splide sizes cells by track-width ÷ cols, which on wide screens produces
+   cells tall enough that 2 rows exceed the track height.
+   max-width overrides the Splide inline width; aspect-ratio:1 + max-height
+   keep the cell square at the capped size.
+   The -20px buffer absorbs the row gap (default 10px × (rows-1)). */
 :global(.splide__slide--col) {
   width: unset !important;
   aspect-ratio: 1;
   min-width: 56px;
   min-height: 56px;
-  /* flex: 1 lets the grid extension distribute height evenly across rows
-     without any cell overflowing the track */
-  flex: 1 1 0;
+  max-width:  calc((50vh - var(--menu-offset) - 44px - 20px) / var(--grid-rows, 2));
+  max-height: calc((50vh - var(--menu-offset) - 44px - 20px) / var(--grid-rows, 2));
   padding: 5px;
-  box-sizing: border-box;
-  overflow: hidden;
+}
+.container[data-filtered] :global(.splide__slide--col) {
+  max-width:  calc((50vh - var(--menu-offset) - 82px - 20px) / var(--grid-rows, 2));
+  max-height: calc((50vh - var(--menu-offset) - 82px - 20px) / var(--grid-rows, 2));
 }
 :global(.splide__slide--col:last-child) {
   margin-right: 0 !important;
