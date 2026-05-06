@@ -191,7 +191,8 @@ function MacrosMenu({ visibility, fullVisibility }) {
                   icon={pm.icon}
                   bgColor={pm.bgColor}
                   textColor={pm.textColor}
-                  hotKey={nextHintChar(pm.name, macroFilter)}
+                  macroName={pm.name}
+                  revealCount={macroFilter.length > 0 ? macroFilter.length : (hintsActive ? 1 : 0)}
                   isHintActive={hintsActive}
                   onClick={() => activateCard(pm)}/>
               </motion.div>
@@ -201,15 +202,6 @@ function MacrosMenu({ visibility, fullVisibility }) {
       )}
     </div>
   )
-}
-
-function nextHintChar(name, filter) {
-  if (!name) return ''
-  const lowerName = name.toLowerCase()
-  if (!filter) return lowerName[0] || ''
-  const idx = lowerName.indexOf(filter)
-  if (idx === -1) return lowerName[0] || ''
-  return lowerName[idx + filter.length] || ''
 }
 
 export default memo(MacrosMenu)

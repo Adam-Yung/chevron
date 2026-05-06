@@ -9,9 +9,6 @@
   overflow: hidden;
   will-change: transform;
 
-  /* Glass surface — semi-transparent backing so the hint letter shows
-     through as a depth layer. Solid fallback for browsers without
-     backdrop-filter support. */
   background: color-mix(in srgb, var(--card) 55%, transparent);
   border: 1px solid rgba(255, 255, 255, 0.10);
   box-shadow:
@@ -26,8 +23,7 @@
   }
 }
 
-/* Ambient glow at the base of the card, tinted by the macro's colour.
-   Creates the "each card has its own identity" depth effect. */
+/* Ambient glow tinted by the macro's brand colour */
 .card::before {
   display: block;
   content: '';
@@ -39,7 +35,7 @@
   pointer-events: none;
   z-index: 0;
 }
-/* dark theme default — slight brightening */
+/* Top-left convex highlight */
 .card::after {
   display: block;
   content: '';
@@ -79,9 +75,7 @@ body[data-color-scheme=light] .card {
   border-color: rgba(0, 0, 0, 0.08);
   box-shadow: 0 2px 16px rgba(0, 0, 0, 0.12), 0 1px 0 rgba(255,255,255,0.8) inset;
 }
-body[data-color-scheme=light] .card::before {
-  opacity: 0.25;
-}
+body[data-color-scheme=light] .card::before { opacity: 0.25; }
 body[data-color-scheme=light] .card::after {
   background: linear-gradient(160deg, rgba(255,255,255,0.5) 0%, transparent 55%);
 }
@@ -92,70 +86,63 @@ body[data-color-scheme=light] .card::after {
   align-items: center;
   justify-content: center;
 }
-.card.realistic:active > .logo-wrapper {
-  transform: scale(.95) !important;
-}
-.card.clicked * {
-  cursor: default;
-}
+.card.realistic:active > .logo-wrapper { transform: scale(.95) !important; }
+.card.clicked * { cursor: default; }
 .card.realistic:active {
   box-shadow: 0 0 10px 1px black inset;
 }
 
-/* ── Hint — diagonal character watermark ────────────────────────────── */
-/* The hint is a large diagonal letter that lives BEHIND the plate/logo
-   but in FRONT of the card's glass surface. Because the card is now a
-   translucent glass panel, the letter shows through as a depth layer —
-   partially visible through the plate when the plate is semi-transparent.
-   This is the original aesthetic intent, now made possible by the glass
-   card architecture. */
-.hint {
+/* ── iOS-style label row ─────────────────────────────────────────────── */
+/* The label lives inside the card at the bottom, below the icon — just
+   like an app label on the iOS home screen. Each character is a separate
+   span so only the newest one needs to animate. */
+.label-row {
   position: absolute;
-  top: 0;
+  bottom: 0;
   left: 0;
-  width: 100%;
-  height: 100%;
+  right: 0;
+  height: 24%;
   display: flex;
   align-items: center;
   justify-content: center;
-  /* var(--macro-text) is set on the card root by Card.jsx so the
-     letter always contrasts with the card's own color scheme. */
-  color: var(--macro-text, #fff);
-  font-size: 210%;
-  font-weight: 900;
-  letter-spacing: -0.04em;
-  opacity: 0;
-  transform: rotate(35deg) translateX(-5%) translateY(-5%);
-  /* z-index above card glass (0) but below plate (10000) and logo (10001).
-     The letter shows through the semi-transparent plate, creating depth. */
-  z-index: 5;
+  gap: 0px;
+  overflow: hidden;
+  z-index: 10002;
   pointer-events: none;
-  /* No transition — animation handles the reveal */
-  transition: none;
-  /* Subtle text shadow amplifies depth through the glass */
-  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.4);
-}
-/* Light theme: letter uses card's dark accent instead of white */
-body[data-color-scheme=light] .hint {
-  text-shadow: 0 1px 8px rgba(255, 255, 255, 0.6);
 }
 
-/* Keyframe fires on every Splide remount (filter change) since CSS
-   animations trigger on element mount, not on class-add. */
-.hint.active {
-  animation: hint-reveal 2.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+/* Individual character */
+.label-char {
+  font-size: 0.52rem;
+  font-weight: 600;
+  color: var(--macro-text, #fff);
+  letter-spacing: 0.01em;
+  line-height: 1;
+  /* stable characters: no animation */
+  opacity: 1;
+  transform: translateX(0);
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
 }
-@keyframes hint-reveal {
-  0%   { opacity: 0; transform: rotate(35deg) translateX(-18%) translateY(-5%); }
-  40%  { opacity: 0.75; transform: rotate(35deg) translateX(8%) translateY(-5%); }
-  100% { opacity: 0.65; transform: rotate(35deg) translateX(8%) translateY(-5%); }
+body[data-color-scheme=light] .label-char {
+  text-shadow: 0 1px 3px rgba(255, 255, 255, 0.6);
+}
+
+/* Only the newest character (last typed) slides in from the right */
+.label-char-new {
+  animation: char-slide-in 0.28s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+@keyframes char-slide-in {
+  from { opacity: 0; transform: translateX(150%); }
+  to   { opacity: 1; transform: translateX(0); }
 }
 @media (prefers-reduced-motion: reduce) {
-  .hint.active {
-    animation: none;
-    opacity: 0.6;
-    transform: rotate(35deg) translateX(8%) translateY(-5%);
-  }
+  .label-char-new { animation: none; opacity: 1; transform: none; }
+}
+
+/* When the label is visible, logo-wrapper shrinks to leave room below the
+   icon for the label — replicating the iOS icon + label layout. */
+.label-visible .logo-wrapper {
+  height: 76%;
 }
 
 /* ── Plate (macro gradient circle) ──────────────────────────────────── */
@@ -171,7 +158,6 @@ body[data-color-scheme=light] .hint {
   background-position: right top;
   transition: background-size .5s, opacity .25s ease-out;
   will-change: transform, opacity;
-  /* Subtle inner highlight to give the circle a glass-like convex feel */
   box-shadow: 0 2px 0 rgba(255, 255, 255, 0.15) inset, 0 4px 16px rgba(0,0,0,0.25);
 }
 .card:hover .plate, .card:active .plate, .plate.detached {
@@ -186,33 +172,23 @@ body[data-color-scheme=light] .hint {
   background: #2a2a2a;
   transition: opacity .5s;
 }
-/* dark theme (default) — semi-transparent so hint shows through */
-.plate::before {
-  opacity: .22;
-}
-.card:hover .plate::before, .card:active .plate::before, .plate.detached::before {
-  opacity: .08;
-}
-/* light theme */
-body[data-color-scheme=light] .plate::before {
-  opacity: .15;
-}
+.plate::before { opacity: .22; }
+.card:hover .plate::before, .card:active .plate::before, .plate.detached::before { opacity: .08; }
+body[data-color-scheme=light] .plate::before { opacity: .15; }
 body[data-color-scheme=light] .card:hover .plate::before,
 body[data-color-scheme=light] .card:active .plate::before,
-body[data-color-scheme=light] .plate.detached::before {
-  opacity: 0;
-}
+body[data-color-scheme=light] .plate.detached::before { opacity: 0; }
 
 /* ── Logo / icon ─────────────────────────────────────────────────────── */
 .logo-wrapper {
   height: 100%;
+  transition: height 0.2s ease;
 }
 .logo {
   width: 38%;
   margin: 10%;
   z-index: 10001;
   will-change: transform;
-  /* Subtle drop shadow so icon is crisp over the glass surface */
   filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.3));
 }
 .logo svg {

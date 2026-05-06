@@ -14,7 +14,7 @@ const LOGO_TRANSITION_DELAY = .25
 // from min(height, width) of the viewport
 const LOGO_SCALE_SIZE = .3
 
-function Card({ active=false, visibility=true, icon, bgColor, textColor, hotKey, isHintActive=false, onClick }) {
+function Card({ active=false, visibility=true, icon, bgColor, textColor, macroName='', revealCount=0, isHintActive=false, onClick }) {
   const [isAnimated, setIsAnimated] = useState(false)
 
   const backgroundStyle = useMemo(() => getCssGradient(bgColor), [bgColor])
@@ -160,7 +160,7 @@ function Card({ active=false, visibility=true, icon, bgColor, textColor, hotKey,
 
   return (
     <div
-      className={gC('card', classes['card'], active && classes['active'])}
+      className={gC('card', classes['card'], active && classes['active'], isHintActive && revealCount > 0 && classes['label-visible'])}
       style={{ '--macro-text': textColor }}
       onClick={onClick}>
       <div className={classes['logo-wrapper']}>
@@ -173,9 +173,16 @@ function Card({ active=false, visibility=true, icon, bgColor, textColor, hotKey,
           : detachableElements
         }
       </div>
-      <div 
-        className={gC(classes['hint'], isHintActive && classes['active'])}>
-        {hotKey}
+      {/* iOS-style label row: characters slide in one at a time from the right.
+          key={i} keeps existing chars stable so only the newest char animates. */}
+      <div className={classes['label-row']}>
+        {isHintActive && revealCount > 0 && macroName.slice(0, revealCount).split('').map((char, i) => (
+          <span
+            key={i}
+            className={gC(classes['label-char'], i === revealCount - 1 && classes['label-char-new'])}>
+            {char}
+          </span>
+        ))}
       </div>
     </div>
   )
