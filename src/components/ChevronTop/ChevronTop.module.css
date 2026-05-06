@@ -1,29 +1,13 @@
-/* ChevronTop: clock + weather row. The .top class creates the flex row;
-   the glass shelf effect is always present but only visible when the
-   wrapper slides the element into view (menu open). */
+/* ChevronTop: clock + weather row.
+   No glass container — the row should feel born from the bar itself,
+   not enclosed in a separate panel. The clip-path reveal in Chevron.jsx
+   makes the content appear to grow upward out of the bar line. */
 .top {
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: center;
   gap: 0;
-  padding: 0.06em 0.3em;
-  border-radius: 0.14em;
-  /* Very faint glass shelf — gives the row a sense of floating above
-     the chevron bar. Visible only in opened mode. */
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.07);
-  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.12);
-}
-@supports (backdrop-filter: blur(1px)) {
-  .top {
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-  }
-}
-body[data-color-scheme=light] .top {
-  background: rgba(255, 255, 255, 0.45);
-  border-color: rgba(0, 0, 0, 0.06);
 }
 
 .centered {

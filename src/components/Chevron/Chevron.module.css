@@ -16,13 +16,13 @@
   overflow: hidden;
   z-index: 1;
 }
-/* Top wrapper: ChevronTop sits at the bottom edge so translateY('100%')
-   slides it just below the overflow:hidden boundary when menu is closed.
-   padding-bottom creates breathing room between the clock/weather row
-   and the horizontal chevron bar in opened mode. */
+/* Top wrapper: ChevronTop sits at the bottom edge. The clip-path on the
+   inner motion.div handles hiding/revealing — no overflow:hidden needed here.
+   padding-bottom creates breathing room between the clock/weather and the bar. */
 .wrapper:first-child {
   align-items: end;
   padding-bottom: 0.18em;
+  overflow: visible;
 }
 /* Bottom wrapper: MacroFilterPill + MacrosMenu sit at the top edge so
    translateY('-100%') slides them just above the boundary when closed.

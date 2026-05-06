@@ -147,9 +147,9 @@ function Chevron({ visibility, onAnimationEnd }) {
           },
           async opened() {
             setIsMacrosMenuRendered(false)
-            // closing top menu element
+            // closing top menu element — clip collapses down into the bar
             controls.topMenu.start({
-              translateY: '100%',
+              clipPath: 'inset(100% 0 0 0)',
               transition: {
                 ease: easeInOutQuad,
                 duration: duration * timings.menu[2]
@@ -246,9 +246,9 @@ function Chevron({ visibility, onAnimationEnd }) {
                 duration: duration * timings.menu[1]
               }
             })
-            // opening top menu element
+            // opening top menu element — clip reveals upward from the bar
             controls.topMenu.start({
-              translateY: 0,
+              clipPath: 'inset(0% 0 0 0)',
               transition: {
                 ease: easeInOutQuad,
                 duration: duration * timings.menu[2]
@@ -280,7 +280,7 @@ function Chevron({ visibility, onAnimationEnd }) {
       }}>
       <div className={classes['wrapper']}>
         <motion.div
-          initial={{ translateY: '100%'}}
+          initial={{ clipPath: 'inset(100% 0 0 0)' }}
           animate={controls.topMenu}>
           <ChevronTop/>
         </motion.div>
