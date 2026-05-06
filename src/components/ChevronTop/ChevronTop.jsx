@@ -3,27 +3,26 @@ import { SettingsContext } from '../../contexts/Settings'
 import Time from '../Time/Time'
 import classes from './ChevronTop.module.css'
 
-// Phase 8d: lazy-load the Weather chunk so it never touches the initial
-// paint bundle. Falls under a Suspense with no fallback so the row simply
-// shows the clock until the chunk + first data load.
+// Phase 8d_cont: when weather is enabled, Weather renders the FULL row
+// ([TIME] · [temp] [emoji]) as a single clickable button. When disabled,
+// just the clock is rendered centered.
 const Weather = lazy(() => import('../Weather/Weather'))
 
 function ChevronTop() {
-  const settings = useContext(SettingsContext)
-  const apiKey = settings.weather?.apiKey ?? ''
-  const lat    = settings.weather?.lat    ?? ''
-  // Weather slot is only rendered when both key and coords are configured.
-  const weatherEnabled = Boolean(apiKey && lat)
+  const settings       = useContext(SettingsContext)
+  const weatherEnabled = Boolean(settings.weather?.apiKey && settings.weather?.lat)
 
+  if (!weatherEnabled) {
+    return <div className={`${classes['top']} ${classes['centered']}`}><Time /></div>
+  }
+
+  // Suspense fallback shows just the clock while the Weather chunk loads.
   return (
-    <div className={`${classes['top']} ${weatherEnabled ? '' : classes['centered']}`}>
-      {weatherEnabled && (
-        <Suspense fallback={null}>
-          <Weather />
-        </Suspense>
-      )}
-      <Time />
-    </div>
+    <Suspense fallback={<div className={`${classes['top']} ${classes['centered']}`}><Time /></div>}>
+      <div className={classes['top']}>
+        <Weather />
+      </div>
+    </Suspense>
   )
 }
 

@@ -1,13 +1,9 @@
-/* Phase 8b: row container for the clock + (Phase 8d) weather widget.
-   When weatherEnabled, the row holds two children with gap between them.
-   When weather is hidden (.centered), justify-content:center keeps the
-   clock perfectly centered without any layout changes in ChevronTop. */
 .top {
   display: flex;
   flex-direction: row;
   align-items: center;
-  justify-content: space-around;
-  gap: .75em;
+  justify-content: center;
+  gap: 0;
 }
 .centered {
   justify-content: center;

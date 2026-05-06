@@ -62,7 +62,14 @@ function MacrosMenu({ visibility, fullVisibility }) {
   )
   const hintsActive = !isPointerCoarse && (macroHintsKeyboard || macroFilter.length > 0)
   const [isCardInFocus, setIsCardInFocus] = useState(false)
-  const sliderRef = useRef(null)
+  const sliderRef    = useRef(null)
+  const containerRef = useRef(null)
+
+  // When the filter is active, collapse to 1 row so the pill never pushes
+  // cards off screen. Splide remounts on every filter change anyway (keyed
+  // on macroFilter), so this takes effect immediately without extra logic.
+  const activeRows = macroFilter.length > 0 ? 1 : rows
+  const slideCapacity = cols * activeRows
 
   const updateValue = useUpdate()
   const redirect    = useRedirect()
@@ -102,21 +109,59 @@ function MacrosMenu({ visibility, fullVisibility }) {
       arrows: arrows && isVisibleSliderHasMultipleSlides,
       drag:   drag   && isVisibleSliderHasMultipleSlides,
       perPage: 1,
-      wheel: true,
+      // Disable Splide's built-in wheel so we can implement weighted snap.
+      wheel: false,
       keyboard: allowedModes.get('Slider').has(mode) ? 'global' : false,
       grid: {
         cols,
-        rows,
+        rows: activeRows,
         gap: { col: gap + 'px', row: gap + 'px' }
       }
     }
   }
+
+  // Weighted horizontal scroll with snap-to-slide. Accumulates deltaX until
+  // a threshold is reached, then advances one slide and resets. A decay
+  // timeout resets the accumulator if the user pauses. This gives a natural
+  // "weight" feeling — a flick goes one slide, a slow scroll stays put.
+  useEffect(() => {
+    const el = containerRef.current
+    if (!el) return
+    let accX = 0
+    let decayTimer = null
+    const THRESHOLD = 160  // px of accumulated deltaX before a slide change
+    const DECAY_MS  = 380  // ms of no scroll before resetting accumulator
+
+    const onWheel = (e) => {
+      // Only handle primarily-horizontal scroll; let vertical pass through
+      // to the App-level handler for open/close.
+      if (Math.abs(e.deltaY) > Math.abs(e.deltaX) * 1.5) return
+      e.preventDefault()
+      e.stopPropagation()
+
+      clearTimeout(decayTimer)
+      accX += e.deltaX
+
+      if (Math.abs(accX) >= THRESHOLD) {
+        sliderRef.current?.splide?.go(accX > 0 ? '+' : '-')
+        accX = 0
+      }
+      decayTimer = setTimeout(() => { accX = 0 }, DECAY_MS)
+    }
+
+    el.addEventListener('wheel', onWheel, { passive: false })
+    return () => {
+      el.removeEventListener('wheel', onWheel)
+      clearTimeout(decayTimer)
+    }
+  }, []) // containerRef and sliderRef are stable refs
 
   // Phase 8c: empty state when filter matches nothing.
   const isEmpty = macroFilter.length > 0 && visibleMacros.length === 0
 
   return (
     <div
+      ref={containerRef}
       className={classes['container']}
       data-glassmorphism={glassmorphism || undefined}>
       {isEmpty ? (

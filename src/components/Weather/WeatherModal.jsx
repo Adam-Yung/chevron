@@ -1,39 +1,30 @@
 import { useCallback, useEffect, useRef } from 'react'
 import { createPortal } from 'react-dom'
 import { motion, AnimatePresence } from 'framer-motion'
+import { weatherEmoji } from './Weather'
 import classes from './WeatherModal.module.css'
 
-// Temperature colour scale — used for both the inline thermometer icons
-// and the forecast card accent colours.
+// Temperature colour scale.
 function tempColor(temp, units) {
-  // Normalise to Celsius for the scale regardless of display units.
   const c = units === '°F' ? (temp - 32) / 1.8 : units === 'K' ? temp - 273.15 : temp
-  if (c <= 0)  return '#60a5fa' // freezing — sky blue
-  if (c <= 10) return '#93c5fd' // cold — light blue
-  if (c <= 18) return '#6ee7b7' // cool — mint
-  if (c <= 24) return '#fbbf24' // warm — amber
-  if (c <= 30) return '#f97316' // hot — orange
-  return '#ef4444'              // scorching — red
+  if (c <= 0)  return '#60a5fa'
+  if (c <= 10) return '#93c5fd'
+  if (c <= 18) return '#6ee7b7'
+  if (c <= 24) return '#fbbf24'
+  if (c <= 30) return '#f97316'
+  return '#ef4444'
 }
 
-// Map OWM icon code prefix to a weather emoji for colour-safe display.
-function weatherEmoji(icon) {
-  if (!icon) return '🌡'
-  const code = icon.replace('d', '').replace('n', '')
-  const map = {
-    '01': '☀️', '02': '⛅', '03': '☁️', '04': '☁️',
-    '09': '🌧', '10': '🌦', '11': '⛈', '13': '❄️', '50': '🌫'
-  }
-  return map[code] ?? '🌡'
-}
+// ❄️ for lows (always feels cold regardless of colour), 🌡 for highs.
+function hiIcon()  { return '🌡' }
+function loIcon()  { return '❄️' }
 
 // Derive per-day high/low/icon from the OWM 3-hour forecast list.
 function buildForecastDays(list, maxDays) {
   if (!list?.length) return []
   const byDay = new Map()
   for (const entry of list) {
-    const date = new Date(entry.dt * 1000)
-    const key  = date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })
+    const key = new Date(entry.dt * 1000).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })
     if (!byDay.has(key)) byDay.set(key, { key, temps: [], icons: [] })
     const d = byDay.get(key)
     d.temps.push(entry.main.temp)
@@ -142,15 +133,15 @@ export default function WeatherModal({ current, forecast, units, maxDays, isStal
             </div>
 
             <div className={classes['hero-right']}>
-              {/* Hi/Lo with colored thermometers */}
+              {/* Hi/Lo — 🌡 for high, ❄️ for low */}
               <div className={classes['hilo']}>
                 <span className={classes['hilo-item']}>
-                  <span className={classes['thermo']} style={{ color: highColor }}>🌡</span>
+                  <span className={classes['thermo']} style={{ color: highColor }}>{hiIcon()}</span>
                   <span className={classes['hilo-label']}>High</span>
                   <span className={classes['hilo-val']} style={{ color: highColor }}>{high}{units}</span>
                 </span>
                 <span className={classes['hilo-item']}>
-                  <span className={classes['thermo']} style={{ color: lowColor }}>🌡</span>
+                  <span className={classes['thermo']}>{loIcon()}</span>
                   <span className={classes['hilo-label']}>Low</span>
                   <span className={classes['hilo-val']} style={{ color: lowColor }}>{low}{units}</span>
                 </span>
@@ -191,10 +182,10 @@ export default function WeatherModal({ current, forecast, units, maxDays, isStal
                     <div className={classes['day-date']}>{label.split(',').slice(1).join(',').trim()}</div>
                     <div className={classes['day-emoji']}>{weatherEmoji(ic)}</div>
                     <div className={classes['day-high']} style={{ color: hc }}>
-                      <span style={{ fontSize: '0.8em' }}>🌡</span> {h}{units}
+                      <span style={{ fontSize: '0.8em' }}>{hiIcon()}</span> {h}{units}
                     </div>
                     <div className={classes['day-low']} style={{ color: lc }}>
-                      <span style={{ fontSize: '0.8em' }}>🌡</span> {l}{units}
+                      <span style={{ fontSize: '0.8em' }}>{loIcon()}</span> {l}{units}
                     </div>
                   </div>
                 )

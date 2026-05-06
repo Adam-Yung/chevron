@@ -176,6 +176,56 @@ function App() {
     }
   }, [])
 
+  // Vertical wheel/trackpad gesture to open (scroll up) or close (scroll
+  // down) the macro menu. Weighted: accumulates deltaY until a threshold
+  // is met, preventing accidental triggers from small scroll twitches.
+  // A cooldown prevents rapid toggling after a successful gesture.
+  const wheelAccRef = useRef({ y: 0, lastAction: 0, timer: null })
+  const switchMacrosMenuRef = useRef(null)
+  switchMacrosMenuRef.current = switchMacrosMenu
+  useEffect(() => {
+    const OPEN_THRESHOLD  = 120   // scroll UP  (negative deltaY) → open
+    const CLOSE_THRESHOLD = 120   // scroll DOWN (positive deltaY) → close
+    const COOLDOWN_MS     = 900   // ms before another gesture is accepted
+    const DECAY_MS        = 450   // ms of no scroll before accumulator resets
+
+    const onWheel = (e) => {
+      // Skip when a [data-keep-focus] panel (Settings, Cheatsheet, Weather
+      // modal, etc.) owns the pointer.
+      const ae = document.activeElement
+      if (ae?.closest?.('[data-keep-focus]')) return
+      // Skip if the scroll is primarily horizontal (handled by MacrosMenu).
+      if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) return
+
+      const acc = wheelAccRef.current
+      clearTimeout(acc.timer)
+      acc.y += e.deltaY
+
+      const now    = Date.now()
+      const onCooldown = now - acc.lastAction < COOLDOWN_MS
+
+      if (!onCooldown) {
+        if (acc.y < -OPEN_THRESHOLD && modeRef.current === 'default') {
+          switchMacrosMenuRef.current(false)
+          acc.y = 0
+          acc.lastAction = now
+        } else if (acc.y > CLOSE_THRESHOLD && modeRef.current === 'opened') {
+          updateStore({ mode: 'default' })
+          acc.y = 0
+          acc.lastAction = now
+        }
+      }
+
+      acc.timer = setTimeout(() => { acc.y = 0 }, DECAY_MS)
+    }
+
+    window.addEventListener('wheel', onWheel, { passive: true })
+    return () => {
+      window.removeEventListener('wheel', onWheel)
+      clearTimeout(wheelAccRef.current.timer)
+    }
+  }, [updateStore]) // updateStore is stable (from context)
+
   /* setting document title */
   useEffect(() => {
     document.title = settings.general.tabTitle

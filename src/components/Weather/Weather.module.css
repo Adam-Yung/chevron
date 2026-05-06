@@ -1,43 +1,58 @@
-.chip {
+/* The wrapper's parent (.wrapper:first-child) uses align-items:end which
+   positions this element at the bottom edge. The entire row is a button. */
+.row {
   display: inline-flex;
   align-items: center;
-  gap: 0.15em;
+  gap: 0.18em;
   background: none;
   border: none;
   color: inherit;
   cursor: pointer;
-  padding: 0.1em 0.3em;
-  border-radius: 6px;
+  padding: 0.05em 0.2em;
+  border-radius: 0.2em;
   font-size: inherit;
   line-height: 1;
-  opacity: 0.88;
-  transition: opacity 0.15s, background 0.15s;
-  position: relative;
+  transition: opacity 0.15s;
+  opacity: 0.9;
 }
-.chip:hover {
-  opacity: 1;
-  background: color-mix(in srgb, var(--primary) 10%, transparent);
+.row:hover { opacity: 1; }
+
+/* When weather data hasn't loaded yet, still fill the row slot properly */
+.row-plain {
+  display: inline-flex;
+  align-items: center;
+  gap: 0;
 }
 
-.chip-icon {
-  width: 1.5em;
-  height: 1.5em;
-  object-fit: contain;
-  flex-shrink: 0;
+.sep {
+  opacity: 0.3;
+  font-size: 0.38em;
+  margin: 0 0.3em;
+  line-height: 1;
 }
 
-.chip-temp {
+/* Temperature — slightly smaller than the clock, acts as secondary info */
+.temp {
+  font-size: 0.42em;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.01em;
+  opacity: 0.85;
+}
+
+/* Weather emoji — same size as the temperature, no pixelation ever */
+.emoji {
+  font-size: 0.45em;
+  line-height: 1;
 }
 
 .stale-dot {
-  width: 5px;
-  height: 5px;
+  width: 0.22em;
+  height: 0.22em;
   border-radius: 50%;
-  background: color-mix(in srgb, var(--primary) 45%, transparent);
+  background: currentColor;
+  opacity: 0.3;
   flex-shrink: 0;
   align-self: flex-start;
-  margin-top: 2px;
+  margin-top: 0.1em;
 }

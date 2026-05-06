@@ -7,16 +7,35 @@ import {
   setCachedCurrent, setCachedForecast
 } from './weatherCache'
 import WeatherModal from './WeatherModal'
+import Time from '../Time/Time'
 import classes from './Weather.module.css'
 
-// OWM free-tier keys are exactly 32 hex chars. Require minimum length so
-// we don't fire network requests on every keystroke while the user types
-// their key into the settings field.
+// OWM free-tier keys are exactly 32 hex chars.
 const OWM_KEY_MIN_LEN = 32
 
+// Map OWM icon code prefix → weather emoji (no pixelated PNGs anywhere).
+export function weatherEmoji(icon) {
+  if (!icon) return '🌤'
+  const code = icon.slice(0, 2)
+  const isNight = icon.endsWith('n')
+  const map = {
+    '01': isNight ? '🌙' : '☀️',
+    '02': isNight ? '🌙' : '⛅',
+    '03': '🌥', '04': '☁️',
+    '09': '🌧', '10': '🌦',
+    '11': '⛈', '13': '❄️', '50': '🌫'
+  }
+  return map[code] ?? '🌤'
+}
+
+// Phase 8d_cont: this component renders the ENTIRE ChevronTop row:
+//   [TIME]  ·  [temp] [emoji]
+// as a single clickable button that opens the weather modal.
+// Lazy-loaded from ChevronTop so it never touches the first-paint bundle.
+// If weather data hasn't loaded yet, falls back to rendering just <Time/>.
 function Weather() {
-  const settings = useContext(SettingsContext)
-  const isOnline = useOnlineStatus()
+  const settings  = useContext(SettingsContext)
+  const isOnline  = useOnlineStatus()
 
   const apiKey  = settings.weather?.apiKey  ?? ''
   const lat     = settings.weather?.lat     ?? ''
@@ -24,17 +43,14 @@ function Weather() {
   const units   = settings.weather?.units   ?? 'metric'
   const maxDays = settings.weather?.forecastDays ?? 5
 
-  const [current,  setCurrent]  = useState(() => getCachedCurrent())
-  const [forecast, setForecast] = useState(() => getCachedForecast())
+  const [current,   setCurrent]   = useState(() => getCachedCurrent())
+  const [forecast,  setForecast]  = useState(() => getCachedForecast())
   const [showModal, setShowModal] = useState(false)
 
-  // Keep a ref to the latest fetch params so the effect callback never
-  // closes over stale values — but the effect itself only re-runs when
-  // lat/lon settle (not on every apiKey keystroke).
+  // Stable ref keeps latest params without recreating the fetch callback.
   const paramsRef = useRef({ apiKey, lat, lon, units })
   useEffect(() => { paramsRef.current = { apiKey, lat, lon, units } }, [apiKey, lat, lon, units])
 
-  // Stable fetch function — reads from ref so it never changes identity.
   const doFetch = useCallback(async (signal) => {
     const { apiKey: key, lat: la, lon: lo, units: u } = paramsRef.current
     if (!key || key.length < OWM_KEY_MIN_LEN || !la || !lo) return
@@ -47,14 +63,10 @@ function Weather() {
       setCachedForecast(fore)
       setCurrent({ stale: false, data: cur })
       setForecast({ stale: false, data: fore })
-    } catch {
-      // Network error or abort — stale cache data stays visible.
-    }
-  }, []) // intentionally stable — reads paramsRef
+    } catch { /* stale cache stays visible */ }
+  }, [])
 
-  // Only re-fetch when lat/lon actually resolve to new values. This fires
-  // once when the component mounts and again only when coordinates change
-  // (e.g., the user resolves a new city), NOT on every apiKey keystroke.
+  // Re-fetch only when coordinates actually change, not on every keystroke.
   useEffect(() => {
     const controller = new AbortController()
     setCurrent(getCachedCurrent())
@@ -63,33 +75,30 @@ function Weather() {
     return () => controller.abort()
   }, [lat, lon, isOnline, doFetch])
 
-  if (!current?.data) return null
+  // No weather data yet — render just the clock so the row is never empty.
+  if (!current?.data) {
+    return <div className={classes['row-plain']}><Time /></div>
+  }
 
-  const w       = current.data
-  const temp    = Math.round(w.main?.temp ?? 0)
-  const icon    = w.weather?.[0]?.icon
-  const desc    = w.weather?.[0]?.description ?? ''
-  const isStale = current.stale || !isOnline
+  const w          = current.data
+  const temp       = Math.round(w.main?.temp ?? 0)
+  const icon       = w.weather?.[0]?.icon
+  const desc       = w.weather?.[0]?.description ?? ''
+  const isStale    = current.stale || !isOnline
   const unitSymbol = units === 'imperial' ? '°F' : units === 'standard' ? 'K' : '°C'
 
   return (
     <>
       <button
         type="button"
-        className={classes['chip']}
+        className={classes['row']}
         onClick={() => setShowModal(true)}
         title={`${desc} — click for forecast`}
-        aria-label={`Weather: ${temp}${unitSymbol}, ${desc}. Click for details.`}>
-        {icon && (
-          <img
-            className={classes['chip-icon']}
-            src={`https://openweathermap.org/img/wn/${icon}.png`}
-            alt=""
-            width={28}
-            height={28}
-          />
-        )}
-        <span className={classes['chip-temp']}>{temp}{unitSymbol}</span>
+        aria-label={`${temp}${unitSymbol}, ${desc}. Click for weather details.`}>
+        <Time />
+        <span className={classes['sep']}>·</span>
+        <span className={classes['temp']}>{temp}{unitSymbol}</span>
+        <span className={classes['emoji']}>{weatherEmoji(icon)}</span>
         {isStale && <span className={classes['stale-dot']} aria-hidden="true" />}
       </button>
 
