@@ -136,6 +136,12 @@ body[data-color-scheme=light] .label-char {
   color: var(--match-color);
   text-shadow: 0 1px 6px rgba(0, 0, 0, 0.5);
 }
+/* Needs explicit light-mode rule to beat the higher-specificity
+   body[data-color-scheme=light] .label-char override above */
+body[data-color-scheme=light] .label-char-match {
+  color: var(--match-color);
+  text-shadow: 0 1px 4px rgba(255, 255, 255, 0.6);
+}
 
 /* The *next* character (the one still to be typed) slides in from the right.
    This is the predictive hint — it falls into place AFTER the user types the

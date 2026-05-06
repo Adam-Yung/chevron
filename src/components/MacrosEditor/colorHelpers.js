@@ -99,9 +99,10 @@ function contrast(l1, l2) {
  */
 export function readableMatchColor(bgColor, isDarkMode, textColor) {
   const MIN_CONTRAST = 2.5
-  // In dark mode, label text sits on a near-white surface (~lum 0.85).
-  // In light mode, label text sits on a near-dark surface (~lum 0.06).
-  const bgLum = isDarkMode ? 0.85 : 0.06
+  // We need the match colour to stand out against the card surface itself.
+  // Dark mode: frosted dark glass card ≈ luminance 0.04
+  // Light mode: frosted bright glass card ≈ luminance 0.80
+  const cardLum = isDarkMode ? 0.04 : 0.80
 
   const raw = midColor(bgColor)
   const parsed = parseHex(raw)
@@ -111,24 +112,24 @@ export function readableMatchColor(bgColor, isDarkMode, textColor) {
   if (!parsed) return raw
 
   const rawLum = luminance(parsed)
-  if (contrast(rawLum, bgLum) >= MIN_CONTRAST) return raw
+  if (contrast(rawLum, cardLum) >= MIN_CONTRAST) return raw
 
   // Try textColor first — it's usually already chosen to contrast the macro bg
   if (textColor) {
     const tc = parseHex(textColor)
-    if (tc && contrast(luminance(tc), bgLum) >= MIN_CONTRAST) return textColor
+    if (tc && contrast(luminance(tc), cardLum) >= MIN_CONTRAST) return textColor
   }
 
-  // Fallback: blend the raw colour heavily toward white (dark mode) or black
-  // (light mode) until contrast is sufficient, up to 3 steps.
+  // Fallback: blend the raw colour toward white (dark mode) or black (light mode)
+  // until contrast is sufficient.
   let [r, g, b] = parsed
   const target = isDarkMode ? 1 : 0
-  for (let i = 0; i < 4; i++) {
-    r = r + (target - r) * 0.45
-    g = g + (target - g) * 0.45
-    b = b + (target - b) * 0.45
+  for (let i = 0; i < 6; i++) {
+    r = r + (target - r) * 0.4
+    g = g + (target - g) * 0.4
+    b = b + (target - b) * 0.4
     const lum = luminance([r, g, b])
-    if (contrast(lum, bgLum) >= MIN_CONTRAST) break
+    if (contrast(lum, cardLum) >= MIN_CONTRAST) break
   }
   const toHex = v => Math.round(v * 255).toString(16).padStart(2, '0')
   return `#${toHex(r)}${toHex(g)}${toHex(b)}`
