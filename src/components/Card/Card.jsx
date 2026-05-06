@@ -14,7 +14,7 @@ const LOGO_TRANSITION_DELAY = .25
 // from min(height, width) of the viewport
 const LOGO_SCALE_SIZE = .3
 
-function Card({ active=false, visibility=true, icon, bgColor, textColor, macroName='', revealCount=0, isHintActive=false, onClick }) {
+function Card({ active=false, visibility=true, icon, bgColor, textColor, macroName='', matchStart=0, matchLength=0, matchColor='', revealCount=0, isHintActive=false, tabFocused=false, onClick }) {
   const [isAnimated, setIsAnimated] = useState(false)
 
   const backgroundStyle = useMemo(() => getCssGradient(bgColor), [bgColor])
@@ -161,7 +161,8 @@ function Card({ active=false, visibility=true, icon, bgColor, textColor, macroNa
   return (
     <div
       className={gC('card', classes['card'], active && classes['active'], isHintActive && revealCount > 0 && classes['label-visible'])}
-      style={{ '--macro-text': textColor }}
+      style={{ '--macro-text': textColor, '--match-color': matchColor || textColor }}
+      data-tab-focused={tabFocused || undefined}
       onClick={onClick}>
       <div className={classes['logo-wrapper']}>
         { 
@@ -173,18 +174,49 @@ function Card({ active=false, visibility=true, icon, bgColor, textColor, macroNa
           : detachableElements
         }
       </div>
-      {/* iOS-style label row: characters slide in one at a time from the right.
-          key={i} keeps existing chars stable so only the newest char animates.
-          The last character shown is always the "next hint" — one ahead of what
-          the user has typed — so it animates in as a predictive preview. */}
+      {/* Label row: three segments
+          1. prefix  — chars before the matched region, default colour
+          2. match   — the typed chars, brand colour (var(--match-color))
+          3. hint    — one char ahead of the match, default colour, slides in
+
+          When hints are inactive or revealCount is 0 nothing renders.
+          The sliding animation fires only on the single hint character,
+          preserving the existing char-slide-in flair. */}
       <div className={classes['label-row']}>
-        {isHintActive && revealCount > 0 && macroName.slice(0, revealCount).split('').map((char, i) => (
-          <span
-            key={i}
-            className={gC(classes['label-char'], i === revealCount - 1 && classes['label-char-new'])}>
-            {char}
-          </span>
-        ))}
+        {isHintActive && revealCount > 0 && (() => {
+          // matchStart/matchLength are only meaningful when a filter is active
+          // (matchLength > 0). When hints are on but no filter is set, show
+          // the first character of the name as the hint (legacy behaviour).
+          if (matchLength === 0) {
+            // No filter: just show the first character as a hint
+            return (
+              <span key="h0" className={gC(classes['label-char'], classes['label-char-new'])}>
+                {macroName[0] ?? ''}
+              </span>
+            )
+          }
+
+          const prefixEnd  = matchStart
+          const matchEnd   = matchStart + matchLength
+          const hintChar   = macroName[matchEnd] ?? ''
+
+          return (
+            <>
+              {/* prefix */}
+              {macroName.slice(0, prefixEnd).split('').map((ch, i) => (
+                <span key={`p${i}`} className={classes['label-char']}>{ch}</span>
+              ))}
+              {/* matched region */}
+              {macroName.slice(prefixEnd, matchEnd).split('').map((ch, i) => (
+                <span key={`m${i}`} className={gC(classes['label-char'], classes['label-char-match'])}>{ch}</span>
+              ))}
+              {/* hint */}
+              {hintChar && (
+                <span key="hint" className={gC(classes['label-char'], classes['label-char-new'])}>{hintChar}</span>
+              )}
+            </>
+          )
+        })()}
       </div>
     </div>
   )

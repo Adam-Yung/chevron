@@ -26,6 +26,23 @@ export function makeSolid(color = '#888888') {
   return { type: 'solid', color }
 }
 
+/**
+ * Returns a single representative colour from a bgColor object.
+ * For solid: the colour itself.
+ * For gradient: the middle stop (or first if only one).
+ * Used to tint matched filter characters on macro cards.
+ */
+export function midColor(bgColor) {
+  if (!bgColor || typeof bgColor !== 'object') return '#ffffff'
+  if (bgColor.type === 'solid') return typeof bgColor.color === 'string' ? bgColor.color : '#ffffff'
+  if (bgColor.type === 'gradient') {
+    const colors = Array.isArray(bgColor.colors) ? bgColor.colors : []
+    if (colors.length === 0) return '#ffffff'
+    return colors[Math.floor((colors.length - 1) / 2)]
+  }
+  return '#ffffff'
+}
+
 export function makeGradient(prev) {
   // Promote a solid to a 2-stop linear gradient seeded with the prev color.
   const seed = (prev && prev.type === 'solid' && prev.color) || '#888888'

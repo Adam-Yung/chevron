@@ -8,6 +8,7 @@ import { motion } from 'framer-motion'
 import Card from '../Card/Card'
 import { allowedModes } from '../../rules'
 import { pinnedMacros, score } from './macroData'
+import { midColor } from '../MacrosEditor/colorHelpers'
 import classes from './MacrosMenu.module.css'
 import '@splidejs/react-splide/css'
 
@@ -59,13 +60,14 @@ function MacrosMenu({ visibility, fullVisibility }) {
   )
   const hintsActive = !isPointerCoarse && (macroHintsKeyboard || macroFilter.length > 0)
   const [isCardInFocus, setIsCardInFocus] = useState(false)
+  // Tab-cycling cursor: index into visibleMacros, or null for no selection.
+  const [tabCursor, setTabCursor] = useState(null)
   const sliderRef    = useRef(null)
   const containerRef = useRef(null)
 
-  // When the filter is active, the MacroFilterPill adds ~40px above the
-  // grid. Keep grid rows unchanged — reducing rows inflates card size.
-  // Instead, the container height is reduced via CSS data attribute so
-  // the pill + cards together fit within the available half-screen space.
+  // Reset tab cursor whenever the visible set changes.
+  useEffect(() => { setTabCursor(null) }, [visibleMacros])
+
   const activeRows     = rows
   const slideCapacity  = cols * activeRows
   const isVisibleSliderHasMultipleSlides = visibleMacros.length > slideCapacity
@@ -99,21 +101,33 @@ function MacrosMenu({ visibility, fullVisibility }) {
     return () => document.removeEventListener('keypress', handleKeypress)
   }, [mode, activateCard])
 
-  // Enter while the menu is open activates the first visible result.
-  // Uses keydown (not keypress) so it fires reliably for Enter.
-  // preventDefault stops any upstream handler (e.g. QueryField) from also
-  // reacting. No-op when isEmpty or there is nothing to activate.
+  // Enter activates the Tab-focused card, or the first visible result if no
+  // Tab selection has been made. Uses keydown so it fires reliably for Enter.
+  // preventDefault stops any upstream handler (e.g. QueryField) reacting.
   useEffect(() => {
     const handleKeydown = e => {
-      if (e.code !== 'Enter') return
       if (!allowedModes.get('Chevron').has(mode)) return
       if (visibleMacros.length === 0) return
-      e.preventDefault()
-      activateCard(visibleMacros[0])
+
+      if (e.code === 'Tab') {
+        e.preventDefault()
+        setTabCursor(prev => {
+          if (prev === null) return e.shiftKey ? visibleMacros.length - 1 : 0
+          const next = e.shiftKey ? prev - 1 : prev + 1
+          return ((next % visibleMacros.length) + visibleMacros.length) % visibleMacros.length
+        })
+        return
+      }
+
+      if (e.code === 'Enter') {
+        e.preventDefault()
+        const target = tabCursor !== null ? visibleMacros[tabCursor] : visibleMacros[0]
+        if (target) activateCard(target)
+      }
     }
     document.addEventListener('keydown', handleKeydown)
     return () => document.removeEventListener('keydown', handleKeydown)
-  }, [mode, visibleMacros, activateCard])
+  }, [mode, visibleMacros, tabCursor, activateCard])
 
   const splideOptions = {
     ref: sliderRef,
@@ -180,7 +194,6 @@ function MacrosMenu({ visibility, fullVisibility }) {
       ref={containerRef}
       className={classes['container']}
       style={{ '--grid-rows': activeRows }}
-      data-filtered={macroFilter.length > 0 || undefined}
       data-glassmorphism={glassmorphism || undefined}>
       {isEmpty ? (
         <div className={classes['empty']}>
@@ -193,28 +206,38 @@ function MacrosMenu({ visibility, fullVisibility }) {
         // retained per Option A in § 3.5.3). The stagger re-fires on remount,
         // which is the desired effect — new card set slides in fresh.
         <Splide {...splideOptions} key={macroFilter || '__all__'}>
-          {visibleMacros.map(pm => (
-            <SplideSlide key={pm.name}>
-              {/* motion.li wrapper for stagger entrance (Phase 7 primitives:
-                  opacity + translateY only). */}
-              <motion.div
-                className={classes['slide-inner']}
-                variants={itemVariants}
-                initial="hidden"
-                animate="visible">
-                <Card
-                  active={pm === selected && visibility && fullVisibility && isCardInFocus}
-                  title={pm.name}
-                  icon={pm.icon}
-                  bgColor={pm.bgColor}
-                  textColor={pm.textColor}
-                  macroName={pm.name}
-                  revealCount={macroFilter.length > 0 ? macroFilter.length + 1 : (hintsActive ? 1 : 0)}
-                  isHintActive={hintsActive}
-                  onClick={() => activateCard(pm)}/>
-              </motion.div>
-            </SplideSlide>
-          ))}
+          {visibleMacros.map((pm, idx) => {
+            const needle     = macroFilter.trim().toLowerCase()
+            const nameLower  = pm.name.toLowerCase()
+            const matchStart = needle ? Math.max(nameLower.indexOf(needle), 0) : 0
+            const matchColor = midColor(pm.bgColor)
+            return (
+              <SplideSlide key={pm.name}>
+                {/* motion.li wrapper for stagger entrance (Phase 7 primitives:
+                    opacity + translateY only). */}
+                <motion.div
+                  className={classes['slide-inner']}
+                  variants={itemVariants}
+                  initial="hidden"
+                  animate="visible">
+                  <Card
+                    active={pm === selected && visibility && fullVisibility && isCardInFocus}
+                    title={pm.name}
+                    icon={pm.icon}
+                    bgColor={pm.bgColor}
+                    textColor={pm.textColor}
+                    macroName={pm.name}
+                    matchStart={matchStart}
+                    matchLength={needle.length}
+                    matchColor={matchColor}
+                    revealCount={macroFilter.length > 0 ? macroFilter.length + 1 : (hintsActive ? 1 : 0)}
+                    isHintActive={hintsActive}
+                    tabFocused={tabCursor === idx}
+                    onClick={() => activateCard(pm)}/>
+                </motion.div>
+              </SplideSlide>
+            )
+          })}
         </Splide>
       )}
     </div>
