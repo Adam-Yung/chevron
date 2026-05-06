@@ -1,4 +1,4 @@
-import Color from 'colorjs.io'
+import Color from './color'
 
 function getContrast(bgColor, color1, color2) {
   const background = bgColor instanceof Color ? bgColor : new Color(bgColor)

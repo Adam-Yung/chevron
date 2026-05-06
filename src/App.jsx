@@ -45,6 +45,12 @@ function App() {
   const onContextMenuRef = useRef(null)
   const onKeyUpRef = useRef(null)
   const onKeyDownRef = useRef(null)
+  // Tracks whether the menu is currently being "peeked" via a held Shift
+  // key. Without this, a tap of Shift fires keydown→opened then keyup→default
+  // in rapid succession, which lets two animations interleave and produces
+  // visual artifacts. We also use it to make sure pressing Shift while the
+  // menu is already open via the button or context menu does NOT close it.
+  const shiftPeekingRef = useRef(false)
 
   function switchMacrosMenu() {
     if (mode === 'default')
@@ -54,16 +60,21 @@ function App() {
   }
 
   onKeyUpRef.current = e => {
-    if (e.key === 'Shift')
-      if (allowedModes.get('Chevron').has(mode))
-        if (mode === 'opened')
-          updateStore({ mode: 'default' })
+    if (e.key !== 'Shift') return
+    if (!shiftPeekingRef.current) return
+    shiftPeekingRef.current = false
+    if (allowedModes.get('Chevron').has(mode) && mode === 'opened')
+      updateStore({ mode: 'default' })
   }
   onKeyDownRef.current = e => {
-    if (e.key === 'Shift')
-        if (allowedModes.get('Chevron').has(mode))
-          if (mode === 'default')
-            updateStore({ mode: 'opened' })
+    // Ignore OS-level key auto-repeat so a long-held Shift doesn't keep
+    // re-triggering the open animation.
+    if (e.key === 'Shift' && !e.repeat && !shiftPeekingRef.current) {
+      if (allowedModes.get('Chevron').has(mode) && mode === 'default') {
+        shiftPeekingRef.current = true
+        updateStore({ mode: 'opened' })
+      }
+    }
 
     // '?' (Shift+/) opens the cheatsheet. Because QueryField always
     // grabs focus, restricting on `tagName === INPUT` would mean the
@@ -98,13 +109,20 @@ function App() {
     const onKeyUp = e => onKeyUpRef.current(e)
     const onKeyDown = e => onKeyDownRef.current(e)
 
+    // If the window loses focus while Shift is held, the keyup will never
+    // arrive and the menu would stay stuck "peeked open". Drop the peek
+    // flag so the next press starts cleanly.
+    const onWindowBlur = () => { shiftPeekingRef.current = false }
+
     document.addEventListener('keyup', onKeyUp)
     document.addEventListener('keydown', onKeyDown)
     document.addEventListener('contextmenu', onContextMenu)
+    window.addEventListener('blur', onWindowBlur)
     return () => {
       document.removeEventListener('keyup', onKeyUp)
       document.removeEventListener('keydown', onKeyDown)
       document.removeEventListener('contextmenu', onContextMenu)
+      window.removeEventListener('blur', onWindowBlur)
     }
   }, [])
 

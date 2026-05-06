@@ -1,7 +1,7 @@
 import { useContext, useEffect, useRef } from 'react'
 import { useState } from 'react'
 import { SettingsContext } from '../../contexts/Settings'
-import { ReactMarkdown } from 'react-markdown/lib/react-markdown'
+import renderMarkdown from '../../functions/generationUtils/renderMarkdown'
 import Icon from '../../chatGPT/Icon'
 import createCompletion from '../../chatGPT/createCompletion'
 import classes from './AIcompletion.module.css'
@@ -118,7 +118,7 @@ function AIcompletion({ query, className }) {
     <Icon className={classes['icon']} onClick={e => e.stopPropagation()}/>
     <div className={className} onClick={e => e.stopPropagation()}>
       <div className={classes['md-container']}>
-        <ReactMarkdown children={completion}/>
+        {renderMarkdown(completion)}
       </div>
     </div>
   </>

@@ -3,7 +3,7 @@ import { Button, Tooltip, Card, Box, Input , Alert, Link} from '@mui/joy'
 import { HexColorPicker } from 'react-colorful'
 import { ButtonCheck, ButtonX } from '../Buttons/Buttons'
 import { BsDiagram2Fill, BsQuestionCircle, BsStars } from 'react-icons/bs'
-import Color from 'colorjs.io'
+import Color from '../../../functions/generationUtils/color'
 import classes from './ColorPicker.module.css'
 import getContrast from '../../../functions/generationUtils/getContrast'
 

@@ -1,6 +1,6 @@
 import { useContext, useEffect, useRef, useState } from 'react'
 import { SettingsContext } from '../../contexts/Settings'
-import dateFormat from 'dateformat'
+import formatDate from '../../functions/generationUtils/formatDate'
 import classes from './Time.module.css'
 
 function Time() {
@@ -30,7 +30,7 @@ function Time() {
 
   return (
     <div className={classes['time']} style={variables}>
-      {dateFormat(time, format)}
+      {formatDate(time, format)}
     </div>
   )
 }

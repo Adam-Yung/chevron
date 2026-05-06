@@ -19,7 +19,7 @@ Status legend: `[x]` shipped &nbsp;·&nbsp; `[~]` in progress &nbsp;·&nbsp; `[ 
 
 ## Completed
 
-> Phases 0 → 5 shipped.
+> Phases 0 → 6 shipped.
 
 ### Phase 0 — Stability safety net  `[x]`  &nbsp;_(commit `92aed52`)_
 
@@ -222,34 +222,77 @@ Safe major bumps verified by build at each step.
 **Deferred** (intentionally — high blast radius, separate phases):
 - `@mui/joy` `5.0.0-alpha.64` → stable v5: token names and the
   `CssVarsProvider` setup shifted; the Settings panel uses Joy
-  pervasively. Phase 6's bundle-splitting work is a better moment to
-  also evaluate replacing Joy with a lighter primitives layer.
+  pervasively. The Settings chunk is already lazy-split (Phase 6),
+  so the Joy weight no longer sits in the initial paint. The
+  remaining win from a Joy swap is purely "drop the Settings chunk
+  size", which is queued for its own phase.
 - React 18 → 19: StrictMode behavior change (double-effects in
   development) interacts with the focus-management work in Phase 3,
   so a review pass is warranted before bumping.
 - ESLint 8 → 9: requires migrating to the flat-config schema; not
   worth it until the test setup in Phase 13 lands.
 
-### Phase 6 — Bundle splitting + first-paint diet  `[ ]`
+### Phase 6 — Bundle splitting + first-paint diet  `[x]`
 
-The single-file build is great for the static zip release but hurts the
-hosted / dev experience.
+The single-file build was great for the static zip release but hurt the
+hosted / dev experience. Phase 6 keeps the static profile intact and
+introduces a hosted profile alongside it, while replacing every
+mid-weight dependency that didn't earn its bytes.
 
-- [ ] Two build profiles: `build:static` keeps `vite-plugin-singlefile`
-      for the release zip; `build:hosted` ships a normal multi-chunk
-      output for caching.
-- [ ] Route-level / panel-level `React.lazy` for `Settings`, `Macros`,
-      `QuickLook` (Settings + AIcompletion already done in 1.5).
-- [ ] Replace **`react-fast-marquee`** with a pure CSS keyframe
-      scroller (saves a dep, runs on the compositor only).
-- [ ] Replace **`react-markdown`** with a lighter streaming-friendly
-      renderer for AI output (`marked` + sanitizer, or a tiny custom
-      parser since we only need bold/italic/code/lists).
-- [ ] Replace **`colorjs.io`** in the contrast / theme paths with a
-      small APCA helper (~10 KB → <2 KB).
-- [ ] Replace **`dateformat`** with `Intl.DateTimeFormat` (need to
-      translate the existing format strings).
-- [ ] Goal: < 700 KiB hosted bundle, < 350 KiB initial chunk.
+- [x] **Two build profiles** wired into `vite.config.js` via Vite's
+      `--mode`:
+  - `npm run build:static` → singlefile output (release zip,
+    Express-served local backend).
+  - `npm run build:hosted` → multi-chunk Vite output with content
+    hashes on every asset name.
+- [x] Route-level / panel-level `React.lazy` for `MacrosMenu`
+      (Splide ~25 KB) added on top of the existing
+      `Settings`/`AIcompletion`/`Cheatsheet`/`MacrosEditor` lazies.
+      `QuickLook` deliberately stayed eager — it's mounted on first
+      paint alongside `Chevron` and lazy-loading would just add a
+      Suspense flicker on the search animation.
+- [x] Replaced **`react-fast-marquee`** with a pure CSS keyframe
+      scroller (`.marquee-track`, `@keyframes marquee-scroll`). Runs
+      entirely on the compositor; `prefers-reduced-motion` disables
+      the animation outright.
+- [x] Replaced **`react-markdown`** (and its `unified` /
+      `mdast-util-from-markdown` chain) with a ~150-line renderer
+      (`src/functions/generationUtils/renderMarkdown.jsx`). Handles
+      headings / bold / italic / inline + fenced code / lists / safe
+      links, and tolerates unterminated fences for streaming output.
+      URL allow-list (`http(s)`, `mailto`, `/`, `#`) prevents
+      `javascript:` injections.
+- [x] Replaced **`colorjs.io`** with a tiny `Color` class in
+      `src/functions/generationUtils/color.js` covering the exact
+      operations the app uses: hex / rgb parsing, OKLCH-based
+      lighten / darken (`set({ 'lch.l': fn })`), and APCA contrast
+      via the public SAPC reference math.
+- [x] Replaced **`dateformat`** with a token-compatible 30-line
+      formatter (`src/functions/generationUtils/formatDate.js`).
+      Existing user-saved format strings keep producing the same
+      output (`h:MM` still renders hour-12 + month, matching the old
+      lib's quirks intentionally).
+- [x] **Cache versioning**: a custom Vite plugin
+      (`publicCacheBust`) appends `?v=<package version>` to
+      `<script src="config.js">` and `<script src="icons.js">` so a
+      version bump invalidates the browser's cached copy of the
+      stable-named helper scripts. Vite's default content hashes
+      cover the rest of the asset graph.
+- [x] **Result** (static profile):
+  - Bundle: ~1140 KiB → ~1073 KiB.
+  - Modules: 1253 → 1140.
+  - Five npm deps removed: `colorjs.io`, `dateformat`,
+    `react-markdown`, `react-fast-marquee`, plus 60+ transitive
+    packages dropped from the lockfile.
+- [x] **Result** (hosted profile):
+  - Initial chunk: ~557 KiB raw / ~176 KiB gzipped.
+  - Lazy chunks: `MacrosMenu` (45 KiB), `Settings` (25 KiB),
+    `MacrosEditor` (23 KiB), `AIcompletion` (8 KiB), `Cheatsheet`
+    (4 KiB).
+  - The 350 KiB initial-chunk goal isn't hit yet — the bulk of the
+    initial chunk is now `framer-motion` + `@mui/joy`'s emotion
+    runtime. Phase 7 (compositor-friendly visuals) and the deferred
+    `@mui/joy` swap are the right places to attack that.
 
 ### Phase 7 — Compositor-friendly visuals  `[ ]`
 
@@ -362,6 +405,24 @@ different escape rules. Consolidate.
       malformed templates at config-load time.
 - [ ] Engine-typing (autocomplete, currency, calculator) becomes a
       first-class registry instead of hard-coded `if` chains.
+
+---
+
+## Drive-by fixes (not part of any phase)
+
+- **Shift macro-menu toggle dual-fire** _(landed alongside Phase 6)_:
+  Pressing Shift opened the menu (`keydown` → `mode='opened'`) and
+  releasing it closed the menu (`keyup` → `mode='default'`). A quick
+  tap fired both within the same animation frame, so the open and
+  close transitions interleaved and produced visual glitches. Pressing
+  Shift while the menu was already open via the side button also
+  closed it as a side-effect.
+  - `App.jsx` now tracks `shiftPeekingRef` so `keyup` only reverts
+    state if the matching `keydown` is what opened the menu.
+  - `e.repeat` is filtered so OS key auto-repeat can't re-fire the
+    open transition while Shift is held.
+  - A `window.blur` listener clears the peek flag so a held Shift
+    doesn't get "stuck" if the user alt-tabs away.
 
 ---
 

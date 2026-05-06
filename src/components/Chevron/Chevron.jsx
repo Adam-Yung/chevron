@@ -1,9 +1,13 @@
-import { useMemo, useContext, useRef, useEffect, useState } from 'react'
+import { lazy, Suspense, useMemo, useContext, useRef, useEffect, useState } from 'react'
 import { SettingsContext, ThemeContext } from '../../contexts/Settings'
 import { useStateSelector } from '../../contexts/Store'
 import useTransitions from '../../hooks/useTransitions'
 import Time from '../Time/Time'
-import MacrosMenu from '../MacrosMenu/MacrosMenu'
+// MacrosMenu drags Splide + the grid extension (~25 KB gzipped) into the
+// initial chunk. Defer it: the menu is only meaningful once the user
+// actually opens the Chevron in `opened` mode, so a Suspense boundary
+// keeps the first paint slim.
+const MacrosMenu = lazy(() => import('../MacrosMenu/MacrosMenu'))
 import { motion, useAnimationControls } from 'framer-motion'
 import { easeInOutQuad, easeInQuad, easeOutCubic, easeOutQuad } from '../../functions/animUtils/easings'
 import dC from '../../functions/generationUtils/dCommandToString'
@@ -303,12 +307,14 @@ function Chevron({ visibility, onAnimationEnd }) {
             vectorEffect="non-scaling-stroke"/>
         </motion.svg>
         <div className={classes['wrapper']}>
-          <motion.div 
+          <motion.div
             initial={{ translateY: '-100%'}}
             animate={controls.bottomMenu}>
-              <MacrosMenu 
-                visibility={visibility}
-                fullVisibility={isMacrosMenuRendered}/>
+              <Suspense fallback={null}>
+                <MacrosMenu
+                  visibility={visibility}
+                  fullVisibility={isMacrosMenuRendered}/>
+              </Suspense>
           </motion.div>
         </div>
       </div>

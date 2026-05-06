@@ -34,6 +34,24 @@
   font-size: var(--text-size);
   font-weight: bold;
   text-transform: uppercase;
+  overflow: hidden;
+  width: 100%;
+}
+
+@keyframes marquee-scroll {
+  from { transform: translate3d(0, 0, 0); }
+  to { transform: translate3d(-50%, 0, 0); }
+}
+
+.marquee-track {
+  display: flex;
+  width: max-content;
+  will-change: transform;
+  animation: marquee-scroll var(--marquee-duration, 30s) linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marquee-track { animation: none; }
 }
 
 .row {
