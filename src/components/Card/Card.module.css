@@ -86,14 +86,30 @@ body[data-color-scheme=light] .card:active::before {
 body[data-color-scheme=light] .hint {
   filter: brightness(80%);
 }
+/* Phase 8b_continued: use a keyframe animation (not a transition) for the
+   active reveal. Splide remounts each Card on every filter change, and CSS
+   transitions don't fire on element mount — only on subsequent state changes.
+   A keyframe runs whenever `.hint.active` is present at mount, so the
+   slide-in plays after every keystroke as the user types into the macro
+   filter. Duration restored to 2.5s (the pre-8a value) for the dramatic
+   diagonal sweep feel. */
 .hint.active {
   transform: rotate(35deg) translate(20%);
   opacity: 1;
-  /* Phase 8a polish: hints are now always-on (gated only on touch). The
-     2.5s reveal made sense for the old hold-Shift peek; for always-on
-     it just delays first paint and re-animates on every filter remount.
-     Match the .2s deactivate timing. */
-  transition: opacity .2s ease, transform .2s ease;
+  animation: hint-slide-in 2.5s ease both;
+}
+@keyframes hint-slide-in {
+  from {
+    opacity: 0;
+    transform: rotate(35deg) translate(-10%);
+  }
+  to {
+    opacity: 1;
+    transform: rotate(35deg) translate(20%);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hint.active { animation: none; }
 }
 
 .plate {

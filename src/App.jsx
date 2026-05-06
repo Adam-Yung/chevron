@@ -12,6 +12,14 @@ import LayoutButton from './components/LayoutButton/LayoutButton'
 const Settings = lazy(() => import('./components/Settings/Settings'))
 // Cheatsheet is small but never needed on first paint, so lazy-load it too.
 const Cheatsheet = lazy(() => import('./components/Cheatsheet/Cheatsheet'))
+// Pre-warm the MacrosMenu chunk on idle so the first open is instant and the
+// CSS keyframe hint animation fires rather than being skipped because the
+// chunk hadn't loaded before the open animation completed.
+if (typeof requestIdleCallback !== 'undefined') {
+  requestIdleCallback(() => import('./components/MacrosMenu/MacrosMenu'))
+} else {
+  setTimeout(() => import('./components/MacrosMenu/MacrosMenu'), 200)
+}
 import OfflineIndicator from './components/OfflineIndicator/OfflineIndicator'
 import { BsGearFill, BsChevronRight, BsQuestionLg } from 'react-icons/bs'
 import { RiMenu5Fill } from 'react-icons/ri'
@@ -66,10 +74,16 @@ function App() {
   //    leave-opened transition, so the end state matches a full reset.
   //  - anything else → resetStore: catches edge cases like Shift while
   //    `searching` where we genuinely want query/selection cleared.
-  function switchMacrosMenu() {
+  //
+  // Phase 8b: `viaKeyboard` propagates the input modality of the open
+  // gesture into the store. The Shift handler passes true; right-click
+  // and the side button pass false. MacrosMenu uses this to decide
+  // whether to reveal the per-card key hints — they only help if the
+  // user is about to keyboard-navigate.
+  function switchMacrosMenu(viaKeyboard = false) {
     const liveMode = modeRef.current
     if (liveMode === 'default')
-      updateStore({ mode: 'opened' })
+      updateStore({ mode: 'opened', macroHintsKeyboard: viaKeyboard })
     else if (liveMode === 'opened')
       updateStore({ mode: 'default' })
     else
@@ -86,7 +100,9 @@ function App() {
       // Shift in `searching` mode from accidentally jumping into the
       // macro menu mid-search.
       if (allowedModes.get('Chevron').has(liveMode)) {
-        switchMacrosMenu()
+        // viaKeyboard=true: Shift opening means the user is about to
+        // key-navigate, so reveal the per-card hints in MacrosMenu.
+        switchMacrosMenu(true)
       }
     }
 
@@ -233,7 +249,7 @@ function App() {
                     <LayoutButton
                       id='macros-menu'
                       style={{ right: 0, bottom: 0 }}
-                      onClick={switchMacrosMenu}>
+                      onClick={() => switchMacrosMenu(false)}>
                         {
                           mode === 'default' && <RiMenu5Fill/>
                         }

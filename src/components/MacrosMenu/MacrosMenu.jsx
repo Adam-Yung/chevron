@@ -28,6 +28,9 @@ function MacrosMenu({ visibility, fullVisibility }) {
   const mode = useStateSelector(store => store.mode)
   // Phase 8a: typed-to-filter buffer. Empty string = show every pinned macro.
   const macroFilter = useStateSelector(store => store.macroFilter)
+  // Phase 8b: true iff the menu was opened via Shift. Combined with the
+  // filter buffer below to decide whether per-card key hints are shown.
+  const macroHintsKeyboard = useStateSelector(store => store.macroHintsKeyboard)
   // ---
 
   // Phase 8a: filter the pinned set by case-insensitive substring match
@@ -51,16 +54,21 @@ function MacrosMenu({ visibility, fullVisibility }) {
 
   // selected macro
   const [selected, setSelected] = useState(null)
-  // Phase 8a polish: hints are always on for pointer-fine devices
-  // (mouse / trackpad). Touch devices suppress the hint because there's
-  // no keyboard to act on it. Tracked once on mount; we don't bother
-  // with a media-query listener because input modality rarely changes
-  // mid-session.
-  const [hintsEnabled] = useState(() =>
-    typeof window === 'undefined' || typeof window.matchMedia !== 'function'
-      ? true
-      : !window.matchMedia('(pointer: coarse)').matches
+  // Phase 8b: hint visibility rule. Hints help only when the user is
+  // about to use the keyboard:
+  //   - opened via Shift            → show (macroHintsKeyboard === true)
+  //   - opened by mouse/touch, then
+  //     user starts typing          → show (macroFilter.length > 0)
+  //   - opened by mouse/touch, idle → hide
+  // Touch-only devices never see hints because there's no keyboard to
+  // act on them. Modality is captured once at mount because input mode
+  // very rarely changes mid-session.
+  const [isPointerCoarse] = useState(() =>
+    typeof window !== 'undefined'
+    && typeof window.matchMedia === 'function'
+    && window.matchMedia('(pointer: coarse)').matches
   )
+  const hintsActive = !isPointerCoarse && (macroHintsKeyboard || macroFilter.length > 0)
   // if the slider is on the slide with the selected card
   const [isCardInFocus, setIsCardInFocus] = useState(false)
   const sliderRef = useRef(null)
@@ -150,7 +158,7 @@ function MacrosMenu({ visibility, fullVisibility }) {
                   bgColor={pm.bgColor}
                   textColor={pm.textColor}
                   hotKey={nextHintChar(pm.name, macroFilter)}
-                  isHintActive={hintsEnabled}
+                  isHintActive={hintsActive}
                   onClick={() => activateCard(pm)}/>
               </SplideSlide>
             )

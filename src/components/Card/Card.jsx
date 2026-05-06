@@ -172,10 +172,10 @@ function Card({ active=false, visibility=true, icon, bgColor, textColor, hotKey,
           : detachableElements
         }
       </div>
-      <motion.div 
+      <div 
         className={gC(classes['hint'], isHintActive && classes['active'])}>
         {hotKey}
-      </motion.div>
+      </div>
     </div>
   )
 }

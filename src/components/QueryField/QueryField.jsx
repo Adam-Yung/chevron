@@ -77,6 +77,11 @@ function QueryField () {
   }, [mode, query, updateStore])
 
   const onKeyDown = useCallback((e) => {
+    // Don't intercept keystrokes while Settings or any other [data-keep-focus]
+    // panel has focus — let those panels handle their own keyboard events.
+    const ae = document.activeElement
+    if (ae && ae.closest && ae.closest('[data-keep-focus]')) return
+
     switch (e.key) {
       case 'Enter':
         if (allowedModes.get('QueryField').has(mode)) {
@@ -137,6 +142,11 @@ function QueryField () {
     // If we re-focused the input here, the next keydown would route through
     // the input's native handler too and the filter would be double-fed.
     if (mode === 'opened') return
+
+    // Don't steal focus from Settings, Cheatsheet, or any other panel that
+    // has declared it owns the keyboard via [data-keep-focus].
+    const ae = document.activeElement
+    if (ae && ae.closest && ae.closest('[data-keep-focus]')) return
 
     if (allowedModes.get('QueryField').has(mode)) {
       if (e.code === 'Space') {

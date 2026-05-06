@@ -325,6 +325,21 @@ animations land on top of compositor-only primitives.
        backed module-scope time store so the clock keeps ticking across
        any unmount/remount churn; new `ChevronTop` component hosting
        the clock with a future slot for the weather widget.
+- [x] **8b_continued — three regressions to clean up before Phase 7**
+       (see `Macro_menu_redesign.md` § 3.3 for the full spec). Fixed:
+  - [x] **Clock still pinned**: root cause was Vite HMR loading a
+         fresh `timeStore.js` module while the original `setInterval`
+         kept mutating the OLD module's `nowMs`. Added
+         `import.meta.hot.dispose(() => clearInterval(intervalHandle))`
+         so only the live module's timer runs (§ 3.3.1).
+  - [x] **Hint slide-in too short**: restored 2.5 s keyframe duration
+         in `Card.module.css` for the dramatic diagonal sweep
+         (`-10% → 20%` translate on the rotated element) (§ 3.3.2).
+  - [x] **Hint animation did not fire on initial open**: framer-motion's
+         `<motion.div>` was attaching inline transform styles that
+         clobbered the CSS keyframe's `from` state. Replaced with a
+         plain `<div>`; also pre-warmed the MacrosMenu lazy chunk on
+         idle so the chunk is loaded before the first open (§ 3.3.3).
 - [ ] **(Phase 7 lands here)** — compositor-friendly visuals so 8c's
        new animations are built on the right primitives from day one.
        See the Phase 7 entry above.

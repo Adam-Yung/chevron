@@ -18,6 +18,15 @@ class InitialStore {
     // from `query` so the macro menu and the search suggestions can never
     // be visible at the same time.
     this.macroFilter = '',
+    // Phase 8b: signals that the macro menu was brought up via keyboard
+    // (Shift toggle) so the per-card key hints should be revealed. When
+    // the menu is opened by right-click, the side button, or touch, this
+    // stays false and hints are hidden — they're only useful for users
+    // who are about to act on them with the keyboard. Typing into the
+    // filter also reveals hints (via macroFilter.length > 0 in the
+    // consumer), which covers the case of "opened by mouse, then user
+    // started typing".
+    this.macroHintsKeyboard = false,
     this.timestamp = Date.now()
   }
 }
@@ -52,8 +61,12 @@ function useUpdate() {
     // Phase 8a: leaving `opened` mode (via Esc, Shift toggle, right-click,
     // or any other transition) clears the macro filter so the next time
     // the menu opens it starts blank.
-    if (newState.mode !== 'opened')
+    if (newState.mode !== 'opened') {
       newState.macroFilter = ''
+      // Reset the keyboard-opened flag whenever we leave macro mode, so
+      // a subsequent mouse/touch open doesn't inherit the prior reveal.
+      newState.macroHintsKeyboard = false
+    }
 
     store.update(newState)
   }, [store])

@@ -130,7 +130,7 @@ const template = {
         { min: 0.1, max: 10, step: 0.1 },
         { format: '{@}em', description: 'Font size of the clock display.' }
       ),
-      format: new types.Input('h:MM', undefined, { description: "Clock format string. Tokens: HH/H, hh/h, MM/M, mm/m, ss/s, dd/d, TT/tt, yyyy/yy." })
+      format: new types.Input('h:mm', undefined, { description: "Clock format string. Tokens: HH/H, hh/h, MM/M, mm/m, ss/s, dd/d, TT/tt, yyyy/yy." })
     }
   }
 }

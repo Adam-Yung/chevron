@@ -1,563 +1,643 @@
-# Macro Menu Redesign
+# Macro Menu Redesign — Phase 8 implementation guide
 
-> Long-form planning document for Phase 8 (working title: **Reimagined macro
-> mode**). Authored so a fresh-context Claude session can pick up and execute
-> end-to-end without re-deriving the design.
+> **Status legend** (mirrors `Roadmap.md`):
+> &nbsp;&nbsp; `[x]` shipped &nbsp;·&nbsp; `[~]` in progress &nbsp;·&nbsp; `[ ]` planned
 >
-> Author note (2026-05-05): this is a **planning artifact only**. No code in
-> the repo is touched by this commit. Implementation is broken into commits
-> 8a → 8e per the plan below.
+> This document is the **executable spec** for Phase 8. Each section maps
+> 1:1 to a sub-commit listed in `Roadmap.md` § "Phase 8 — Macro mode
+> reimagined". A fresh-context Claude session should be able to read this
+> top-to-bottom and finish Phase 8 without asking the human for any
+> design decision that isn't already captured here.
+>
+> When you ship a sub-commit, **also tick its box in `Roadmap.md`** and
+> append the SHA in the commit-message style of the existing entries.
 
 ---
 
-## 0. TL;DR
+## 0. Sequencing snapshot
 
-The macro menu currently piggybacks on the search-mode state machine, which
-creates two overlapping UIs (menu + suggestions stack) and makes "shift to
-toggle" ambiguous with "shift to peek". This phase:
+```
+8a              [x]  Decoupling                                 (commit 1ddee78 + earlier)
+8b              [x]  Time singleton + ChevronTop shell
+8b_continued    [~]  Three regressions from 8a/8b              ← YOU ARE HERE
+Phase 7         [ ]  Compositor-friendly visuals
+8c              [ ]  MacrosMenu redesign + icon picker
+8d              [ ]  Weather widget
+8e              [ ]  Gestures + minimal touch
+Phase 16        [ ]  README rewrite + project polish            (after Phase 8)
+```
 
-1. **Decouples macro mode from search mode** with a new `macro` mode and a
-   new `macroFilter` slice in the store, completely independent of `query`.
-2. **Reimagines the macro menu** as a modern, touch-first grid with
-   Framer-Motion stagger entrances, search-as-you-type filter overlay, and
-   compositor-only animations.
-3. **Fixes the clock** (root cause: re-mount churn on mode transitions) and
-   adds an **OpenWeatherMap widget** to its right with graceful no-key
-   fallback.
-4. **Adds a gesture system** (swipe up = open, swipe down = close, swipe
-   left/right inside menu = paginate) that's **opt-in by default on
-   desktop**, automatic on touch devices.
-5. Carves out roadmap entries for **calculator + currency / weight / time
-   converters** as future engine-typed inputs.
+Phase 7 is interleaved between `8b_continued` and `8c` so 8c's stagger
+animations land on top of compositor-only primitives. See § 8.7.
 
-The user's vision is endorsed with **three pushbacks** captured below
-(§ 2). The implementation is broken into five commits (§ 8) so each can be
-reverted independently.
+Phase 8.5 (settings schema + migration) is unrelated to the macro work
+and lives alongside, not blocking.
 
 ---
 
-## 1. Problem statement
+## 1. Original problem statement (preserved for context)
 
-### 1.1 Bugs the user reported
+The macro menu used to piggyback on the search-mode state machine,
+producing two overlapping UIs (menu + suggestions stack). "Shift to
+toggle" overlapped ambiguously with "Shift to peek". The clock didn't
+tick reliably. Right-click was a toggle (surprising for a destructive
+control). There was no type-to-filter, no weather widget, no gestures.
 
-- **Macro menu and search stack visually**: with the menu open, typing
-  causes `query` to populate, which trips the `query → searching` reducer
-  in `Store.jsx:44-47`, which tries to play the *opened → searching*
-  transition (which doesn't exist in `Chevron.jsx`'s transition table),
-  leaving both UIs visible simultaneously.
-- **Shift again doesn't fully close**: keydown opens, but a second
-  Shift while in `opened` mode currently triggers the keyup-close path
-  *and* the `peekingRef`-was-false branch, so visual state desyncs.
-  The recent fix (using `modeRef`) solved the keyup-stale-closure case
-  but did not address "Shift while already opened via button".
-- **Clock doesn't tick** while the menu is visible. Time.jsx's recursive
-  setTimeout is correct (line 38-43), but `MacrosMenu` is wrapped in a
-  `Suspense` boundary mounted from `Chevron.jsx:313-317`, and the
-  surrounding `<motion.div>` exit animation can unmount Time. Also,
-  `useEffect([])` won't re-fire when the parent flickers in/out of
-  Suspense.
-- **Right-click toggles** (currently `switchMacrosMenu` in App.jsx:62) but
-  user wants right-click to be a destructive close, not a toggle.
+Phase 8 fixes all of the above in five sub-commits, with Phase 7
+interleaved so the redesign rests on compositor-only primitives.
 
-### 1.2 What the user wants
+### 1.1 Pushback decisions (still in force)
 
-(quoting their own framing, condensed)
+- **Hold-Shift typing is broken at the OS level** (every char arrives
+  shifted). Decision: scrap the tap-vs-hold distinction entirely.
+  Shift is now a pure toggle. Typing into the open menu uses the new
+  `macroFilter` slice. (User-confirmed.)
+- **7-day forecast is too dense.** Decision: today-only by default, 5-day
+  strip on hover/tap. Configurable.
+- **"Touch as a first-class citizen" is Phase 10.** Phase 8e ships
+  desktop trackpad gestures + a minimal touch path (no auto-focus,
+  bigger hit targets) but does NOT lift the mobile-not-supported
+  banner. (User-confirmed.)
+- **Skip MiniSearch.** Hand-rolled prefix+substring scorer instead, in
+  the spirit of Phase 6's anti-bloat posture. (User-confirmed.)
 
-- Pressing Shift, Esc, or right-click while macro mode is active = **full
-  reset to default**.
-- **Hold-Shift** opens the menu and lets the user type to filter while held;
-  release = close.
-- **Tap-Shift** also opens (keep current peek behavior) but typing inside
-  goes to the filter, not the QueryField.
-- **Filter input is decoupled from QueryField**. Typed character replaces
-  the clock display ("typing buffer" indicator); MacrosMenu narrows in
-  realtime.
-- **Weather widget** to the right of the clock; no API key → hide widget
-  and recenter clock.
-- **Gestures**: swipe up = open, swipe down = close; left/right swipe in
-  menu paginates; trackpad scroll wheels through pages.
-- **Touch first-class**: on-screen keyboard only when needed; bigger hit
-  targets.
-- **Roadmap**: currency / weight / time converters + calculator.
-- "Make it modern, stylish, beautiful."
+### 1.2 Resolved decisions (do not relitigate)
+
+1. **Forecast density**: today-only by default, 5-day strip on hover.
+2. **Hold-Shift typing**: dropped. Shift = pure toggle.
+3. **Glassmorphic backdrop**: ship a solid backdrop in 8c; gate
+   `backdrop-filter` behind a `@supports` query AND an
+   `appearance.macroMenu.glassmorphism` switch (default off).
+4. **Settings tab icon for weather**: `FiCloud`.
+5. **Calculator timeline**: deferred to Phase 15.
+6. **Icon picker for macros**: lands as part of 8c.
+7. **Phase 7 sequencing**: between `8b_continued` and `8c`.
+8. **Touch in Phase 8**: minimal viable in 8e; full mobile is Phase 10.
+9. **Mobile banner stays as-is** for Phase 8e (per user's most recent
+   instruction; the dismissible-toast restructure is Phase 10's job).
 
 ---
 
-## 2. Pushback / agreement / improvements
+## 2. State machine reference
 
-The user explicitly invited critique. Here it is:
-
-### 2.1 Endorsed
-
-- ✅ **Decoupling macro mode from search**. Critical correctness fix; the
-  current dual-UI is genuinely a bug.
-- ✅ **Right-click = destructive close**. A toggle is what almost every
-  context-menu-disabling site does and it's surprising for a destructive
-  control. Match user expectation.
-- ✅ **Filter typing decoupled from QueryField**. The right design.
-- ✅ **Weather + clock in same row, hide gracefully when unconfigured.**
-- ✅ **Trackpad scroll = paginate** in menu. Splide already does this
-  (`wheel: true` in `MacrosMenu.jsx:90`); just ensure it's wired into the
-  redesigned grid.
-- ✅ **Calculator / converters in Roadmap.** They're already partially
-  there (currency exists as an engine type); formalize.
-
-### 2.2 Pushback (3 items)
-
-#### 2.2.1 ✋ Hold-Shift to type is broken on the OS level
-
-Shift is a **modifier**: holding it down means every typed character
-arrives as the **shifted variant**. Try holding Shift and typing "google"
-— you get "GOOGLE", which is a poor filter UX (you'd have to lowercase
-client-side). It also breaks any macro whose name has a dash, comma, or
-slash (those become `_`, `<`, `?` while held).
-
-**Counter-proposal**: two interaction modes, both first-class:
-
-- **Tap-Shift** (release within ~300ms, no other key): toggles macro
-  mode persistently. Type freely without modifiers. Press Shift / Esc /
-  right-click again to close.
-- **Hold-Shift** (Shift held while another non-modifier key arrives):
-  pure peek mode. Filter buffer disabled while holding. Release = close.
-  This is the existing keyboardist's "show me the shortcuts" behavior
-  and *should* stay snappy.
-
-This separates "I want to look up a macro hotkey" (peek) from "I want to
-search and pick a macro by name" (toggle). The user's spec is achievable
-but the typing-while-held path is much weaker than typing-after-tap.
-
-**If the user insists on hold-Shift typing**, the workaround is:
-strip the shift modifier before matching the typed key against the
-filter buffer. Implementable; it's a footnote, not a blocker.
-
-#### 2.2.2 ✋ 7-day forecast is a lot of pixels
-
-The clock + weather sit in the **top wrapper** of `Chevron.jsx`, which
-animates open/closed. Seven daily cells + icons + temps could easily
-dwarf the clock and make the chrome visually cluttered.
-
-**Counter-proposal**: today-only by default (icon + current temp + hi/lo);
-expand to a 5-day strip on hover (desktop) or tap (touch). This matches
-how weather chips work on iOS / Android lock screens.
-
-If the user really wants 7-day always-visible, fine — but flag it as a
-density issue and provide a "compact / expanded" setting under
-Appearance.
-
-#### 2.2.3 ✋ Touch as "first-class citizen" on a desktop startpage
-
-This is a tractable scope question, not a design objection. Phase 10
-(Mobile / touch first-class) is already on the roadmap. Today, mobile
-visitors see a "not supported" banner with an `ignoreMobile` localStorage
-escape hatch (`App.jsx:22, 235-245`).
-
-**Counter-proposal**: Phase 8 ships gestures **on the existing desktop
-flow** (so trackpad users benefit immediately), and explicitly **does
-NOT** lift the mobile banner. Lifting the banner is Phase 10's job and
-needs viewport / safe-area / on-screen-keyboard work that's separate
-from "make the macro menu touch-friendly".
-
-Concretely: gestures land in Phase 8; mobile-as-supported lands later.
-
-### 2.3 Suggested improvements (additive)
-
-- **Filter algorithm = MiniSearch** (3 KB gzipped) over name + triggers +
-  category, with prefix and fuzzy. The current
-  `pinnedMacros.indexOf(macro)` and per-keypress hotkey loop in
-  `MacrosMenu.jsx:64-74` is fine for the existing button-based flow
-  but is too crude once we have a typing filter.
-- **Filter buffer indicator**: instead of replacing the clock with the
-  raw typed string, show a pill above the clock with the filter +
-  "n results". Keep clock visible. This is more legible than swapping
-  the clock contents in/out.
-- **Weather caching**: OpenWeatherMap free tier is rate-limited (60
-  calls/min, 1M/month). Cache the response in a `LocalStorageObject`
-  with a TTL of 10 minutes for current weather, 1 hour for forecast.
-  Survives page reloads + offline.
-- **Geocoding instead of bundling a city library**: OpenWeatherMap
-  ships a `/geo/1.0/direct?q={city}` endpoint that returns lat/lon
-  for free. No need to bundle anything. Lazy-load a city autocomplete
-  only when the settings tab is opened.
-- **Animate the menu open with stagger** (Framer Motion's
-  `staggerChildren`) so cards cascade in. Pure transform/opacity =
-  compositor-only, fits Phase 7's mandate.
-- **`prefers-reduced-motion`**: any new animation must respect it.
-  Existing pattern in `App.css` does the heavy lifting; new components
-  must opt in to the same `@media (prefers-reduced-motion: reduce)`
-  rule.
-- **Don't leak the gesture system into `App.jsx`**. Extract it into a
-  `useGestures` hook so `App.jsx` stays a layout file.
-
----
-
-## 3. Architecture
-
-### 3.1 New mode: `macro`
-
-`src/rules.js` becomes:
+`src/rules.js`:
 
 ```js
 const allowedModes = new Map([
-  ['QueryField', new Set(['default', 'searching'])],
-  ['Chevron',    new Set(['default', 'opened', 'macro'])],   // + macro
-  ['Suggestions',new Set(['searching'])],
-  ['Slider',     new Set(['opened', 'macro'])],              // + macro
-  ['MacroFilter',new Set(['macro'])],                        // new actor
+  ['QueryField',  new Set(['default', 'searching'])],
+  ['Chevron',     new Set(['default', 'opened'])],
+  ['Suggestions', new Set(['searching'])],
+  ['Slider',      new Set(['opened'])],
+  ['MacroFilter', new Set(['opened'])],   // added in 8a
 ])
 ```
 
-`Store.jsx`:
+`src/contexts/Store.jsx` `InitialStore` shape (post-8a/8b):
 
-- Add `macroFilter: ''` to `InitialStore`.
-- `useUpdate` already auto-recomputes `mode` from `query` (line 44-47).
-  Add a parallel rule:
+```js
+{
+  mode: 'default',                  // 'default' | 'searching' | 'opened'
+  query: '',
+  selectedSuggestion: null,
+  redirected: false,
+  macroFilter: '',                  // 8a: typed-to-filter buffer
+  macroHintsKeyboard: false,        // 8b: did Shift open the menu?
+  timestamp: Date.now()             // AnimatePresence remount key
+}
+```
 
-  ```js
-  if ('macroFilter' in partialNewState) {
-    // typing in macro mode never leaves macro mode
-    // pure filter update, mode untouched
-  }
-  if ('mode' in partialNewState && partialNewState.mode !== 'macro') {
-    newState.macroFilter = ''           // closing macro mode resets filter
-  }
-  ```
+Reducer rules in `useUpdate`:
 
-- `useReset` already nukes everything (returns a fresh `InitialStore`).
-  Use it for the right-click / Esc / Shift-while-open paths.
+- Setting `query` recomputes `mode` (`'searching'` if non-empty,
+  `'default'` otherwise).
+- Leaving `'searching'` clears `selectedSuggestion`.
+- Leaving `'opened'` clears `macroFilter` AND `macroHintsKeyboard`.
 
-### 3.2 Existing `opened` mode → renamed `macro`?
-
-**Decision: keep `opened` as the legacy alias and add `macro` as the
-canonical name** for one phase, then deprecate `opened` in Phase 8b.
-
-Rationale: `opened` is sprinkled across `Chevron.jsx`, `MacrosMenu.jsx`,
-`useStateSelector` consumers, and the Splide `keyboard: 'global'` gate.
-A single rename is fine — but staging it as alias-then-rename keeps the
-diff per commit small and bisectable.
-
-Actually, on reflection: the rename adds churn for zero behavioral
-benefit. **Drop the rename**; keep using `opened`. The "macro" naming
-shows up only in the *new* slice (`macroFilter`) and the new gesture
-hook. Existing `mode === 'opened'` checks stay as-is.
-
-**Final**: don't rename. Add `macroFilter` next to `mode`. Done.
-
-### 3.3 Component map (new + changed)
+### 2.1 Current key/event behavior table (post-8a)
 
 ```
-src/
-├── App.jsx                              [MOD] gesture wiring, key handling,
-│                                              right-click = reset
-├── components/
-│   ├── Chevron/
-│   │   └── Chevron.jsx                  [MOD] top wrapper hosts
-│   │                                          ChevronTop (clock+weather);
-│   │                                          MacrosMenu gets filter prop
-│   ├── ChevronTop/                      [NEW] composes clock + weather
-│   │   ├── ChevronTop.jsx
-│   │   └── ChevronTop.module.css
-│   ├── Time/
-│   │   └── Time.jsx                     [MOD] guard against unmount churn
-│   ├── Weather/                         [NEW] lazy chunk
-│   │   ├── Weather.jsx
-│   │   ├── Weather.module.css
-│   │   └── weatherCache.js              [NEW] LocalStorageObject TTL cache
-│   ├── MacrosMenu/
-│   │   ├── MacrosMenu.jsx               [MOD] accept filter, MiniSearch,
-│   │   │                                      stagger animation,
-│   │   │                                      bigger hit targets
-│   │   └── MacrosMenu.module.css        [MOD] grid + touch sizing
-│   ├── MacroFilterPill/                 [NEW] floating filter indicator
-│   │   ├── MacroFilterPill.jsx
-│   │   └── MacroFilterPill.module.css
-│   └── QueryField/
-│       └── QueryField.jsx               [MOD] disable focus grabber while
-│                                              mode === 'macro'
-├── hooks/
-│   ├── useGestures.js                   [NEW] swipe / wheel detector
-│   └── useMacroFilter.js                [NEW] keypress → store.macroFilter
-├── functions/
-│   └── webUtils/
-│       └── openWeather.js               [NEW] fetch wrappers w/ AbortCtrl
-└── settings/
-    ├── settings.js                      [MOD] + weather, + clockFormat
-    └── settingTypes.jsx                 [MOD] (no changes expected)
+EVENT                                  STATE TRANSITION                     FILTER ACTION
+Shift (default, !repeat)               default → opened                     clear (was already empty)
+Shift (opened, !repeat)                opened  → default                    clear
+Shift (other modes, !repeat)           resetStore()                         clear
+Right-click anywhere                   switchMacrosMenu(false)              clear
+Side button (LayoutButton)             switchMacrosMenu(false)              clear
+Esc (opened, filter ≠ '')              opened, pop last char                pop char
+Esc (opened, filter = '')              opened → default                     clear
+Letter / digit / space / -._ in opened append to macroFilter                append
+Backspace in opened                    pop from macroFilter (or close)      pop / no-op
+'?' (Shift+/, not in editor)           open Cheatsheet                      —
+Letter key (default)                   default → searching (QueryField)     —
 ```
+
+`switchMacrosMenu(viaKeyboard)` propagates the input modality so
+MacrosMenu can decide whether to reveal per-card hints (keyboard yes,
+mouse/touch no — hints reappear once the user starts typing).
 
 ---
 
-## 4. Detailed designs
+## 3. Sub-commit specs
 
-### 4.1 Mode + key handling
+### 3.1 8a — Decoupling — `[x]` SHIPPED
 
-```
-┌────────────────────────────────────────────────────────────────────┐
-│ EVENT                  STATE TRANSITION              FILTER ACTION  │
-├────────────────────────────────────────────────────────────────────┤
-│ Tap-Shift (default)    default  → opened             clear          │
-│ Tap-Shift (opened)     opened   → default            clear          │
-│ Hold-Shift (default)   default  → opened (peek)      DISABLED       │
-│ Release-Shift (peek)   opened   → default            clear          │
-│ Esc (opened)           opened   → default            clear          │
-│ Esc (opened, filter)   opened, filter ≠''           pop last char   │
-│ Esc (opened, no filter)opened   → default            (n/a)          │
-│ Right-click (any)      mode     → default            clear          │
-│ Letter key (opened)    opened   → opened             append char    │
-│ Backspace (opened)     opened   → opened             pop last char  │
-│ Letter key (default)   default  → searching          (QueryField)   │
-└────────────────────────────────────────────────────────────────────┘
-```
+**Done.** Reference for what 8a left in place:
 
-**Tap vs hold detection**: track `shiftDownAt = performance.now()` on
-keydown; on keyup with `(now - shiftDownAt) < 250 && noOtherKeyArrived`,
-classify as tap. If the user typed any non-modifier key while Shift was
-held, treat as hold-peek (release closes).
+- `src/rules.js`: `'MacroFilter'` actor added.
+- `src/contexts/Store.jsx`: `macroFilter` slice + reducer rule.
+- `src/hooks/useMacroFilter.js`: NEW. Routes printable keystrokes into
+  `macroFilter` while `mode === 'opened'`. Skips when any modifier
+  (incl. Shift) is held so hotkeys still reach `MacrosMenu`.
+- `src/App.jsx`:
+  - Removed `shiftPeekingRef`, `onKeyUpRef`, `window.blur` handler.
+  - `switchMacrosMenu(viaKeyboard)`: pure toggle. Uses
+    `updateStore({ mode: 'default' })` (NOT `resetStore`) on close so
+    `timestamp` is preserved and the Chevron plays its proper close
+    animation in reverse.
+  - Shift handler passes `viaKeyboard=true`. Right-click and the
+    side-button onClick pass `false`.
+  - Esc in opened: pop char or close.
+  - Mounts `useMacroFilter()` at App level.
+- `src/components/QueryField/QueryField.jsx`: focus grabber and
+  `keypress` handler short-circuit when `mode === 'opened'`.
+- `src/components/MacrosMenu/MacrosMenu.jsx`: reads `macroFilter`,
+  filters via hand-rolled `name + category + triggers` substring
+  scorer, keys Splide on `macroFilter` to force a clean remount on
+  filter change, derives per-card `hotKey` via `nextHintChar`.
+- `src/components/Cheatsheet/Cheatsheet.jsx`: documents the new keys.
 
-This mirrors macOS / iPad's "globe key" double-personality and is
-familiar enough to need no documentation.
+**Known caveat fixed mid-8a**: original close path used `resetStore()`
+which broke the close animation; switched to `updateStore({ mode:
+'default' })` which preserves `timestamp` so AnimatePresence does not
+unmount/remount the Chevron mid-close.
 
-**Right-click**: `App.jsx:111-114` currently calls
-`switchMacrosMenu()` which toggles. Change to:
+### 3.2 8b — Time singleton + ChevronTop shell — `[x]` SHIPPED (with regressions)
 
-```js
-onContextMenuRef.current = e => {
-  if (mode === 'default') updateStore({ mode: 'opened' })
-  else                    resetStore()      // any other mode = full reset
-  e.preventDefault()
+**Done.** What 8b put in place:
+
+- `src/components/Time/timeStore.js`: NEW. Module-scope ms timestamp,
+  `setInterval(tick, 1000)`, listener Set, `subscribeTime` /
+  `getTime` exports.
+- `src/components/Time/Time.jsx`: switched to
+  `useSyncExternalStore(subscribeTime, getTime)`. Constructs `new
+  Date(timeMs)` for `formatDate`.
+- `src/components/ChevronTop/ChevronTop.jsx`: NEW. Flex row hosting
+  `<Time/>`; future slot for `<Weather/>`.
+- `src/components/ChevronTop/ChevronTop.module.css`: NEW. Centered
+  flex row, `gap: .75em`.
+- `src/components/Chevron/Chevron.jsx`: replaced `<Time/>` mount with
+  `<ChevronTop/>`.
+
+Phase 8b also added `macroHintsKeyboard` plumbing as a polish item
+(keyboard-opened menus reveal hints; mouse/touch-opened ones do not
+until typing begins).
+
+**Regressions discovered after merge — see § 3.3 below.**
+
+### 3.3 8b_continued — Three regressions — `[~]` IN PROGRESS
+
+This sub-commit has **no new feature work**. It only resolves three
+defects introduced or surfaced by 8a/8b. Each is independently
+investigable and verifiable.
+
+#### 3.3.1 Clock pinned at page-load time
+
+**Symptom**: the displayed clock shows the time the page was loaded
+(e.g. `8:05`) and never advances. Verified to persist after the
+8b rewrite to a `Date.now()` number primitive + plain
+`setInterval(tick, 1000)`.
+
+**Hypotheses to investigate, in priority order**:
+
+1. **`useSyncExternalStore` snapshot semantics**: confirm that
+   `getTime()` returns a value that React detects as changed each
+   tick. Numbers compare by value with Object.is, so a new
+   `Date.now()` SHOULD always look fresh — but if the listener is
+   never being added (or is being removed by a stray cleanup), no
+   re-render is scheduled. Add a temporary `console.log` in `tick()`
+   showing `listeners.size` to confirm subscribers exist.
+2. **Module identity / HMR**: in dev, Vite HMR may load a fresh copy
+   of `timeStore.js` while the original `setInterval` keeps mutating
+   the OLD module's `nowMs`. The new `getTime` would always return
+   the new module's stale `nowMs`. Test in a production build
+   (`npm run build:hosted && npx http-server dist`) — if the bug
+   disappears, this is the cause and the fix is to add a HMR-safe
+   guard:
+
+   ```js
+   if (import.meta.hot) {
+     import.meta.hot.dispose(() => clearInterval(intervalHandle))
+   }
+   ```
+
+3. **Listener never registered**: `useSyncExternalStore`'s `subscribe`
+   identity matters — if it changes between renders, React re-subs
+   each time and the previous subscription is torn down, which is
+   fine, but a bug in the wrapper could leak an unsubscribed
+   listener. Make sure `subscribeTime` is exported as a stable
+   reference (it is — module-scope function — but verify nothing
+   wraps it inside Time.jsx).
+4. **`<Time/>` is unmounted before subscribe takes effect**: ChevronTop
+   is hosted inside the Chevron's top wrapper which has
+   `initial={{ translateY: '100%' }}`. The element IS in the DOM
+   (just translated off-screen), so it should subscribe normally.
+   Confirm with React DevTools that `<Time/>` is mounted at the
+   moment the user reports the stuck reading.
+5. **`formatDate` short-circuit**: cross-checked, no caching. Not the
+   cause.
+
+**Fix path**:
+- Add the diagnostic logs first; reproduce; identify root cause.
+- If HMR (most likely), add `import.meta.hot` cleanup.
+- If snapshot semantics, switch the snapshot to a stable reference
+  pattern: cache the last `nowMs` and only return a new value when
+  `tick` actually advanced it (current code already does this — but
+  double-check the order of `nowMs = Date.now()` vs notify).
+- If subscribe issue, wrap `subscribeTime` / `getTime` in stable
+  `useRef`-cached identities at the call site as a defensive measure.
+
+**Files**:
+- `src/components/Time/timeStore.js` (likely the fix site)
+- `src/components/Time/Time.jsx` (verify only, no expected changes)
+
+**Verification**:
+- Open page, leave for 60 s, confirm clock shows current second.
+- Open menu (Shift), wait 5 s, confirm clock kept ticking while menu
+  was open.
+- Close menu, confirm clock continues.
+- Search (type into QueryField), submit, hit back button to return
+  via bfcache, confirm clock is still live (this exercises the
+  `key={timestamp}` remount path that motivated the singleton).
+- Repeat in `npm run build:hosted` (production build) to rule out HMR.
+
+#### 3.3.2 Hint slide-in is too short
+
+**Symptom**: the per-card `.hint.active` reveal is "a very short
+slide" — visually a quick twitch, not the dramatic diagonal sweep the
+original `transition: opacity 2.5s ease, transform 2.5s ease` produced.
+
+**What changed**: 8a polish reduced the duration from `2.5s` to `.2s`
+(under the assumption that always-on hints shouldn't replay slowly on
+every filter remount). 8b_continued must restore the dramatic feel
+while still allowing per-keystroke replay.
+
+**Original CSS** (pre-8a, for reference):
+
+```css
+.hint {
+  ...
+  transform: rotate(35deg) translate(-10%);
+  transition: opacity .2s, transform .2s, filter .2s;
+}
+.hint.active {
+  transform: rotate(35deg) translate(20%);
+  opacity: 1;
+  transition: opacity 2.5s ease, transform 2.5s ease;
 }
 ```
 
-### 4.2 Filter input plumbing
+The displacement `translate(-10%) → translate(20%)` is unchanged. The
+distinctive feel comes from the **2.5 s ease** running on a rotated
+element — slow enough to read as a deliberate reveal.
 
-`useMacroFilter` hook:
+**Current CSS** (8b_continued first attempt, too short):
 
-```js
-function useMacroFilter() {
-  const mode = useStateSelector(s => s.mode)
-  const filter = useStateSelector(s => s.macroFilter)
-  const updateStore = useUpdate()
-
-  useEffect(() => {
-    if (mode !== 'opened') return
-    const onKey = (e) => {
-      if (e.metaKey || e.ctrlKey || e.altKey) return
-      if (e.key === 'Backspace') {
-        e.preventDefault()
-        updateStore({ macroFilter: filter.slice(0, -1) })
-        return
-      }
-      if (e.key.length === 1 && /[\p{L}\p{N}\s\-_.]/u.test(e.key)) {
-        e.preventDefault()
-        updateStore({ macroFilter: filter + e.key.toLowerCase() })
-      }
-    }
-    document.addEventListener('keydown', onKey)
-    return () => document.removeEventListener('keydown', onKey)
-  }, [mode, filter, updateStore])
+```css
+.hint.active {
+  transform: rotate(35deg) translate(20%);
+  opacity: 1;
+  animation: hint-slide-in .2s ease both;
+}
+@keyframes hint-slide-in {
+  from { opacity: 0; transform: rotate(35deg) translate(-10%); }
+  to   { opacity: 1; transform: rotate(35deg) translate(20%); }
 }
 ```
-
-Mounted from `App.jsx` once, after the existing keydown listener. The
-existing `?`-opens-cheatsheet handler stays put (Shift+/ = `?` is fine
-since the filter regex doesn't accept `?`).
-
-**QueryField focus grabber must yield**: add `mode === 'macro' || mode
-=== 'opened'` to the early-return in `QueryField.jsx:164-171`. Otherwise
-the input snatches focus back and the QueryField's `keypress` handler
-ALSO sees the typed letter (double-handling).
-
-Actually, simpler: while in `opened` mode, mount a `<div data-keep-focus
-tabIndex={-1}>` wrapper around the menu and call `.focus()` on it on
-mode entry. The existing `[data-keep-focus]` plumbing already handles
-the rest.
-
-### 4.3 MacrosMenu redesign
-
-Visual targets:
-
-- **Grid** of cards (current Splide layout retained for pagination
-  benefit, but card visuals refreshed).
-- **Card hit target**: min 56×56 CSS px (Apple HIG = 44pt, Material =
-  48dp; both fine).
-- **Glassmorphic backdrop** behind the grid: `backdrop-filter: blur(16px)
-  saturate(1.6)`; falls back to solid `background: theme.menuBg` when
-  not supported.
-- **Stagger entrance**: `motion.ul` with `variants={ container }`,
-  `motion.li` with `variants={ item }`. ~30ms stagger; total ≤ 200ms.
-- **Filter dim**: matched cards `opacity: 1`; unmatched
-  `opacity: 0.25 + transform: scale(0.95)`. CSS-only via a
-  `data-match="true|false"` attribute. No layout shift.
-- **Empty state**: filter that matches nothing shows a centered "no
-  matches for {filter}" message.
-
-Hotkey-on-card hint stays (current `Card` component already does
-`isHintActive` from `isShiftPressed`); this is the "peek" feature and
-it's good.
-
-Splide config additions:
-
-- `breakpoints` with smaller `cols` on narrow viewports (groundwork
-  for Phase 10 mobile work; safe to add now).
-- `wheel: true` is already on. Verify it survives the redesign.
-
-### 4.4 Time.jsx fix
-
-The current code:
-
-```js
-useEffect(() => {
-  setTime(new Date())
-  updateTime(setTime, timerRef)
-  return () => clearTimeout(timerRef.current)
-}, [])
-```
-
-is correct. The bug is that `MacrosMenu`'s `<motion.div>` parent
-(`Chevron.jsx:309-319`) and the wrapping `<Suspense>` cause Time to
-**unmount** when the menu animates closed (because `MacrosMenu` itself
-unmounts). But Time doesn't live inside MacrosMenu — it's in the **top
-wrapper** at `Chevron.jsx:284-290`. So why the report?
-
-Hypothesis: `Chevron.jsx:152` calls `setIsMacrosMenuRendered(false)`
-during the opened→default transition, which triggers a Chevron
-re-render, but Time's `useEffect([])` shouldn't refire on parent
-re-render. It would only refire if React unmounts Chevron itself.
-
-**Most likely cause**: `App.jsx`'s `<motion.div key={timestamp}>`
-(line 195-200) — when `timestamp` changes (which `useReset` does via
-`new InitialStore`), the entire Chevron tree unmounts and remounts
-with a fresh tree. Each remount restarts the timer, so it *should*
-keep ticking. But if `setTime` is called on an unmounted component,
-React 18 silently no-ops, and the next remount has stale state.
 
 **Fix**:
+- Restore the long duration (≈2.5 s, or experiment with 1.5–2 s).
+- Keep it keyframe-based (animations fire on mount; transitions don't)
+  so it replays on Splide remount after each keystroke.
+- If 2.5 s feels too long for per-keystroke replay, gate the keyframe
+  duration via a CSS custom property set on the menu container — long
+  on first reveal, shorter on re-reveal. But probably the simpler fix
+  is to keep it 2.5 s everywhere; the user's mental model is "I see
+  the hints animate in and they're done", not "they re-animate
+  constantly".
 
-1. Use `useSyncExternalStore` against a singleton `timeStore` so the
-   timer survives across mounts. One `setInterval(1s)` lives at module
-   scope; multiple consumers subscribe.
-2. OR: simpler, hoist the timer to a `TimeProvider` that wraps the
-   app once, store current time in context, and have Time.jsx just
-   `useContext`.
+**Files**:
+- `src/components/Card/Card.module.css`
 
-Recommend (1) — no provider boilerplate, and `useSyncExternalStore` is
-the canonical React 18 pattern for "external mutable source". Pattern:
+**Verification**:
+- Hold Shift / tap Shift / right-click to open menu. Hints slide in
+  smoothly across ~2.5 s, diagonally from upper-left to lower-right
+  of each card.
+- Type a letter. Splide remounts; hints slide in again on the new
+  set of cards.
+- `prefers-reduced-motion`: animation disabled (already handled).
+
+#### 3.3.3 Hint animation does not fire on initial menu open
+
+**Symptom**: when the menu first opens (whether via Shift, side
+button, or right-click), the hint characters are visible at their
+final position but never *animated* into it. The animation only
+plays after a Splide remount triggered by typing.
+
+**Why**: when MacrosMenu first mounts (lazy-loaded via
+`React.lazy`), the Cards mount with `.hint.active` already in their
+class list. Theoretically a CSS `animation` declaration runs on
+element mount — but `<motion.div>` from framer-motion (used as the
+`.hint` wrapper in `Card.jsx`) may set inline `transform` styles or
+wrap in a layout effect that overrides the CSS animation's `from`
+keyframe.
+
+**Hypotheses to investigate**:
+
+1. **framer-motion stomps on transform**: `<motion.div>` without an
+   explicit `initial`/`animate` may still attach a transform style
+   that conflicts. **Fix**: change the `.hint` wrapper from
+   `<motion.div>` to a plain `<div>`. There's no animation control
+   on it from JS — the CSS keyframe is sufficient.
+2. **The class is added a frame after mount**: if `isHintActive`
+   flips from `false → true` after the first paint, the keyframe
+   doesn't fire because CSS animations only fire on a "from no
+   `animation` to having an `animation`" transition once per
+   mount (browser-specific, but generally yes). **Test**: log
+   `isHintActive` in Card render to confirm it's `true` on the
+   FIRST render after mount.
+3. **MacrosMenu's `Suspense fallback={null}`** (in `Chevron.jsx`)
+   may delay the first mount such that the open animation has
+   already finished by the time Cards exist — in which case the
+   keyframe fires but is masked because the user has already moved
+   on visually. **Fix**: pre-warm the lazy chunk (call
+   `import('./MacrosMenu/MacrosMenu')` from `App.jsx` once on idle)
+   so the first open is instant.
+
+**Fix path**:
+- Try (1) first — drop the `motion.div` wrapper. Lowest blast radius.
+- If (1) doesn't fix it, instrument with logs to identify whether
+  `.hint.active` is present on first paint of the Card.
+- (3) is also worth doing for general perceived perf even if it's
+  not the root cause here.
+
+**Files**:
+- `src/components/Card/Card.jsx` (replace `motion.div` with `div`
+  for `.hint`)
+- Possibly `src/App.jsx` (pre-warm MacrosMenu chunk)
+
+**Verification**:
+- Tap Shift to open: hints slide in across 2.5 s.
+- Right-click to open: hints stay hidden (correct: no
+  `macroHintsKeyboard`).
+- Right-click to open, then type a letter: Splide remounts, hints
+  slide in across 2.5 s on the filtered set.
+- Tap Shift to open, type a letter: hints replay (or already
+  visible — see § 3.3.2 decision on per-keystroke replay duration).
+
+#### 3.3.4 Commit message and roadmap update
+
+When all three regressions are resolved:
+
+- Commit title: `Phase 8b_continued: clock + hint regressions`
+- Body should reference each of the three issues by section number
+  here.
+- Tick the `[~]` boxes in `Roadmap.md` § Phase 8 for `8b_continued`
+  to `[x]` and append the SHA. The parent Phase 8 stays `[~]` until
+  8e ships.
+
+---
+
+### 3.4 Phase 7 — Compositor-friendly visuals — `[ ]`
+
+**Spec lives in `Roadmap.md` Phase 7.** Land between `8b_continued`
+and `8c` so 8c's stagger animations rest on the new primitives.
+
+Outline:
+
+- `src/components/Chevron/Chevron.jsx`: replace SVG `d` morph
+  (`stages[]` array currently animated via framer-motion's `d`
+  interpolation) with N stacked `<motion.path>` elements, one per
+  stage. Cross-fade with `opacity` + `transform` only — zero
+  per-frame paint.
+- `src/components/QuickLook/`: same audit; cross-fade snapshots.
+- Audit any remaining `transition: <length>` usages globally;
+  convert to transform/opacity where possible.
+- Optional: `content-visibility: auto` on offscreen Settings /
+  Cheatsheet panels.
+
+**Verification**: Chrome DevTools Performance recording of menu
+open/close shows zero paint events on the Chevron SVG. No visual
+regression to open/close/search transitions.
+
+---
+
+### 3.5 8c — MacrosMenu redesign — `[ ]`
+
+#### 3.5.1 Visual targets
+
+- **Grid** of cards (Splide retained for pagination).
+- **Card hit target**: min 56×56 CSS px (Apple HIG = 44 pt; Material
+  = 48 dp; both fine).
+- **Glassmorphic backdrop** (opt-in): `backdrop-filter: blur(16px)
+  saturate(1.6)`. Solid fallback when `@supports` fails OR when the
+  `appearance.macroMenu.glassmorphism` switch is off (default).
+- **Stagger entrance**: `motion.ul` container variants +
+  `motion.li` item variants. ~30 ms stagger, total ≤ 200 ms. Built
+  on Phase 7's primitives — opacity + transform only.
+- **Filter dim** for unmatched cards (only relevant if 8c keeps
+  showing all cards instead of the current "remove unmatched"
+  approach — see § 3.5.3). `data-match="true|false"` attribute,
+  CSS-only animation. No layout shift.
+- **Empty state**: filter that matches nothing renders a centered
+  "no matches for {filter}" message in place of the grid.
+
+#### 3.5.2 MacroFilterPill
+
+NEW: `src/components/MacroFilterPill/`. Floating pill above the
+menu showing the current filter buffer + result count
+(e.g. `gi  ·  3 results`). Visible only when `macroFilter !== ''`.
+Mounts in the Chevron's top wrapper next to ChevronTop (or directly
+above the menu — designer's call, lean toward "above the menu" so
+ChevronTop stays a clean clock+weather row).
+
+Marked `[data-keep-focus]` for consistency.
+
+#### 3.5.3 Filter behavior
+
+The current 8a implementation **removes** unmatched cards from the
+Splide list (and remounts on filter change). 8c can either:
+
+- **Option A**: keep the remount-on-filter behavior, polish the
+  visuals around it. Simpler. No `data-match` machinery.
+- **Option B**: render all cards, dim unmatched via `data-match`.
+  Animation is smoother (no layout reshuffle) but the Splide grid
+  has to handle "fewer matched cards, padded with dimmed ones"
+  semantics. More complex.
+
+**Recommended: Option A** for consistency with what shipped in 8a.
+Revisit Option B as a Phase 8.x polish if the remount feel is jarring.
+
+#### 3.5.4 Hand-rolled filter scorer
+
+Replace 8a's plain `.includes()` with a slightly smarter scorer:
 
 ```js
-// timeStore.js
-let now = new Date()
-const listeners = new Set()
-setInterval(() => {
-  now = new Date()
-  listeners.forEach(l => l())
-}, 1000 - (Date.now() % 1000))   // align to second boundary
+function score(macro, needle) {
+  const name = (macro.name || '').toLowerCase()
+  const category = (macro.category || '').toLowerCase()
+  const triggers = (macro.triggers || []).map(t => t.toLowerCase())
 
-export const subscribeTime = l => { listeners.add(l); return () => listeners.delete(l) }
-export const getTime = () => now
-```
-
-```js
-// Time.jsx
-const time = useSyncExternalStore(subscribeTime, getTime)
-```
-
-The interval lives forever (one per page lifetime). No accidental
-re-creation. Survives any unmount.
-
-### 4.5 Weather widget
-
-#### 4.5.1 Settings additions
-
-```js
-// settings/settings.js (template additions)
-weather: {
-  apiKey: new Input({
-    default: '',
-    description: 'OpenWeatherMap API key. Free tier at openweathermap.org.'
-  }),
-  city: new Input({
-    default: '',
-    description: 'City name. Resolved via OpenWeatherMap geocoding once.'
-  }),
-  lat: new Input({ default: '', description: 'Latitude (auto-filled).' }),
-  lon: new Input({ default: '', description: 'Longitude (auto-filled).' }),
-  units: new List({
-    default: 'metric',
-    options: ['metric', 'imperial', 'standard'],
-    description: 'Temperature units (Celsius / Fahrenheit / Kelvin).'
-  }),
-  forecastDays: new Range({
-    default: 5,
-    min: 0,
-    max: 7,
-    description: 'How many forecast days to show on hover/tap. 0 = today only.'
-  })
+  // 1. exact name match  → 100
+  if (name === needle) return 100
+  // 2. name starts with  → 80
+  if (name.startsWith(needle)) return 80
+  // 3. trigger exact     → 70
+  if (triggers.includes(needle)) return 70
+  // 4. trigger prefix    → 60
+  if (triggers.some(t => t.startsWith(needle))) return 60
+  // 5. name substring    → 40
+  if (name.includes(needle)) return 40
+  // 6. category match    → 20
+  if (category.includes(needle)) return 20
+  return 0
 }
 ```
 
-`hidden`: `['weather.lat', 'weather.lon']` — these are auto-filled when
-the user hits "Resolve" next to the city input.
+Visible set = `pinnedMacros.filter(m => score(m, needle) > 0).sort
+((a, b) => score(b, needle) - score(a, needle))`.
 
-Add `weather: FiCloud` to `TAB_ICONS` in `Settings.jsx:40-47`. The new
-tab will auto-appear because the sidebar derives tabs from
-`Object.keys(settings.template)` (`Settings.jsx:62`).
+Still no MiniSearch dep. Fits in ~30 lines.
 
-#### 4.5.2 City resolution
+#### 3.5.5 Icon picker for MacrosEditor
 
-Inside the Weather settings tab, add a "Resolve coordinates" button next
-to the city input. On click:
+`src/components/MacrosEditor/IconPicker/IconPicker.jsx` — NEW.
+Replaces the text + `<datalist>` field on each macro row.
 
-```
-GET https://api.openweathermap.org/geo/1.0/direct?q={city}&limit=5&appid={key}
-```
+- **Trigger**: small button next to the icon-name field rendering the
+  current icon (or a placeholder when blank).
+- **Popover**: floating panel; search input on top; scrollable grid
+  of icon swatches below.
+- **Search**: substring match on icon name, lowercased. Initial
+  render shows the full `Object.keys(window.ICONS)` grid.
+- **Selection**: click writes the icon name to the parent state and
+  closes the popover.
+- **Markup**: marked `[data-keep-focus]`. Reuses `Card`-style icon
+  rendering for the swatches so it visually matches the menu.
+- **No new dep**. ~3 KB. Falls under the existing MacrosEditor lazy
+  chunk.
 
-Show top-5 hits in a dropdown; on selection, write `lat` / `lon` /
-`city` (canonical name) to settings. This is Phase 8d's "lazy-loaded
-location autocomplete" without bundling a city database — the API does
-it for us.
-
-#### 4.5.3 Weather data fetch
-
-```
-GET https://api.openweathermap.org/data/2.5/weather?lat={lat}&lon={lon}&units={units}&appid={key}
-GET https://api.openweathermap.org/data/2.5/forecast?lat={lat}&lon={lon}&units={units}&appid={key}
-```
-
-(`/onecall` requires OneCall 3.0 paid subscription; the legacy
-`/forecast` is free and gives 5-day / 3-hour forecast which we sample
-to one entry per day.)
-
-`weatherCache.js` (`LocalStorageObject`):
+#### 3.5.6 Settings additions
 
 ```js
+// settings/settings.js — appearance.macroMenu category
+appearance: {
+  ...,
+  macroMenu: {
+    glassmorphism: new Switch({
+      default: false,
+      description: 'Frost the macros menu backdrop. Disable on slow GPUs.'
+    })
+  }
+}
+```
+
+#### 3.5.7 Files touched
+
+```
+src/components/MacrosMenu/MacrosMenu.jsx           [MOD]
+src/components/MacrosMenu/MacrosMenu.module.css    [MOD]
+src/components/MacroFilterPill/                    [NEW]
+src/components/MacrosEditor/IconPicker/            [NEW]
+src/components/MacrosEditor/MacrosEditorBody.jsx   [MOD]
+settings/settings.js                                [MOD]
+```
+
+#### 3.5.8 Verification
+
+- Existing pinned macros render at the same grid density as before.
+- Filter is snappy (<16 ms per keystroke on a ~30-macro corpus).
+- Empty state shows for no-match filter.
+- Hold-Shift hint visible during open transition AND once menu is
+  open (this is gated on § 3.3.3 being fixed first).
+- Glassmorphism toggle works; default off.
+- MacrosEditor icon picker opens, searches, writes back the same
+  string the text input used to.
+
+---
+
+### 3.6 8d — Weather widget — `[ ]`
+
+#### 3.6.1 Settings additions
+
+```js
+// settings/settings.js — new top-level `weather` category
+weather: {
+  apiKey:       new Input({ default: '', description: 'OpenWeatherMap API key. Free tier at openweathermap.org.' }),
+  city:         new Input({ default: '', description: 'City name. Resolved via OpenWeatherMap geocoding once.' }),
+  lat:          new Input({ default: '', description: 'Latitude (auto-filled).' }),
+  lon:          new Input({ default: '', description: 'Longitude (auto-filled).' }),
+  units:        new List({ default: 'metric', options: ['metric', 'imperial', 'standard'], description: 'Temperature units (Celsius / Fahrenheit / Kelvin).' }),
+  forecastDays: new Range({ default: 5, min: 0, max: 7, description: 'How many forecast days to show on hover/tap. 0 = today only.' })
+}
+hidden: ['weather.lat', 'weather.lon']
+```
+
+`Settings.jsx` `TAB_ICONS.weather = FiCloud`.
+
+#### 3.6.2 Geocoding flow
+
+Inside the Weather settings tab, add a "Resolve coordinates" button
+next to the city input:
+
+```
+GET https://api.openweathermap.org/geo/1.0/direct
+    ?q={city}&limit=5&appid={key}
+```
+
+Show top-5 results in a dropdown; on selection, write
+`lat`/`lon`/`city` (canonical name) to settings. Implement as a new
+`SettingType` subclass `LocationInput` for cleanliness, OR as
+custom rendering within the existing `Input` flow — prefer the
+former.
+
+#### 3.6.3 Data fetch
+
+```
+GET https://api.openweathermap.org/data/2.5/weather  ?lat={lat}&lon={lon}&units={units}&appid={key}
+GET https://api.openweathermap.org/data/2.5/forecast ?lat={lat}&lon={lon}&units={units}&appid={key}
+```
+
+Avoid `/onecall` (paid tier). Free tier: 60 calls/min, 1M/month.
+
+#### 3.6.4 Cache
+
+```js
+// src/components/Weather/weatherCache.js
 class WeatherCache extends LocalStorageObject {
   static key = 'chevron.weather'
-  // shape: { current: {...,fetchedAt}, forecast: {...,fetchedAt} }
+  // shape: { current: { ...payload, fetchedAt }, forecast: { ...payload, fetchedAt } }
 }
 ```
 
-TTL gates: `Date.now() - fetchedAt < 10*60_000` for current,
+TTL: `Date.now() - fetchedAt < 10*60_000` for current,
 `< 60*60_000` for forecast. On cache miss, fetch in background and
 serve stale data optimistically.
 
-**Offline behavior**: the existing `useOnlineStatus` (Phase 4) tells
-us when not to fetch. Keep showing the cached data with a small "stale"
-dot until reconnect.
+Offline behavior (Phase 4's `useOnlineStatus`): keep showing cached
+data with a small "stale" dot until reconnect.
 
-#### 4.5.4 Layout
+#### 3.6.5 Layout
 
 ```
-┌─ Top wrapper (current Time slot) ─────────────────────────────┐
-│                                                               │
-│   ☀ 18°  ⌃ 22°/14°    │    14:32:05    │   tap → forecast    │
-│                                                               │
-└───────────────────────────────────────────────────────────────┘
+┌─ ChevronTop row ────────────────────────────────────────────────┐
+│  ☀ 18°  ⌃ 22°/14°    │    14:32:05    │   tap → forecast strip  │
+└─────────────────────────────────────────────────────────────────┘
 ```
 
-When `apiKey` empty or settings `weather.city` blank: weather slot
-hidden, clock recenters via flexbox `justify-content: center`. CSS
-container query so the layout adapts to the chevron's stretched width.
+When `weatherEnabled = Boolean(settings.weather.apiKey &&
+settings.weather.lat)` is false: weather slot hidden, clock
+recenters via `flex-direction: row; justify-content: center`.
 
-`<ChevronTop>` JSX:
+ChevronTop becomes:
 
 ```jsx
 <div className={c['top']}>
@@ -570,15 +650,39 @@ container query so the layout adapts to the chevron's stretched width.
 </div>
 ```
 
-`weatherEnabled = Boolean(settings.weather.apiKey && settings.weather.lat)`.
+Forecast strip on hover (desktop) / tap (touch): `<motion.div>`
+slides down below the ChevronTop row when active. Click-outside or
+Esc to close. `prefers-reduced-motion`: skip the slide.
 
-Forecast strip on hover (desktop) / tap (touch): a `<motion.div>`
-that slides down below the row when active. Click-outside or Esc to
-close. `prefers-reduced-motion`: skip the slide.
+#### 3.6.6 Files
 
-### 4.6 Gesture system
+```
+src/functions/webUtils/openWeather.js              [NEW]  fetch wrappers w/ AbortController
+src/components/Weather/Weather.jsx                 [NEW]
+src/components/Weather/Weather.module.css          [NEW]
+src/components/Weather/weatherCache.js             [NEW]
+src/components/ChevronTop/ChevronTop.jsx           [MOD]  add Suspense<Weather/>
+settings/settings.js                                [MOD]
+src/components/Settings/Settings.jsx               [MOD]  TAB_ICONS.weather, LocationInput rendering
+```
 
-`useGestures`:
+#### 3.6.7 Verification
+
+- No key configured → no widget; clock centered.
+- Add key, add city, click Resolve → coordinates fill, widget
+  appears with current weather.
+- Hover/tap → forecast strip slides in.
+- Disconnect network → cached data persists with stale dot.
+- Bundle: new `Weather-*.js` chunk in `build:hosted` output, ≤ 8 KB
+  gzipped.
+
+---
+
+### 3.7 8e — Gestures + minimal touch — `[ ]`
+
+#### 3.7.1 useGestures hook
+
+`src/hooks/useGestures.js` — NEW:
 
 ```js
 function useGestures({ onSwipeUp, onSwipeDown, onSwipeLeft, onSwipeRight }) {
@@ -593,14 +697,11 @@ function useGestures({ onSwipeUp, onSwipeDown, onSwipeLeft, onSwipeRight }) {
       const dy = t.clientY - startY
       const dx = t.clientX - startX
       const dt = performance.now() - startT
-      if (dt > 600) return                                // too slow
+      if (dt > 600) return                     // too slow
       const absX = Math.abs(dx), absY = Math.abs(dy)
-      if (Math.max(absX, absY) < 60) return               // too short
-      if (absY > absX) {
-        dy < 0 ? onSwipeUp?.() : onSwipeDown?.()
-      } else {
-        dx < 0 ? onSwipeLeft?.() : onSwipeRight?.()
-      }
+      if (Math.max(absX, absY) < 60) return    // too short
+      if (absY > absX) (dy < 0 ? onSwipeUp : onSwipeDown)?.()
+      else             (dx < 0 ? onSwipeLeft : onSwipeRight)?.()
     }
     window.addEventListener('touchstart', onTouchStart, { passive: true })
     window.addEventListener('touchend',   onTouchEnd,   { passive: true })
@@ -616,550 +717,166 @@ Wired in `App.jsx`:
 
 ```js
 useGestures({
-  onSwipeUp:    () => mode === 'default' && updateStore({ mode: 'opened' }),
-  onSwipeDown:  () => mode !== 'default' && resetStore(),
+  onSwipeUp:   () => mode === 'default' && updateStore({ mode: 'opened', macroHintsKeyboard: false }),
+  onSwipeDown: () => mode !== 'default' && resetStore(),
   // left/right delegated to Splide's own touch handler — don't double-fire
 })
 ```
 
-Splide handles pagination swipes natively; don't intercept those.
+Splide handles pagination swipes natively; do not intercept those.
 
-**Trackpad horizontal scroll** for pagination: Splide's `wheel: true`
-already handles vertical wheel events. For horizontal, Splide's recent
-versions accept `wheelMinThreshold` and `wheelSleep` options; if not
-sufficient, add a tiny passthrough that converts `wheelDeltaX` to
-`splide.go('+' or '-')`.
+#### 3.7.2 Trackpad horizontal scroll for pagination
 
-**Virtual keyboard control**: defer to Phase 10. For Phase 8, the
-QueryField stays auto-focused on desktop only. On touch devices,
-`isMobile` already shows the not-supported banner; once Phase 10
-removes that, the QueryField needs `inputMode="none"` until the user
-taps it.
+Splide's `wheel: true` already handles vertical wheel events. For
+horizontal: try Splide's `wheelMinThreshold` and `wheelSleep`
+options first; if insufficient, add a tiny pass-through that converts
+`wheelDeltaX` into `splide.go('+')` / `splide.go('-')`.
 
----
+#### 3.7.3 Touch-aware QueryField focus
 
-## 5. Settings additions (concrete diff sketch)
+In `QueryField.jsx`'s focus grabber and initial-focus `useEffect`,
+detect touch via `('ontouchstart' in window)` or
+`matchMedia('(pointer: coarse)').matches`. On touch devices, **do
+not** auto-focus the input on mount. User must tap to focus.
+Prevents the on-screen keyboard from popping up unbidden.
 
-`settings/settings.js` — add a `weather` category at the same level as
-`general`, `appearance`, `chevron`, `query`, `menu`. Order in the
-sidebar follows insertion order in the template object.
+#### 3.7.4 Mobile banner
 
-```js
-template: {
-  general: {...},
-  appearance: {...},
-  chevron: {...},
-  query: {...},
-  menu: {...},
-  weather: {
-    apiKey:        new Input({ default: '', description: '...' }),
-    city:          new Input({ default: '', description: '...' }),
-    lat:           new Input({ default: '', description: '...' }),
-    lon:           new Input({ default: '', description: '...' }),
-    units:         new List({ default: 'metric', options: ['metric', 'imperial', 'standard'], description: '...' }),
-    forecastDays:  new Range({ default: 5, min: 0, max: 7, description: '...' }),
-  },
-  // ai, etc.
-},
-hidden: [
-  'weather.lat',
-  'weather.lon',
-  // existing hidden entries...
-]
-```
+**Per user instruction, the mobile banner stays as-is in Phase 8e.**
+No dismissible-toast restructure. Touch-banner work moves entirely
+to Phase 10.
 
-`settings/settings.js` — also: a new `gestures` group under
-`appearance`:
+The banner currently shows when `isMobile && !ignoreMobile`. It
+remains a full-screen block with a localStorage escape hatch.
+
+#### 3.7.5 Settings additions
 
 ```js
+// settings/settings.js — appearance.gestures
 appearance: {
   ...,
   gestures: {
-    enableSwipe: new Switch({ default: true, description: 'Swipe up to open the macros menu, swipe down to close.' }),
-    enableTrackpad: new Switch({ default: true, description: 'Trackpad scroll paginates the macros menu.' }),
+    enableSwipe:    new Switch({ default: true,  description: 'Swipe up to open the macros menu, swipe down to close.' }),
+    enableTrackpad: new Switch({ default: true,  description: 'Trackpad scroll paginates the macros menu.' })
   }
 }
 ```
 
-`Settings.jsx` — `TAB_ICONS`:
+#### 3.7.6 Files
 
-```js
-const TAB_ICONS = {
-  general:   FiSettings,
-  appearance:FiLayout,
-  chevron:   FiZap,
-  query:     FiSearch,
-  menu:      FiGrid,
-  weather:   FiCloud,
-  macros:    FiCommand,
-}
 ```
+src/hooks/useGestures.js                           [NEW]
+src/App.jsx                                         [MOD]  wire useGestures
+src/components/QueryField/QueryField.jsx           [MOD]  touch-aware focus
+src/components/MacrosMenu/MacrosMenu.jsx           [MOD]  verify wheel/drag survives
+settings/settings.js                                [MOD]  appearance.gestures
+```
+
+#### 3.7.7 Verification
+
+- Trackpad two-finger swipe up → menu opens; swipe down → closes.
+- Inside menu, two-finger horizontal swipe paginates.
+- Toggling either switch in Settings respects the toggle.
+- On a touch device (or DevTools touch emulation): page loads → no
+  on-screen keyboard appears. Tap center → QueryField focuses,
+  keyboard appears (intentional).
+- Mobile banner unchanged (full-page block + localStorage escape
+  hatch).
 
 ---
 
-## 6. Bundle impact
+## 4. Glossary
 
-Estimated additions (uncompressed, before tree-shake):
+- **Macro mode**: `mode === 'opened'` in the store. Old name, kept
+  for grep-ability.
+- **Macro filter**: the `macroFilter` slice (8a). String typed by
+  user while macro mode is active.
+- **`macroHintsKeyboard`**: store flag (8b) — true iff the menu was
+  opened via Shift. Used by MacrosMenu to decide whether to reveal
+  per-card hints. Cleared automatically when leaving `'opened'`.
+- **MacrosMenu**: the lazy-loaded grid component. Backed by
+  `window.CONFIG.macros.filter(m => m.pinned)`.
+- **ChevronTop**: 8b's row component hosting the clock; future home
+  of the weather widget.
+- **MacroFilterPill**: 8c's floating filter buffer indicator.
+- **Geocode**: OpenWeatherMap's `/geo/1.0/direct` endpoint. Free.
+- **OneCall**: paid-tier OpenWeatherMap endpoint. Avoid.
+
+---
+
+## 5. Bundle budget
+
+Phase 8 targets:
 
 | Item                          | Size  | Lazy? |
 |-------------------------------|-------|-------|
-| `Weather.jsx` + cache + CSS   | ~6 KB | Yes — `lazy(() => import(...))` from `ChevronTop` |
-| `MiniSearch` (filter)         | ~10 KB| Yes — lazy from MacrosMenu when filter first used |
-| `useGestures` hook            | ~1 KB | No — sits in App.jsx already-eager chunk |
-| `MacroFilterPill` + CSS       | ~2 KB | No — small enough |
+| `Weather` chunk + cache + CSS | ~6 KB | Yes — lazy from `ChevronTop` |
+| Hand-rolled scorer in MacrosMenu | <1 KB | Already eager via MacrosMenu chunk |
+| `useGestures` hook            | ~1 KB | No — App.jsx eager chunk |
+| `MacroFilterPill` + CSS       | ~2 KB | No — small enough to stay eager |
+| Icon picker                   | ~3 KB | Yes — under MacrosEditor chunk |
 | Settings additions            | ~1 KB | Already lazy via Settings chunk |
 
-Net first-paint cost: ~3 KB (just the gesture hook + filter pill skeleton).
-Weather + filter activation are pay-as-you-go.
+Net first-paint cost: ~3 KB (gesture hook + filter pill skeleton).
 
-Don't bundle a city database. Stays under Phase 6's bundle goals.
-
----
-
-## 7. `Roadmap.md` additions
-
-Append to "Additional ideas" (or promote to phases later):
-
-```markdown
-### Phase 8 — Macro mode reimagined  `[ ]`
-
-User-facing: type-to-filter macros menu, weather widget, gestures,
-clock fix. See `Macro_menu_redesign.md` for the spec.
-
-Sequencing interleaves Phase 7 between 8b and 8c so the new
-animations land on top of compositor-only primitives.
-
-- [ ] 8a Decoupling: new `macroFilter` slice; right-click = reset;
-       tap-Shift toggle, hold-Shift peek with hotkey hints; QueryField
-       focus yield.
-- [ ] 8b Time.jsx singleton store (useSyncExternalStore); ChevronTop
-       layout shell (slot for weather).
-- [ ] 7  Compositor-friendly visuals (Chevron + QuickLook path
-       cross-fade, transition audit) — see Phase 7 entry.
-- [ ] 8c MacrosMenu redesign (stagger entrance built on Phase 7's
-       primitives, MiniSearch filter, optional glassmorphism behind a
-       settings switch, ≥56px hit targets, MacrosEditor icon picker).
-- [ ] 8d Weather widget (lazy chunk, OpenWeatherMap geocoding +
-       /weather + /forecast, LocalStorageObject TTL cache, settings tab).
-- [ ] 8e Gestures (swipe up/down + trackpad horizontal pagination) +
-       minimal touch (no auto-focus on touch, mobile banner becomes
-       dismissible toast).
-
-### Phase 15 — Calculator + converters  `[ ]`
-
-Build on Phase 14's engine-typing refactor.
-
-- [ ] **Calculator engine**: parse `2+2*3` style queries; show inline
-      result above the suggestions list. Use the existing
-      `nerdamer-light` substitute or a 200-line shunting-yard parser
-      to keep the bundle small.
-- [ ] **Currency converter** is already partially there; formalize as
-      an engine type with the same surface as the calculator.
-- [ ] **Weight converter**: `100kg in lb`, `5oz in g`. Static unit table.
-- [ ] **Time converter**: `9am pst in tokyo`, `2h30m in seconds`. Use
-      `Intl.DateTimeFormat` for timezone resolution; no external lib.
-- [ ] All four feed into the same "instant answer" UI above suggestions.
-```
-
-The existing `Phase 10 — Mobile / touch first-class` entry already
-covers the "make mobile work" piece; Phase 8e is the *desktop trackpad
-+ optional touch fallback* slice. Make a cross-reference note in
-Phase 10 that Phase 8e laid the gesture foundation.
+Bundle ceiling: `≤ 1100 KiB` static. Must hold across every commit.
 
 ---
 
-## 8. Implementation phasing (commits)
+## 6. Done criteria for Phase 8
 
-Each commit ships independently; build clean at each step.
+- [x] 8a — Macro mode decoupled from search; no two UIs visible
+       simultaneously; right-click + Shift behave per § 2.1.
+- [x] 8b — Time singleton + ChevronTop shell.
+- [ ] 8b_continued — Clock ticks; hint slide-in is dramatic and fires
+       on every open.
+- [ ] Phase 7 — Compositor-friendly visuals.
+- [ ] 8c — Type-filterable, touch-friendly menu with stagger
+       entrance and respects `prefers-reduced-motion`.
+- [ ] 8d — Weather widget appears when configured, hides cleanly
+       otherwise, caches for offline.
+- [ ] 8e — Trackpad swipes work; touch swipes work. Mobile banner
+       unchanged.
 
-### 8.1 Revised sequencing (post-decisions)
-
-Phase 7 (compositor-friendly visuals) and Phase 8 are interleaved
-because Phase 8c's stagger animations should be built on top of
-Phase 7's compositor-only primitives, not retrofitted later:
-
-```
-8a  → Decoupling (logic only, no visuals)
-8b  → Time singleton + ChevronTop shell (no visuals beyond layout)
- 7  → Compositor-friendly visuals (Chevron path cross-fade, QuickLook audit)
-8c  → MacrosMenu redesign (now lands on top of 7's primitives)
-8d  → Weather widget
-8e  → Gestures + minimal touch
-```
-
-8a / 8b are pure logic and can land first regardless. Phase 7 lands
-before any new animation work. 8c through 8e follow.
-
-### 8a — Decoupling (no UI redesign yet)
-
-- `src/rules.js`: add `MacroFilter` actor.
-- `src/contexts/Store.jsx`: add `macroFilter` to InitialStore +
-  reducer rule.
-- `src/hooks/useMacroFilter.js`: NEW.
-- `src/App.jsx`:
-  - Add tap/hold-Shift discrimination.
-  - Right-click handler dispatches `resetStore()` when not in default.
-  - Mount `useMacroFilter()`.
-- `src/components/QueryField/QueryField.jsx`: yield focus when
-  `mode === 'opened'`.
-- `src/components/MacrosMenu/MacrosMenu.jsx`: read `macroFilter` from
-  store; filter the rendered list (simple `.includes()` for now).
-
-**Verification**: open menu via Shift, type "g", only matching cards
-show. Right-click anywhere → menu closes. Esc with filter → pop char.
-Esc with empty filter → close. No QueryField interference.
-
-### 8b — Time.jsx singleton + ChevronTop shell
-
-- `src/components/Time/timeStore.js`: NEW (one interval, listeners).
-- `src/components/Time/Time.jsx`: switch to `useSyncExternalStore`.
-- `src/components/ChevronTop/`: NEW shell, hosts `<Time />` only for
-  now (slot for `<Weather />` left empty).
-- `src/components/Chevron/Chevron.jsx`: replace `<Time />` mount with
-  `<ChevronTop />`.
-
-**Verification**: clock ticks regardless of menu open / close /
-animations. No regression to format / fontSize settings.
-
-### Phase 7 — Compositor-friendly visuals (interleaved here)
-
-This phase is independent of the macro work but is wedged between 8b
-and 8c so 8c can land its new animations on top of compositor-only
-primitives.
-
-- `src/components/Chevron/Chevron.jsx`: replace SVG `d` morph with
-  pre-computed path snapshots (the existing `stages[]` array becomes
-  the snapshot set). Render N stacked `<motion.path>` elements, one
-  per stage; cross-fade with `opacity` + `transform` only. Removes
-  per-frame paint.
-- `src/components/QuickLook/`: same audit; cross-fade snapshots.
-- Audit `transition: <length>` usages globally; replace any that can
-  be done with `transform` / `opacity`.
-- Optional: `content-visibility: auto` on the offscreen Settings /
-  Cheatsheet panels (low risk, pure perf).
-
-**Verification**: open Chrome DevTools Performance, record opening +
-closing the menu. Paint events on the SVG should drop to zero
-(transforms + opacity only). No visual regression to the open / close /
-search transitions. Tick the box on the Roadmap's Phase 7 entry.
-
-### 8c — MacrosMenu redesign
-
-- `src/components/MacrosMenu/MacrosMenu.jsx`: lazy `MiniSearch`
-  factory, stagger animation via Framer (built on Phase 7's
-  compositor-only primitives — `opacity` + `transform` only), larger
-  card sizing, `data-match` attribute.
-- `src/components/MacrosMenu/MacrosMenu.module.css`: hit-target sizing
-  (≥56px), dim/scale unmatched cards, optional glassmorphic shell
-  gated by `@supports (backdrop-filter: blur(1px))` AND
-  `appearance.macroMenu.glassmorphism === true` (default false; user
-  opt-in per decision §10 #3).
-- `src/components/MacroFilterPill/`: NEW. Floating "filtering: gi…
-  (3 results)" pill above the menu.
-- **Hold-Shift hotkey hints**: verify `Card.isHintActive` survives.
-  Crucially, the hint should fire **even when the menu is not yet
-  open** (per decision §10 #2) — the user wants to see what they'd
-  launch *before* committing. Move the `useIsKeyPressed('Shift')`
-  subscription out of `MacrosMenu` (which is lazy-loaded and only
-  mounts after open) into a higher component so the hints can light
-  up during the open transition. Likely lift to `Chevron.jsx` and
-  pass down as a prop.
-- **MacrosEditor icon picker** (decision §10 #6): replace the text +
-  datalist input in `MacrosEditorBody` with a popover icon grid.
-  - New `src/components/MacrosEditor/IconPicker/IconPicker.jsx`:
-    button shows current icon; opens popover with searchable grid of
-    all `Object.keys(window.ICONS)` entries; selection writes the
-    icon name back to the parent. Keep the underlying value as a
-    string so existing macros and the JSON tab stay compatible.
-  - Use the existing `Card`-style icon rendering for the swatches so
-    it looks consistent with how the icon will appear in the menu.
-  - Search field on top filters the grid client-side
-    (`name.toLowerCase().includes(query)`).
-
-**Verification**: visual parity check (existing pinned macros render at
-the same grid density), filter feel snappy (<16ms per keypress),
-empty-state shows for no matches, **hold-Shift hint visible during
-open transition AND while menu is fully open**, glassmorphism switch
-toggles correctly, MacrosEditor icon picker opens, searches, and
-writes back the same string the text input used to.
-
-### 8d — Weather widget + settings
-
-- `src/functions/webUtils/openWeather.js`: NEW. Three exports:
-  `geocode(city, key, signal)`, `getCurrent(lat, lon, units, key, signal)`,
-  `getForecast(lat, lon, units, key, signal)`.
-- `src/components/Weather/weatherCache.js`: NEW (LocalStorageObject
-  with TTL).
-- `src/components/Weather/Weather.jsx`: NEW. Reads cache, fires fetches,
-  hover/tap to expand forecast.
-- `src/components/Weather/Weather.module.css`: NEW.
-- `src/components/ChevronTop/ChevronTop.jsx`: mount `<Weather />`
-  conditionally on `apiKey && lat`.
-- `settings/settings.js`: add `weather` category.
-- `src/components/Settings/Settings.jsx`: `TAB_ICONS.weather = FiCloud`.
-- Settings city-resolve flow (custom `Input` rendering with adjacent
-  Resolve button, or a new `SettingType` subclass `LocationInput` —
-  prefer the latter for cleanliness).
-
-**Verification**: with no key, no widget, clock centered. Add key, add
-city, click Resolve → coordinates filled, widget appears with current
-weather. Disconnect network → cached data persists with stale dot.
-
-### 8e — Gestures + minimal touch
-
-- `src/hooks/useGestures.js`: NEW.
-- `src/App.jsx`: wire `useGestures` to mode transitions.
-- `src/components/MacrosMenu/MacrosMenu.jsx`: verify Splide's
-  `wheel`/`drag` survives.
-- Add settings switches under `appearance.gestures`.
-- **Touch-aware QueryField focus** (decision §10 #8): in
-  `QueryField.jsx`'s focus grabber + `useEffect` initial focus,
-  detect touch via `('ontouchstart' in window)` or
-  `matchMedia('(pointer: coarse)').matches`. On touch devices, **do
-  not** auto-focus the input on mount; only focus when the user
-  taps it. This prevents the on-screen keyboard from popping up
-  unbidden.
-- **Lift mobile banner for macro-only flow**: `App.jsx:235-245`
-  currently shows the "mobile not supported" banner when `isMobile
-  && !ignoreMobile`. Modify to: **always render Chevron + macros
-  menu**; show the banner as a dismissible toast above instead of
-  blocking the UI. Touch users who only want the macros menu can
-  use it; users who try to type still see the warning. The
-  `ignoreMobile` localStorage key keeps working as the
-  dismiss-permanently mechanism.
-- **Larger touch hit targets in MacrosMenu**: already satisfied by
-  8c's ≥56px requirement.
-
-**Verification**:
-- Trackpad two-finger swipe up on the page → menu opens. Two-finger
-  swipe down → closes. Inside menu, two-finger horizontal swipe
-  paginates. Disabling either switch in Settings respects the toggle.
-- On a touch device (or DevTools touch emulation), load the page →
-  no on-screen keyboard appears. Swipe up → menu opens, no keyboard.
-  Tap a card → navigation. Tap the (now-blank) center → QueryField
-  focuses and keyboard appears (intentional).
-- Mobile banner is a dismissible toast, not a full-page block.
+Bundle stays ≤ 1100 KiB (static). Hosted profile gains the
+`Weather-*.js` lazy chunk (~6 KB).
 
 ---
 
-## 9. Testing notes (for the implementer)
+## 7. Pre-flight checklist for the implementing session
 
-The repo doesn't have a test harness yet (Phase 13 is queued). For
-each commit:
+Read these files first, in order:
 
-- `npm run build` (defaults to `build:static`). Must succeed and
-  produce a sub-1100 KiB bundle.
-- `npm run build:hosted`. Verify the new lazy chunk appears
-  (`Weather-*.js`, `MiniSearch-*.js`).
-- Manual test plan in each commit's verification section above.
-
-When Phase 13 lands later, port the manual checks to Vitest:
-
-```js
-test('right-click in opened mode resets store', () => {
-  // mount App with opened mode
-  // dispatch contextmenu event
-  // expect store.mode === 'default' && store.macroFilter === ''
-})
-```
-
-Add to Phase 13's coverage list:
-
-- Tap-Shift toggle vs hold-Shift peek discrimination.
-- macroFilter pop on Backspace, clear on close.
-- Weather cache TTL gating (mock Date.now).
-- Geocode failure fallback (no widget shown).
-- Gesture handler ignores swipes shorter than 60px / longer than 600ms.
-
----
-
-## 10. Resolved decisions
-
-User-confirmed answers to the original open questions (2026-05-05):
-
-1. **Forecast density**: ✅ 5-day strip on hover. Today-only by default,
-   slide-down strip on hover (desktop) / tap (touch).
-2. **Hold-Shift typing**: ✅ Tap-Shift only typing. Hold-Shift remains a
-   pure peek mode — but **must show visual indication** of what would
-   launch on each card. The existing `Card.isHintActive` (driven by
-   `useIsKeyPressed('Shift')` in `MacrosMenu.jsx:35,116`) already does
-   exactly this — show the hotkey letter overlay on every card while
-   Shift is held. **Keep this behavior, verify it works after the
-   redesign.** Don't gate it on `mode === 'opened'`; it should also
-   work *before* the menu is open (so the user can see what they're
-   about to launch as soon as they hold Shift).
-3. **Glassmorphic backdrop**: ⚠ Nice-to-have. Prioritize performance and
-   stability. Implementation: ship a solid (non-blurred) backdrop in
-   8c; gate `backdrop-filter` behind a `@supports` query and an
-   `appearance.macroMenu.glassmorphism` settings switch (off by
-   default). User can opt in.
-4. **Settings tab icon for weather**: ✅ `FiCloud`.
-5. **Calculator timeline**: ✅ Deferred. Phase 15 stays where it is.
-
-### 10.1 New decisions (added 2026-05-05)
-
-6. **Icon picker for macros**: ✅ Add to MacrosEditor as part of 8c
-   (lifts naturally because we're touching macro UX anyway). Today's
-   editor has a datalist autocomplete on a text input (Phase 4.5,
-   `MacrosEditorBody`). Replace it with a popover grid of every
-   `window.ICONS` entry, searchable by name. Keep the text input as
-   the underlying value; the picker just writes to it. ~3 KB of new
-   code; no new dep (icons are already in the bundle). See §13.1.
-7. **Phase 7 (compositor-friendly visuals) bundled in**: ✅ Land
-   **between 8b and 8c**. See §8.1 for revised sequencing.
-8. **Touch support in Phase 8**: ✅ Minimal viable touch lands in 8e.
-   The macros menu is theoretically touch-ready already; we just need
-   gestures + don't-auto-focus-on-touch + lift the mobile banner for
-   the macro-only flow. Full mobile (PWA, viewport notch, on-screen
-   keyboard polish) stays Phase 10. See §13.2.
-
----
-
-## 14. Cross-reference: Phase 7 + touch-now scope (added 2026-05-05)
-
-### 14.1 MacrosEditor icon picker (decision §10 #6)
-
-Today's macros editor (Phase 4.5) lets you type an icon name into a
-text input that has a `<datalist>` of `window.ICONS` keys. Functional,
-but discovery is poor — users have to know the icon name to even
-start typing.
-
-The picker:
-
-- Lives in `src/components/MacrosEditor/IconPicker/`.
-- Trigger: a small button next to the icon-name field rendering the
-  current icon (or a generic placeholder when blank).
-- Popover: floating panel with a search input on top, scrollable
-  grid of icon swatches below.
-- Search: substring match on the icon's lowercase name. Initial
-  render shows the full grid.
-- Selection: click a swatch → write the name to the parent state,
-  close popover.
-- Mark popover with `[data-keep-focus]` so the QueryField focus
-  grabber leaves it alone (consistent with Phase 4 / Phase 7 modal
-  conventions).
-- No new dep. Reuses `window.ICONS` already on the page.
-- Bundle cost: ~3 KB. Falls under the MacrosEditor lazy chunk; zero
-  first-paint cost.
-
-### 14.2 Minimal touch path (decision §10 #8)
-
-Defining what "minimal touch" means so it stays scoped:
-
-**In Phase 8e:**
-- Swipe gestures (open/close menu, paginate within).
-- Don't auto-focus QueryField on touch devices.
-- Mobile banner becomes a dismissible toast, not a full-page block.
-- Verified hit targets ≥ 56px (already in 8c).
-
-**Explicitly NOT in Phase 8e** (stays Phase 10):
-- PWA / service worker / install prompt.
-- Viewport / safe-area handling for notched phones.
-- Orientation change handling.
-- Polishing the QueryField for touch keyboards (autocomplete,
-  spell check, capitalization defaults).
-- Pull-to-refresh suppression.
-- Haptic feedback.
-
-This keeps Phase 8e a ~100-line addition rather than a parallel mobile
-project. The macros menu on touch is fully functional after 8e — user
-can swipe up, swipe left/right, tap an icon, never see the keyboard.
-Search-on-mobile is the work that's still deferred.
-
-### 14.3 Phase 7 timing rationale
-
-8a / 8b are pure logic (mode decoupling, time fix). They can land
-anytime — no animation entanglement.
-
-Phase 7 must precede 8c because:
-
-- 8c adds a stagger entrance to the menu cards.
-- If Phase 7 establishes "compositor-only" as the rule (cross-faded
-  path snapshots, no per-frame paint), then 8c follows the rule from
-  day one.
-- If Phase 7 came after, 8c would need to be re-audited and possibly
-  reanimated. Easier to do it right the first time.
-
-Phase 7's footprint is small: it's a rewrite of `Chevron.jsx`'s
-animation orchestration to render N stacked path snapshots and
-cross-fade between them with `opacity` / `transform`. The `stages[]`
-array (`Chevron.jsx:59-104`) already enumerates the four shapes —
-that's the snapshot set. The rewrite is mechanical: compute each
-snapshot once, render all four, animate `opacity` per snapshot
-during transitions instead of animating `d`.
-
-QuickLook gets the same treatment.
-
----
-
-## 11. Glossary (so future-Claude knows the names)
-
-- **Macro mode**: the `mode === 'opened'` state in the store. Old name,
-  kept for grep-ability.
-- **Macro filter**: the `macroFilter` slice (new). String typed by user
-  while macro mode is active.
-- **Tap-Shift**: Shift key released within 250ms with no other key
-  pressed during the hold.
-- **Hold-Shift / peek**: Shift held >250ms or with another key pressed
-  during the hold. Releases close the menu.
-- **MacrosMenu**: the lazy-loaded grid component in
-  `src/components/MacrosMenu/`. Backed by `window.CONFIG.macros` filtered
-  to `pinned: true`.
-- **ChevronTop**: new component wrapping the clock + weather row; sits
-  in the top wrapper of `Chevron.jsx`.
-- **Geocode**: OpenWeatherMap's `/geo/1.0/direct` endpoint. Free.
-- **OneCall**: OpenWeatherMap's paid-tier combined-data endpoint.
-  Avoid; we use legacy `/weather` + `/forecast` instead.
-
----
-
-## 12. Done criteria for Phase 8
-
-All five sub-commits land. Each independently verifiable:
-
-- [ ] 8a Macro mode is fully decoupled from search; no two UIs visible
-       simultaneously; right-click and Shift behave per the table in §4.1.
-- [ ] 8b Clock ticks every second, every mode, every visibility state.
-- [ ] 8c Macros menu is touch-friendly, type-filterable, has a pleasing
-       stagger entrance, respects `prefers-reduced-motion`.
-- [ ] 8d Weather appears when configured, hides cleanly when not, caches
-       for offline, fits next to the clock without clutter.
-- [ ] 8e Trackpad swipes work; touch swipes work (even if mobile is still
-       officially blocked at the banner level).
-
-Bundle stays ≤ 1100 KiB (static). Hosted profile gains 2 lazy chunks
-(`Weather-*.js`, `MiniSearch-*.js`), neither >15 KB.
-
----
-
-## 13. Pre-flight checklist for the implementing session
-
-Read these files first, in this order:
-
-1. `src/rules.js` (mode actors)
-2. `src/contexts/Store.jsx` (state machine)
-3. `src/App.jsx` (current key + context-menu handlers; recently
-   refactored, has `modeRef` + `shiftPeekingRef` already)
-4. `src/components/Chevron/Chevron.jsx` (transition table; the bottom
-   wrapper hosts MacrosMenu, the top wrapper hosts Time)
-5. `src/components/MacrosMenu/MacrosMenu.jsx` (current Splide setup)
-6. `src/components/Time/Time.jsx` (current timer; analyze the unmount
-   path before rewriting)
-7. `src/components/QueryField/QueryField.jsx:140-180` (focus grabber +
-   keypress handler — the source of dual-handling)
-8. `settings/settings.js` + `settings/settingTypes.jsx` (template
-   shape; how `Input`, `Switch`, `Range`, `List` work)
-9. `src/components/Settings/Settings.jsx` (sidebar tab generation)
-10. `src/classes/localStorage/*` (LocalStorageObject base for the
-    weather cache)
-11. `Roadmap.md` (style for phase entries; commit-message style)
-12. Latest commit (`git log -1 --stat`) — confirms current baseline.
+1. `Roadmap.md` — current Phase 8 state, surrounding phases.
+2. `src/rules.js` — mode actors.
+3. `src/contexts/Store.jsx` — state machine + reducer.
+4. `src/App.jsx` — Shift handler, right-click handler, focus grabber
+   integration, `switchMacrosMenu`, `useMacroFilter` mount point.
+5. `src/components/Chevron/Chevron.jsx` — transition table; the
+   bottom wrapper hosts MacrosMenu, the top wrapper hosts ChevronTop.
+6. `src/components/ChevronTop/ChevronTop.jsx` + `.module.css`.
+7. `src/components/Time/timeStore.js` + `Time.jsx` — required reading
+   for § 3.3.1.
+8. `src/components/MacrosMenu/MacrosMenu.jsx` — current Splide setup,
+   filter scorer, hint derivation.
+9. `src/components/Card/Card.jsx` + `Card.module.css` — required
+   reading for § 3.3.2 / § 3.3.3.
+10. `src/components/QueryField/QueryField.jsx:140-180` — focus
+    grabber + keypress yield.
+11. `settings/settings.js` + `settings/settingTypes.jsx` — template
+    shape; `Input` / `Switch` / `Range` / `List` semantics.
+12. `src/components/Settings/Settings.jsx` — sidebar tab generation
+    + `TAB_ICONS`.
+13. `src/classes/localStorage/*` — `LocalStorageObject` base for the
+    weather cache.
+14. Latest commit (`git log -1 --stat`) — current baseline.
 
 Then:
 
-- Confirm pushback decisions with the user (§ 10 questions).
-- Open a branch or worktree for Phase 8.
-- Land 8a → 8e in order, one commit each, message style:
-  `Phase 8a: macro mode decoupling`, etc.
-- After 8e: update `Roadmap.md`'s Completed section, paste the SHAs.
+- Pick the next sub-commit per § 0.
+- Implement, build (`npm run build` AND `npm run build:hosted`),
+  manually verify against the section's Verification checklist.
+- One commit per sub-section. Title style:
+  `Phase 8c: MacrosMenu redesign + icon picker`.
+- Tick the box in `Roadmap.md`, paste the SHA in the entry.
 - Don't push; the user pushes manually (per repo convention).
