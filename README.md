@@ -395,9 +395,9 @@ Because of the limitations of the CORS policy, macros icons must be stored in `/
 
 The phased improvement plan lives in **[Roadmap.md](./Roadmap.md)**.
 
-Currently shipped: Phases 0 → 4 (stability safety net, user-reported UX fixes, performance hardening, provider-agnostic LLM with Ollama preset, accessibility + keyboard UX, macros editor + cheatsheet + offline-safe hardening).
+Currently shipped: Phases 0 → 5 (stability safety net, user-reported UX fixes, performance hardening, provider-agnostic LLM with Ollama preset, accessibility + keyboard UX, macros editor + cheatsheet + offline-safe hardening, per-field macros editor UI, dependency modernization).
 
-In planning: per-field macros editor UI (Phase 4.5), dependency modernization (Phase 5), bundle splitting (Phase 6), compositor-friendly visuals (Phase 7), settings schema migration (Phase 8), security hardening (Phase 9), mobile / touch (Phase 10), PWA / offline shell (Phase 11), TypeScript migration (Phase 12), test coverage (Phase 13), search-engines refactor (Phase 14).
+In planning: bundle splitting (Phase 6), compositor-friendly visuals (Phase 7), settings schema migration (Phase 8), security hardening (Phase 9), mobile / touch (Phase 10), PWA / offline shell (Phase 11), TypeScript migration (Phase 12), test coverage (Phase 13), search-engines refactor (Phase 14).
 
 > **Note on Phase 11 (PWA)**: although the Phase 4 work makes Chevron *runtime*-resilient when offline, a true service-worker-backed PWA is deliberately deferred until after Phase 6's bundle-splitting refactor. `vite-plugin-singlefile` (used by the static-zip distribution) inlines all JS into one HTML file, which is incompatible with `vite-plugin-pwa`'s service-worker model. Phase 6 introduces a separate `build:hosted` profile where the PWA can land cleanly without breaking the static release.
 

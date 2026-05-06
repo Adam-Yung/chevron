@@ -19,7 +19,7 @@ Status legend: `[x]` shipped &nbsp;·&nbsp; `[~]` in progress &nbsp;·&nbsp; `[ 
 
 ## Completed
 
-> Phases 0 → 4 shipped.
+> Phases 0 → 5 shipped.
 
 ### Phase 0 — Stability safety net  `[x]`  &nbsp;_(commit `92aed52`)_
 
@@ -183,36 +183,52 @@ break.** This phase intentionally avoids any new network dependency.
 
 ---
 
-## Planned
+### Phase 4.5 — Macros editor: per-field UI  `[x]`
 
-### Phase 4.5 — Macros editor: per-field UI  `[ ]`
+Per-field UIs replacing the JSON-only MVP. The editor now opens with
+four tabs: **Macros**, **Commands**, **Engines**, **Raw JSON**.
 
-Replace the JSON-editor MVP from Phase 4c with form-based widgets so
-users don't need to know JSON.
+- [x] Macros tab: per-row card with collapse/expand. Fields: name,
+      category, url, normalisedURL, triggers (chip input with
+      Enter/Tab/comma to commit, Backspace to pop), `bgColor` (full
+      solid + gradient editor with native color pickers, gradient
+      stops, type and angle), `textColor`, pinned checkbox, optional
+      hotkey, icon name (with datalist autocomplete from
+      `window.ICONS`), per-macro commands sub-list.
+- [x] Commands tab: editable type + trigger pairs.
+- [x] Engines tab: per-engine card (name, id rename, bgColor, textColor,
+      per-type templates).
+- [x] Add / remove / reorder buttons on every list.
+- [x] Raw JSON tab preserved as a power-user fallback. State stays in
+      sync between form tabs and the JSON view (edits in either side
+      flow into a shared cfg object).
+- [x] No new heavy deps (no MUI Joy in the editor, no `react-colorful`,
+      no `colorjs.io`). All inputs are native HTML controls — keeps
+      the editor lean and fully offline-capable.
 
-- [ ] Macros list with per-row fields: name, category, primary URL,
-      triggers (chip input), bgColor / textColor (reuse Settings'
-      `ColorPicker`), pinned, optional hotkey, optional icon name.
-- [ ] Commands list: type + trigger.
-- [ ] Engines list: name + URL templates per query type.
-- [ ] Add / remove / reorder for each list.
-- [ ] Keep the JSON editor available behind a "raw" toggle for power
-      users.
+### Phase 5 — Dependency modernization  `[x]`
 
-### Phase 5 — Dependency modernization  `[ ]`
+Safe major bumps verified by build at each step.
 
-Pull every dep onto a current major. Each upgrade is its own sub-commit so
-breakage can be bisected.
+- [x] Vite 3.2.3 → **5.4.21**.
+- [x] `@vitejs/plugin-react` 2.2.0 → **4.7.0** (Vite 5 compatible).
+- [x] `vite-plugin-singlefile` 0.13.3 → **2.3.3** (Vite 5 compatible).
+- [x] `react-icons` 4.7.1 → **5.6.0**.
+- [x] `framer-motion` 7.8.0 → **11.18.2** (build clean; existing
+      `AnimatePresence` + `motion.div` + `useAnimationControls` usage
+      survived without API changes).
+- [x] `react-scroll-into-view-if-needed` already on 3.0.1 (current).
 
-- [ ] Vite 3 → 5 (rollup 4, esbuild bump; check `vite-plugin-singlefile`
-      compatibility — may need the v2 release).
-- [ ] Framer Motion 7 → 11 (API mostly stable; the big risk is layout
-      animation behavior changes around `<AnimatePresence mode>`).
-- [ ] `@mui/joy` `5.0.0-alpha.64` → stable v5 (token names and color
-      modes shifted between alpha and stable; `CssVarsProvider` is the
-      replacement for the alpha theme provider).
-- [ ] `react-icons` and `react-scroll-into-view-if-needed` to current.
-- [ ] React 18 → 19 once the above are green.
+**Deferred** (intentionally — high blast radius, separate phases):
+- `@mui/joy` `5.0.0-alpha.64` → stable v5: token names and the
+  `CssVarsProvider` setup shifted; the Settings panel uses Joy
+  pervasively. Phase 6's bundle-splitting work is a better moment to
+  also evaluate replacing Joy with a lighter primitives layer.
+- React 18 → 19: StrictMode behavior change (double-effects in
+  development) interacts with the focus-management work in Phase 3,
+  so a review pass is warranted before bumping.
+- ESLint 8 → 9: requires migrating to the flat-config schema; not
+  worth it until the test setup in Phase 13 lands.
 
 ### Phase 6 — Bundle splitting + first-paint diet  `[ ]`
 
