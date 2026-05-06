@@ -1,14 +1,14 @@
 import { memo, useState, useEffect, useContext, useRef, useCallback, useMemo } from 'react'
 import useRedirect from '../../hooks/useRedirect'
 import { useStateSelector, useUpdate } from '../../contexts/Store'
-import { SettingsContext } from '../../contexts/Settings'
+import { SettingsContext, ColorSchemeContext } from '../../contexts/Settings'
 import { Splide, SplideSlide } from '@splidejs/react-splide'
 import { Grid } from '@splidejs/splide-extension-grid'
 import { motion } from 'framer-motion'
 import Card from '../Card/Card'
 import { allowedModes } from '../../rules'
 import { pinnedMacros, score } from './macroData'
-import { midColor } from '../MacrosEditor/colorHelpers'
+import { readableMatchColor } from '../MacrosEditor/colorHelpers'
 import classes from './MacrosMenu.module.css'
 import '@splidejs/react-splide/css'
 
@@ -27,6 +27,8 @@ const itemVariants = {
 
 function MacrosMenu({ visibility, fullVisibility }) {
   const settings = useContext(SettingsContext)
+  const colorScheme = useContext(ColorSchemeContext)
+  const isDarkMode = colorScheme === 'dark'
 
   const pagination = settings.menu.pagination
   const arrows     = settings.menu.arrows
@@ -210,7 +212,7 @@ function MacrosMenu({ visibility, fullVisibility }) {
             const needle     = macroFilter.trim().toLowerCase()
             const nameLower  = pm.name.toLowerCase()
             const matchStart = needle ? Math.max(nameLower.indexOf(needle), 0) : 0
-            const matchColor = midColor(pm.bgColor)
+            const matchColor = readableMatchColor(pm.bgColor, isDarkMode, pm.textColor)
             return (
               <SplideSlide key={pm.name}>
                 {/* motion.li wrapper for stagger entrance (Phase 7 primitives:
