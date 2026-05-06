@@ -1,4 +1,4 @@
-import { memo, useState, useEffect, useContext, useRef, useCallback } from 'react'
+import { memo, useState, useEffect, useContext, useRef, useCallback, useMemo } from 'react'
 import useRedirect from '../../hooks/useRedirect'
 import useIsKeyPressed from '../../hooks/useIsKeyPressed'
 import { useStateSelector , useUpdate} from '../../contexts/Store'
@@ -24,24 +24,48 @@ function MacrosMenu({ visibility, fullVisibility }) {
   const gap = settings.menu.gap
 
   const slideCapacity = cols * rows
-  const isSliderHasMultipleSlides = pinnedMacros.length > slideCapacity
 
   /* store */
   const mode = useStateSelector(store => store.mode)
+  // Phase 8a: typed-to-filter buffer. Empty string = show every pinned macro.
+  const macroFilter = useStateSelector(store => store.macroFilter)
   // ---
-  
+
+  // Phase 8a: filter the pinned set by case-insensitive substring match
+  // against name + triggers + category. Hand-rolled (no MiniSearch dep)
+  // because the pinned set is small (<~30 entries) and Phase 6's posture
+  // is to avoid extra runtime deps where a few lines suffice.
+  const visibleMacros = useMemo(() => {
+    const needle = macroFilter.trim().toLowerCase()
+    if (!needle) return pinnedMacros
+    return pinnedMacros.filter(m => {
+      const haystack = [
+        m.name,
+        m.category,
+        ...(Array.isArray(m.triggers) ? m.triggers : [])
+      ].filter(Boolean).join(' ').toLowerCase()
+      return haystack.includes(needle)
+    })
+  }, [macroFilter])
+
+  const isVisibleSliderHasMultipleSlides = visibleMacros.length > slideCapacity
+
   // selected macro
   const [selected, setSelected] = useState(null)
   const isShiftPressed = useIsKeyPressed('Shift')
   // if the slider is on the slide with the selected card
   const [isCardInFocus, setIsCardInFocus] = useState(false)
   const sliderRef = useRef(null)
-  
+
   const updateValue = useUpdate()
   const redirect = useRedirect()
 
   const activateCard = useCallback(macro => {
-    const cardIndex = pinnedMacros.indexOf(macro)
+    // Compute the slide index from the currently-rendered list, not the
+    // full pinned set, so the slider scrolls to the correct page after a
+    // filter has narrowed the rows.
+    const cardIndex = visibleMacros.indexOf(macro)
+    if (cardIndex < 0) return
     
     // select the card
     setSelected(macro)
@@ -57,7 +81,7 @@ function MacrosMenu({ visibility, fullVisibility }) {
     
     // !visibility - ignore animations if the menu isn't visible
     redirect(macro.url, 'card', !visibility)
-  }, [redirect, visibility, slideCapacity, updateValue])
+  }, [redirect, visibility, slideCapacity, updateValue, visibleMacros])
 
   // hotkeys listener
   useEffect(() => {
@@ -84,8 +108,8 @@ function MacrosMenu({ visibility, fullVisibility }) {
     extensions: { Grid },
     options: {
       pagination,
-      arrows: arrows && isSliderHasMultipleSlides,
-      drag: drag && isSliderHasMultipleSlides,
+      arrows: arrows && isVisibleSliderHasMultipleSlides,
+      drag: drag && isVisibleSliderHasMultipleSlides,
       perPage: 1,
       wheel: true,
       keyboard: allowedModes.get('Slider').has(mode) ? 'global' : false,
@@ -99,11 +123,16 @@ function MacrosMenu({ visibility, fullVisibility }) {
       }
     }
   }
+  // Phase 8a: keying Splide on the filter forces a clean remount whenever
+  // the visible card set changes, sidestepping Splide's internal slide
+  // index caching. The filter changes infrequently (only while typing in
+  // macro mode) so the remount cost is acceptable. Phase 8c will revisit
+  // this with a proper data-match attribute + CSS dim animation.
   return (
     <div className={classes['container']}>
-      <Splide {...splideOptions}>
+      <Splide {...splideOptions} key={macroFilter || '__all__'}>
         {
-          pinnedMacros.map(pm => {
+          visibleMacros.map(pm => {
             return (
               <SplideSlide key={pm.name}>
                 <Card
@@ -117,7 +146,7 @@ function MacrosMenu({ visibility, fullVisibility }) {
                   onClick={() => activateCard(pm)}/>
               </SplideSlide>
             )
-          })      
+          })
         }
       </Splide>
     </div>

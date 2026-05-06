@@ -306,7 +306,44 @@ which forces a paint on every frame.
       that can be done with `transform` / `opacity`.
 - [ ] Optional: `content-visibility: auto` on offscreen panels.
 
-### Phase 8 — Settings schema + migration  `[ ]`
+### Phase 8 — Macro mode reimagined  `[~]`
+
+Decouple the macro menu from the search-mode state machine, fix the
+clock under animation churn, add an OpenWeatherMap widget, type-to-
+filter the macros menu, and make the menu touch-friendly with gestures.
+Full design + sub-commit breakdown lives in `Macro_menu_redesign.md`.
+Sequencing interleaves Phase 7 between 8b and 8c so the new
+animations land on top of compositor-only primitives.
+
+- [~] **8a Decoupling** — new `macroFilter` slice; right-click in any
+       non-default mode = full reset; Shift = pure toggle (no tap/hold
+       distinction); QueryField yields focus while macro mode is
+       active; `MacrosMenu` reads `macroFilter` and narrows the visible
+       cards.
+- [ ] **8b Time singleton + ChevronTop shell** — `useSyncExternalStore`-
+       backed module-scope time store so the clock keeps ticking across
+       any unmount/remount churn; new `ChevronTop` component hosting
+       the clock with a future slot for the weather widget.
+- [ ] **(Phase 7 lands here)** — compositor-friendly visuals so 8c's
+       new animations are built on the right primitives from day one.
+       See the Phase 7 entry above.
+- [ ] **8c MacrosMenu redesign** — stagger entrance built on Phase 7's
+       primitives, hand-rolled prefix+substring filter scorer (no new
+       deps — Phase 6 spirit), `MacroFilterPill` indicator above the
+       menu, ≥56 px hit targets, optional glassmorphism behind a
+       `@supports` query + opt-in settings switch (off by default),
+       MacrosEditor icon picker.
+- [ ] **8d Weather widget** — lazy chunk; OpenWeatherMap geocoding +
+       `/weather` + `/forecast`; `LocalStorageObject` TTL cache; new
+       `weather` settings tab with a "resolve coordinates" flow; today-
+       only by default, slide-down 5-day strip on hover/tap.
+- [ ] **8e Gestures** — `useGestures` hook (swipe up/down + trackpad
+       horizontal pagination); the mobile banner stays as-is in this
+       phase (touch-banner restructure remains Phase 10's job).
+
+### Phase 8.5 — Settings schema + migration  `[ ]`
+
+> Bumped from Phase 8 to make room for the macro redesign work.
 
 Right now persisted settings are trusted verbatim — an old localStorage
 shape can crash the app silently or get partially merged.
@@ -405,6 +442,47 @@ different escape rules. Consolidate.
       malformed templates at config-load time.
 - [ ] Engine-typing (autocomplete, currency, calculator) becomes a
       first-class registry instead of hard-coded `if` chains.
+
+### Phase 15 — Calculator + converters  `[ ]`
+
+Builds on Phase 14's engine-typing refactor. Surfaces "instant answer"
+results above the suggestions list for math, currency, weight, and
+time queries.
+
+- [ ] **Calculator engine**: parse `2+2*3`-style queries; show inline
+      result above suggestions. ~200-line shunting-yard parser to keep
+      the bundle small (no `nerdamer` / `mathjs`).
+- [ ] **Currency converter**: formalize the existing currency path as
+      a registered engine type with the same surface as the calculator.
+- [ ] **Weight converter**: `100kg in lb`, `5oz in g`. Static unit
+      table; no external lib.
+- [ ] **Time converter**: `9am pst in tokyo`, `2h30m in seconds`. Use
+      `Intl.DateTimeFormat` for timezone resolution; no external lib.
+- [ ] All four feed into the same "instant answer" UI above suggestions.
+
+### Phase 16 — README rewrite + project polish  `[ ]`
+
+After the macro redesign lands, the customer-facing README is overdue
+for a rewrite. Today's README mixes user-facing content with maintainer
+material that belongs elsewhere.
+
+- [ ] **Rewrite README** to clearly demonstrate the new behaviors and
+      capabilities: macro mode (Shift toggle, type-to-filter, gestures),
+      cheatsheet, weather widget, AI completion, offline-safe path,
+      build profiles, configurability via the in-app editor.
+- [ ] **Declutter**: pull the roadmap, TODOs, and any maintainer-only
+      notes out of README. The roadmap lives in `Roadmap.md`; the
+      maintainer guide lives in `Maintainer.md`. README stays focused
+      on "what is this and how do I use it".
+- [ ] **Add screenshots / GIFs** of the macro menu, search, and AI
+      completion so the README sells the product before the install
+      instructions.
+- [ ] **Cross-link** `Roadmap.md` and `Maintainer.md` at the bottom of
+      README under a "For contributors" footer.
+- [ ] **General polish pass**: audit naming, dead code, leftover phase
+      stubs, README badges (build status when CI lands in Phase 13),
+      LICENSE block visibility, package.json description / keywords /
+      repository fields.
 
 ---
 

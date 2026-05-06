@@ -14,6 +14,10 @@ class InitialStore {
     this.query = '',
     this.selectedSuggestion = null,
     this.redirected = false,
+    // Phase 8a: text the user is typing while macro mode is open. Decoupled
+    // from `query` so the macro menu and the search suggestions can never
+    // be visible at the same time.
+    this.macroFilter = '',
     this.timestamp = Date.now()
   }
 }
@@ -45,6 +49,11 @@ function useUpdate() {
       newState.mode = partialNewState.query ? 'searching' : 'default'
     if (newState.mode !== 'searching')
       newState.selectedSuggestion = null
+    // Phase 8a: leaving `opened` mode (via Esc, Shift toggle, right-click,
+    // or any other transition) clears the macro filter so the next time
+    // the menu opens it starts blank.
+    if (newState.mode !== 'opened')
+      newState.macroFilter = ''
 
     store.update(newState)
   }, [store])

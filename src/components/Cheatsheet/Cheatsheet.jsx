@@ -33,10 +33,12 @@ const SECTIONS = [
   {
     title: 'Macros menu',
     rows: [
-      { keys: [['Right-click']], label: 'Toggle the macros menu' },
-      { keys: [['Shift']], label: 'Hold to peek the macros menu' },
+      { keys: [['Shift']], label: 'Toggle the macros menu (Shift again, Esc, or right-click closes)' },
+      { keys: [['Right-click']], label: 'Open from anywhere; reset to default when already open' },
+      { keys: [['<letters>']], label: 'Type while the menu is open to filter cards by name, category, or trigger' },
+      { keys: [['Backspace']], label: 'Delete the last character of the filter' },
       { keys: [['Shift', '<key>']], label: 'Trigger a macro hotkey (when its `key` property is set)' },
-      { keys: [['ArrowLeft'], ['ArrowRight']], label: 'Navigate the macros menu' }
+      { keys: [['ArrowLeft'], ['ArrowRight']], label: 'Navigate between macro pages' }
     ]
   },
   {

@@ -133,6 +133,11 @@ function QueryField () {
 
   const spacebarLastPressRef = useRef(-1)
   const onKeyPress = useCallback((e) => {
+    // Phase 8a: when macro mode is open the filter hook owns the keyboard.
+    // If we re-focused the input here, the next keydown would route through
+    // the input's native handler too and the filter would be double-fed.
+    if (mode === 'opened') return
+
     if (allowedModes.get('QueryField').has(mode)) {
       if (e.code === 'Space') {
         if (Date.now() - spacebarLastPressRef.current < DOUBLE_PRESS_THRESHOLD)
@@ -159,10 +164,15 @@ function QueryField () {
   // any focus-trap container marked with [data-keep-focus] (Settings
   // panel etc). This keeps "type anywhere and it lands in the field"
   // behavior while letting actual UI controls keep keyboard focus.
+  // Phase 8a: also yield while macro mode is active so clicking inside
+  // the macros menu doesn't yank focus back to the (hidden) search input.
+  const modeRef = useRef(mode)
+  useEffect(() => { modeRef.current = mode }, [mode])
   useEffect(() => {
     const INTERACTIVE = 'button, input, textarea, select, a[href], summary, [role="button"], [contenteditable="true"], [tabindex]:not([tabindex="-1"]), [data-keep-focus], [data-keep-focus] *'
     const grabFocus = (e) => {
       if (!inputRef.current) return
+      if (modeRef.current === 'opened') return
       if (document.activeElement === inputRef.current) return
       const target = e.target
       if (target && target.nodeType === 1 && target.closest && target.closest(INTERACTIVE))

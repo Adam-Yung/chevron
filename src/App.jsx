@@ -1,6 +1,7 @@
 import { lazy, Suspense, useContext, useEffect, useRef, useState } from 'react'
 import { ColorSchemeContext, SettingsContext, ThemeContext } from './contexts/Settings'
 import { useReset, useStateSelector, useUpdate } from './contexts/Store'
+import useMacroFilter from './hooks/useMacroFilter'
 import { AnimatePresence, motion} from 'framer-motion'
 import ActiveElements from './components/ActiveElements/ActiveElements'
 import QueryField from './components/QueryField/QueryField'
@@ -43,47 +44,52 @@ function App() {
 
   /* handlers */
   const onContextMenuRef = useRef(null)
-  const onKeyUpRef = useRef(null)
   const onKeyDownRef = useRef(null)
-  // Tracks whether the menu is currently being "peeked" via a held Shift
-  // key. Without this, a tap of Shift fires keydown→opened then keyup→default
-  // in rapid succession, which lets two animations interleave and produces
-  // visual artifacts. We also use it to make sure pressing Shift while the
-  // menu is already open via the button or context menu does NOT close it.
-  const shiftPeekingRef = useRef(false)
-  // Live mirror of `mode` so handlers don't read a stale value from their
-  // captured render closure. The previous bug: keydown dispatched
-  // mode→'opened', then keyup fired before the next render — keyup's
-  // closure still saw mode==='default' so its `mode === 'opened'` guard
-  // failed and the menu was left stuck open.
+  // Live mirror of `mode` so handlers can read it synchronously without
+  // recreating the listener on every transition.
   const modeRef = useRef(mode)
   useEffect(() => { modeRef.current = mode }, [mode])
+  // Live mirror of macroFilter for the same reason — Esc-while-typing
+  // needs to look at the current buffer length without re-binding the
+  // global keydown listener on every keystroke.
+  const macroFilter = useStateSelector(state => state.macroFilter)
+  const macroFilterRef = useRef(macroFilter)
+  useEffect(() => { macroFilterRef.current = macroFilter }, [macroFilter])
 
+  // Phase 8a: macro mode is a pure toggle. Open from default, full-reset
+  // from anywhere else. Same semantics for the side button, the
+  // right-click handler, and Shift.
   function switchMacrosMenu() {
-    if (mode === 'default')
+    if (modeRef.current === 'default')
       updateStore({ mode: 'opened' })
-    else if (mode === 'opened')
-      updateStore({ mode: 'default' })
+    else
+      resetStore()
   }
 
-  onKeyUpRef.current = e => {
-    if (e.key !== 'Shift') return
-    if (!shiftPeekingRef.current) return
-    shiftPeekingRef.current = false
-    // We opened the menu via peek, so close it. Don't gate on `mode`
-    // here — by the time keyup arrives the dispatched keydown update
-    // may not have rendered yet, and the stale mode would block the
-    // close. setting mode to 'default' is idempotent.
-    updateStore({ mode: 'default' })
-  }
   onKeyDownRef.current = e => {
-    // Ignore OS-level key auto-repeat so a long-held Shift doesn't keep
-    // re-triggering the open animation.
-    if (e.key === 'Shift' && !e.repeat && !shiftPeekingRef.current) {
+    // Phase 8a: Shift = simple toggle. No tap-vs-hold distinction, no
+    // peek state to track. `e.repeat` is filtered so a held Shift can't
+    // re-fire the toggle while the OS is repeating the key.
+    if (e.key === 'Shift' && !e.repeat) {
       const liveMode = modeRef.current
-      if (allowedModes.get('Chevron').has(liveMode) && liveMode === 'default') {
-        shiftPeekingRef.current = true
-        updateStore({ mode: 'opened' })
+      // Only fire the toggle from modes Chevron knows about. Prevents
+      // Shift in `searching` mode from accidentally jumping into the
+      // macro menu mid-search.
+      if (allowedModes.get('Chevron').has(liveMode)) {
+        switchMacrosMenu()
+      }
+    }
+
+    // Esc in macro mode: pop a char if the filter has content, else
+    // close the menu. Owned here (not in `useMacroFilter`) so the
+    // close path lives next to the other close paths.
+    if (e.key === 'Escape' && modeRef.current === 'opened') {
+      if (macroFilterRef.current.length > 0) {
+        e.preventDefault()
+        updateStore({ macroFilter: macroFilterRef.current.slice(0, -1) })
+      } else {
+        e.preventDefault()
+        resetStore()
       }
     }
 
@@ -108,32 +114,35 @@ function App() {
       }
     }
   }
+  // Phase 8a: right-click is destructive. From default it opens the menu
+  // (existing behavior); from any other mode it resets the store. This
+  // matches user expectation that the secondary action on a non-default
+  // state cancels back to default rather than toggling.
   onContextMenuRef.current = e => {
-    switchMacrosMenu()
+    if (modeRef.current === 'default')
+      updateStore({ mode: 'opened' })
+    else
+      resetStore()
     e.preventDefault()
   }
   // ---
 
+  // Phase 8a: route printable keystrokes into store.macroFilter while
+  // mode === 'opened'. Mounted at the App level so the listener is
+  // active even when the lazy-loaded MacrosMenu hasn't rendered yet
+  // (matters during the open transition).
+  useMacroFilter()
+
   // adding event listeners
   useEffect(() => {
     const onContextMenu = e => onContextMenuRef.current(e)
-    const onKeyUp = e => onKeyUpRef.current(e)
     const onKeyDown = e => onKeyDownRef.current(e)
 
-    // If the window loses focus while Shift is held, the keyup will never
-    // arrive and the menu would stay stuck "peeked open". Drop the peek
-    // flag so the next press starts cleanly.
-    const onWindowBlur = () => { shiftPeekingRef.current = false }
-
-    document.addEventListener('keyup', onKeyUp)
     document.addEventListener('keydown', onKeyDown)
     document.addEventListener('contextmenu', onContextMenu)
-    window.addEventListener('blur', onWindowBlur)
     return () => {
-      document.removeEventListener('keyup', onKeyUp)
       document.removeEventListener('keydown', onKeyDown)
       document.removeEventListener('contextmenu', onContextMenu)
-      window.removeEventListener('blur', onWindowBlur)
     }
   }, [])
 

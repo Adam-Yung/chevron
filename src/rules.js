@@ -26,6 +26,12 @@ const allowedModes = new Map([
   ])],
   ['Slider', new Set([
     'opened'
+  ])],
+  // Phase 8a: typing in `opened` mode appends to `macroFilter` instead of
+  // landing in the QueryField. Lives next to the other actor sets so the
+  // rule registry stays in one place.
+  ['MacroFilter', new Set([
+    'opened'
   ])]
 ])
 
