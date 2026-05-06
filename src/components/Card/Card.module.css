@@ -101,7 +101,7 @@ body[data-color-scheme=light] .card::after {
   bottom: 0;
   left: 0;
   right: 0;
-  height: 24%;
+  height: 26%;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -113,23 +113,28 @@ body[data-color-scheme=light] .card::after {
 
 /* Individual character */
 .label-char {
-  font-size: 0.52rem;
+  font-size: 0.62rem;
   font-weight: 600;
-  color: var(--macro-text, #fff);
+  /* Uniform legible colour: uses the theme primary text colour with a
+     strong enough fallback so it reads on any card background. */
+  color: rgba(255, 255, 255, 0.92);
   letter-spacing: 0.01em;
   line-height: 1;
   /* stable characters: no animation */
   opacity: 1;
   transform: translateX(0);
-  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+  text-shadow: 0 1px 5px rgba(0, 0, 0, 0.65);
 }
 body[data-color-scheme=light] .label-char {
-  text-shadow: 0 1px 3px rgba(255, 255, 255, 0.6);
+  color: rgba(20, 20, 20, 0.88);
+  text-shadow: 0 1px 3px rgba(255, 255, 255, 0.7);
 }
 
-/* Only the newest character (last typed) slides in from the right */
+/* The *next* character (the one still to be typed) slides in from the right.
+   This is the predictive hint — it falls into place AFTER the user types the
+   previous character, so the hint is always one step ahead. */
 .label-char-new {
-  animation: char-slide-in 0.28s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  animation: char-slide-in 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) both;
 }
 @keyframes char-slide-in {
   from { opacity: 0; transform: translateX(150%); }
@@ -139,10 +144,11 @@ body[data-color-scheme=light] .label-char {
   .label-char-new { animation: none; opacity: 1; transform: none; }
 }
 
-/* When the label is visible, logo-wrapper shrinks to leave room below the
-   icon for the label — replicating the iOS icon + label layout. */
+/* When the label is visible, the logo-wrapper keeps full height so the icon
+   stays centred in its own space. The label overlays the bottom of the card
+   (it is absolutely-positioned), so no height reduction is needed here. */
 .label-visible .logo-wrapper {
-  height: 76%;
+  height: 100%;
 }
 
 /* ── Plate (macro gradient circle) ──────────────────────────────────── */

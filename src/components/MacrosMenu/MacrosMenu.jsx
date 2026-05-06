@@ -192,7 +192,7 @@ function MacrosMenu({ visibility, fullVisibility }) {
                   bgColor={pm.bgColor}
                   textColor={pm.textColor}
                   macroName={pm.name}
-                  revealCount={macroFilter.length > 0 ? macroFilter.length : (hintsActive ? 1 : 0)}
+                  revealCount={macroFilter.length > 0 ? macroFilter.length + 1 : (hintsActive ? 1 : 0)}
                   isHintActive={hintsActive}
                   onClick={() => activateCard(pm)}/>
               </motion.div>

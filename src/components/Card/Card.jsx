@@ -174,7 +174,9 @@ function Card({ active=false, visibility=true, icon, bgColor, textColor, macroNa
         }
       </div>
       {/* iOS-style label row: characters slide in one at a time from the right.
-          key={i} keeps existing chars stable so only the newest char animates. */}
+          key={i} keeps existing chars stable so only the newest char animates.
+          The last character shown is always the "next hint" — one ahead of what
+          the user has typed — so it animates in as a predictive preview. */}
       <div className={classes['label-row']}>
         {isHintActive && revealCount > 0 && macroName.slice(0, revealCount).split('').map((char, i) => (
           <span

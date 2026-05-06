@@ -23,7 +23,7 @@
 
 .sep {
   opacity: 0.25;
-  font-size: 0.32em;
+  font-size: 0.38em;
   margin: 0 0.4em;
   line-height: 1;
   font-weight: 300;
@@ -31,7 +31,7 @@
 
 /* Temperature: secondary to clock, high legibility */
 .temp {
-  font-size: 0.38em;
+  font-size: 0.46em;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
   letter-spacing: -0.01em;
@@ -40,7 +40,7 @@
 
 /* Emoji — same visual weight as temperature text */
 .emoji {
-  font-size: 0.4em;
+  font-size: 0.48em;
   line-height: 1;
 }
 

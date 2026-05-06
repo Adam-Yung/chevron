@@ -1,19 +1,33 @@
 /* ── Splide overrides ────────────────────────────────────────────────── */
 :global(.splide__track) {
   height: calc(50vh - var(--menu-offset) - 44px);
+  overflow: hidden !important;
 }
 .container[data-filtered] :global(.splide__track) {
   height: calc(50vh - var(--menu-offset) - 82px);
 }
+/* Ensure the slide list and each slide fill (not overflow) the track */
+:global(.splide__list) {
+  height: 100% !important;
+}
+:global(.splide__slide) {
+  height: 100% !important;
+}
 :global(.splide__slide__row) {
   justify-content: center;
+  height: 100% !important;
 }
 :global(.splide__slide--col) {
   width: unset !important;
   aspect-ratio: 1;
   min-width: 56px;
   min-height: 56px;
+  /* flex: 1 lets the grid extension distribute height evenly across rows
+     without any cell overflowing the track */
+  flex: 1 1 0;
   padding: 5px;
+  box-sizing: border-box;
+  overflow: hidden;
 }
 :global(.splide__slide--col:last-child) {
   margin-right: 0 !important;

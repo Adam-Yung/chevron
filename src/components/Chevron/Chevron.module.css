@@ -18,11 +18,14 @@
 }
 /* Top wrapper: ChevronTop sits at the bottom edge. The clip-path on the
    inner motion.div handles hiding/revealing — no overflow:hidden needed here.
-   padding-bottom creates breathing room between the clock/weather and the bar. */
+   padding-bottom creates breathing room between the clock/weather and the bar.
+   Slightly larger font-size than the base wrapper to give the clock/weather
+   row more visual presence. */
 .wrapper:first-child {
   align-items: end;
   padding-bottom: 0.18em;
   overflow: visible;
+  font-size: 5.6em;
 }
 /* Bottom wrapper: MacroFilterPill + MacrosMenu sit at the top edge so
    translateY('-100%') slides them just above the boundary when closed.
