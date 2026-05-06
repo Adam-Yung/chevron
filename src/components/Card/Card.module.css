@@ -1,54 +1,91 @@
+/* ── Card shell ────────────────────────────────────────────────────────── */
 .card {
   position: relative;
   aspect-ratio: 1;
   max-width: 100%;
   max-height: 100%;
   margin: 2px;
-  border-radius: 18%;
+  border-radius: 22%;
   overflow: hidden;
+  will-change: transform;
+
+  /* Glass surface — semi-transparent backing so the hint letter shows
+     through as a depth layer. Solid fallback for browsers without
+     backdrop-filter support. */
+  background: color-mix(in srgb, var(--card) 55%, transparent);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  box-shadow:
+    0 4px 24px rgba(0, 0, 0, 0.28),
+    0 1px 0 rgba(255, 255, 255, 0.07) inset;
 }
+@supports (backdrop-filter: blur(1px)) {
+  .card {
+    backdrop-filter: blur(12px) saturate(1.3);
+    -webkit-backdrop-filter: blur(12px) saturate(1.3);
+    background: color-mix(in srgb, var(--card) 38%, transparent);
+  }
+}
+
+/* Ambient glow at the base of the card, tinted by the macro's colour.
+   Creates the "each card has its own identity" depth effect. */
 .card::before {
   display: block;
   content: '';
-  width: 100%;
-  height: 100%;
   position: absolute;
-  background: var(--card);
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 50% 110%, var(--secondary, var(--card)) 0%, transparent 70%);
+  opacity: 0.40;
+  pointer-events: none;
+  z-index: 0;
 }
-/* dark theme (default) */
-.card::before {
-  filter: brightness(130%);
-}
-.card:hover::before {
-  filter: brightness(150%);
-}
-.card:active::before {
-  filter: brightness(175%);
-}
-/* light theme */
-body[data-color-scheme=light] .card::before {
-  filter: brightness(88%);
-}
-body[data-color-scheme=light] .card:hover::before {
-  filter: brightness(80%);
-}
-body[data-color-scheme=light] .card:active::before {
-  filter: brightness(75%);
+/* dark theme default — slight brightening */
+.card::after {
+  display: block;
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(160deg, rgba(255,255,255,0.06) 0%, transparent 55%);
+  pointer-events: none;
+  z-index: 0;
+  border-radius: inherit;
 }
 
+/* ── Interactions ────────────────────────────────────────────────────── */
 .card, .card * {
-  /* `transition: all` is expensive: every changed property (including
-     layout-affecting ones like width/height/font-size) animates. We only
-     actually animate filter/opacity/transform/background here, so be
-     explicit. */
   transition:
-    filter .25s,
-    opacity .25s,
-    transform .25s,
-    background-size .25s,
-    background-color .25s;
+    filter .2s,
+    opacity .2s,
+    transform .22s cubic-bezier(0.34, 1.56, 0.64, 1),
+    background-size .5s,
+    background-color .2s,
+    box-shadow .2s;
   cursor: pointer;
 }
+.card:hover {
+  transform: scale(1.05);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.35),
+    0 1px 0 rgba(255, 255, 255, 0.12) inset;
+  border-color: rgba(255, 255, 255, 0.18);
+}
+.card:active {
+  transform: scale(0.96);
+  transition-duration: .1s;
+}
+/* light theme */
+body[data-color-scheme=light] .card {
+  background: color-mix(in srgb, var(--card) 60%, transparent);
+  border-color: rgba(0, 0, 0, 0.08);
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.12), 0 1px 0 rgba(255,255,255,0.8) inset;
+}
+body[data-color-scheme=light] .card::before {
+  opacity: 0.25;
+}
+body[data-color-scheme=light] .card::after {
+  background: linear-gradient(160deg, rgba(255,255,255,0.5) 0%, transparent 55%);
+}
+
 .card > * {
   width: 100%;
   display: flex;
@@ -61,65 +98,70 @@ body[data-color-scheme=light] .card:active::before {
 .card.clicked * {
   cursor: default;
 }
-/* realistic mode */
 .card.realistic:active {
   box-shadow: 0 0 10px 1px black inset;
 }
 
+/* ── Hint — diagonal character watermark ────────────────────────────── */
+/* The hint is a large diagonal letter that lives BEHIND the plate/logo
+   but in FRONT of the card's glass surface. Because the card is now a
+   translucent glass panel, the letter shows through as a depth layer —
+   partially visible through the plate when the plate is semi-transparent.
+   This is the original aesthetic intent, now made possible by the glass
+   card architecture. */
 .hint {
-  /* Glass key-cap badge anchored to the bottom-right corner of the card.
-     Sits above the icon (z-index > plate/logo) so it's always readable. */
   position: absolute;
-  bottom: 9%;
-  right: 7%;
-  top: auto;
-  left: auto;
-  width: auto;
-  height: auto;
-  min-width: 1.4em;
-  padding: 0.15em 0.35em;
-  border-radius: 0.3em;
-  background: rgba(0, 0, 0, 0.42);
-  backdrop-filter: blur(6px) saturate(1.4);
-  -webkit-backdrop-filter: blur(6px) saturate(1.4);
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  color: #fff;
-  font-size: 0.65rem;
-  font-weight: 800;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  text-align: center;
-  line-height: 1.3;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* var(--macro-text) is set on the card root by Card.jsx so the
+     letter always contrasts with the card's own color scheme. */
+  color: var(--macro-text, #fff);
+  font-size: 210%;
+  font-weight: 900;
+  letter-spacing: -0.04em;
   opacity: 0;
-  transform: scale(0.5);
-  /* keep transition for non-animation browsers */
-  transition: opacity .2s, transform .2s;
-  z-index: 10002;
+  transform: rotate(35deg) translateX(-5%) translateY(-5%);
+  /* z-index above card glass (0) but below plate (10000) and logo (10001).
+     The letter shows through the semi-transparent plate, creating depth. */
+  z-index: 5;
+  pointer-events: none;
+  /* No transition — animation handles the reveal */
+  transition: none;
+  /* Subtle text shadow amplifies depth through the glass */
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.4);
 }
-/* light theme: dark badge on light cards */
+/* Light theme: letter uses card's dark accent instead of white */
 body[data-color-scheme=light] .hint {
-  background: rgba(255, 255, 255, 0.55);
-  border-color: rgba(0, 0, 0, 0.12);
-  color: #111;
-}
-/* Phase 8b_continued: keyframe fires on mount so the badge animates
-   after every Splide remount (filter keystroke). */
-.hint.active {
-  animation: hint-badge-in 2.5s ease both;
-}
-@keyframes hint-badge-in {
-  0%   { opacity: 0; transform: scale(0.5); }
-  12%  { opacity: 1; transform: scale(1.12); }
-  20%  { transform: scale(1); }
-  100% { opacity: 1; transform: scale(1); }
-}
-@media (prefers-reduced-motion: reduce) {
-  .hint.active { animation: none; opacity: 1; transform: scale(1); }
+  text-shadow: 0 1px 8px rgba(255, 255, 255, 0.6);
 }
 
+/* Keyframe fires on every Splide remount (filter change) since CSS
+   animations trigger on element mount, not on class-add. */
+.hint.active {
+  animation: hint-reveal 2.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@keyframes hint-reveal {
+  0%   { opacity: 0; transform: rotate(35deg) translateX(-18%) translateY(-5%); }
+  40%  { opacity: 0.75; transform: rotate(35deg) translateX(8%) translateY(-5%); }
+  100% { opacity: 0.65; transform: rotate(35deg) translateX(8%) translateY(-5%); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hint.active {
+    animation: none;
+    opacity: 0.6;
+    transform: rotate(35deg) translateX(8%) translateY(-5%);
+  }
+}
+
+/* ── Plate (macro gradient circle) ──────────────────────────────────── */
 .plate {
   position: absolute;
-  width: 60%;
+  width: 58%;
   aspect-ratio: 1;
   z-index: 10000;
   border-radius: 50%;
@@ -127,8 +169,10 @@ body[data-color-scheme=light] .hint {
   background-repeat: no-repeat;
   background-size: 200% 200%;
   background-position: right top;
-  transition: background-size .6s, opacity .3s ease-out;
+  transition: background-size .5s, opacity .25s ease-out;
   will-change: transform, opacity;
+  /* Subtle inner highlight to give the circle a glass-like convex feel */
+  box-shadow: 0 2px 0 rgba(255, 255, 255, 0.15) inset, 0 4px 16px rgba(0,0,0,0.25);
 }
 .card:hover .plate, .card:active .plate, .plate.detached {
   background-size: 100% 100%;
@@ -140,35 +184,37 @@ body[data-color-scheme=light] .hint {
   height: 100%;
   border-radius: 50%;
   background: #2a2a2a;
-  transition: opacity .6s;
+  transition: opacity .5s;
 }
-/* dark theme (default) */
+/* dark theme (default) — semi-transparent so hint shows through */
 .plate::before {
-  opacity: .3;
+  opacity: .22;
 }
 .card:hover .plate::before, .card:active .plate::before, .plate.detached::before {
-  opacity: .1;
+  opacity: .08;
 }
 /* light theme */
 body[data-color-scheme=light] .plate::before {
-  opacity: .2;
+  opacity: .15;
 }
 body[data-color-scheme=light] .card:hover .plate::before,
-body[data-color-scheme=light] .card:active .plate::before, 
+body[data-color-scheme=light] .card:active .plate::before,
 body[data-color-scheme=light] .plate.detached::before {
   opacity: 0;
 }
 
+/* ── Logo / icon ─────────────────────────────────────────────────────── */
 .logo-wrapper {
   height: 100%;
 }
 .logo {
-  width: 40%;
+  width: 38%;
   margin: 10%;
   z-index: 10001;
   will-change: transform;
+  /* Subtle drop shadow so icon is crisp over the glass surface */
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.3));
 }
-
 .logo svg {
   display: flex;
   width: 100%;

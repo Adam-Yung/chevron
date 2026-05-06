@@ -161,6 +161,7 @@ function Card({ active=false, visibility=true, icon, bgColor, textColor, hotKey,
   return (
     <div
       className={gC('card', classes['card'], active && classes['active'])}
+      style={{ '--macro-text': textColor }}
       onClick={onClick}>
       <div className={classes['logo-wrapper']}>
         { 
