@@ -14,6 +14,8 @@
   aspect-ratio: 1;
   min-width: 56px;
   min-height: 56px;
+  /* Inset padding makes cards visually smaller with visible breathing room. */
+  padding: 5px;
 }
 :global(.splide__slide--col:last-child) {
   margin-right: 0 !important;

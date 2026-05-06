@@ -67,50 +67,54 @@ body[data-color-scheme=light] .card:active::before {
 }
 
 .hint {
+  /* Glass key-cap badge anchored to the bottom-right corner of the card.
+     Sits above the icon (z-index > plate/logo) so it's always readable. */
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  color: var(--card);
-  font-size: 190%;
-  font-weight: 700;
+  bottom: 9%;
+  right: 7%;
+  top: auto;
+  left: auto;
+  width: auto;
+  height: auto;
+  min-width: 1.4em;
+  padding: 0.15em 0.35em;
+  border-radius: 0.3em;
+  background: rgba(0, 0, 0, 0.42);
+  backdrop-filter: blur(6px) saturate(1.4);
+  -webkit-backdrop-filter: blur(6px) saturate(1.4);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: #fff;
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-align: center;
+  line-height: 1.3;
   opacity: 0;
-  transform: rotate(35deg) translate(-10%);
-  transition: opacity .2s, transform .2s, filter .2s;
+  transform: scale(0.5);
+  /* keep transition for non-animation browsers */
+  transition: opacity .2s, transform .2s;
+  z-index: 10002;
 }
-/* dark theme (default) */
-.hint {
-  filter: brightness(180%);
-}
-/* light theme */
+/* light theme: dark badge on light cards */
 body[data-color-scheme=light] .hint {
-  filter: brightness(80%);
+  background: rgba(255, 255, 255, 0.55);
+  border-color: rgba(0, 0, 0, 0.12);
+  color: #111;
 }
-/* Phase 8b_continued: use a keyframe animation (not a transition) for the
-   active reveal. Splide remounts each Card on every filter change, and CSS
-   transitions don't fire on element mount — only on subsequent state changes.
-   A keyframe runs whenever `.hint.active` is present at mount, so the
-   slide-in plays after every keystroke as the user types into the macro
-   filter. Duration restored to 2.5s (the pre-8a value) for the dramatic
-   diagonal sweep feel. */
+/* Phase 8b_continued: keyframe fires on mount so the badge animates
+   after every Splide remount (filter keystroke). */
 .hint.active {
-  transform: rotate(35deg) translate(20%);
-  opacity: 1;
-  animation: hint-slide-in 2.5s ease both;
+  animation: hint-badge-in 2.5s ease both;
 }
-@keyframes hint-slide-in {
-  from {
-    opacity: 0;
-    transform: rotate(35deg) translate(-10%);
-  }
-  to {
-    opacity: 1;
-    transform: rotate(35deg) translate(20%);
-  }
+@keyframes hint-badge-in {
+  0%   { opacity: 0; transform: scale(0.5); }
+  12%  { opacity: 1; transform: scale(1.12); }
+  20%  { transform: scale(1); }
+  100% { opacity: 1; transform: scale(1); }
 }
 @media (prefers-reduced-motion: reduce) {
-  .hint.active { animation: none; }
+  .hint.active { animation: none; opacity: 1; transform: scale(1); }
 }
 
 .plate {

@@ -17,9 +17,12 @@
   z-index: 1;
 }
 /* Top wrapper: ChevronTop sits at the bottom edge so translateY('100%')
-   slides it just below the overflow:hidden boundary when menu is closed. */
+   slides it just below the overflow:hidden boundary when menu is closed.
+   padding-bottom creates breathing room between the clock/weather row
+   and the horizontal chevron bar in opened mode. */
 .wrapper:first-child {
   align-items: end;
+  padding-bottom: 0.18em;
 }
 /* Bottom wrapper: MacroFilterPill + MacrosMenu sit at the top edge so
    translateY('-100%') slides them just above the boundary when closed.
