@@ -30,6 +30,11 @@ function useMacroFilter() {
 
     const onKey = e => {
       if (e.metaKey || e.ctrlKey || e.altKey) return
+      // Skip when Shift is held: Shift+letter is reserved for macro
+      // hotkey activation (handled by `MacrosMenu`'s keypress listener).
+      // If we preventDefault'd the keydown here, the keypress would never
+      // fire and the hotkey would silently swallow into the filter.
+      if (e.shiftKey) return
 
       if (e.key === 'Backspace') {
         if (filter.length === 0) return

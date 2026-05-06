@@ -1,6 +1,5 @@
 import { memo, useState, useEffect, useContext, useRef, useCallback, useMemo } from 'react'
 import useRedirect from '../../hooks/useRedirect'
-import useIsKeyPressed from '../../hooks/useIsKeyPressed'
 import { useStateSelector , useUpdate} from '../../contexts/Store'
 import { SettingsContext } from '../../contexts/Settings'
 import { Splide, SplideSlide } from '@splidejs/react-splide'
@@ -52,7 +51,16 @@ function MacrosMenu({ visibility, fullVisibility }) {
 
   // selected macro
   const [selected, setSelected] = useState(null)
-  const isShiftPressed = useIsKeyPressed('Shift')
+  // Phase 8a polish: hints are always on for pointer-fine devices
+  // (mouse / trackpad). Touch devices suppress the hint because there's
+  // no keyboard to act on it. Tracked once on mount; we don't bother
+  // with a media-query listener because input modality rarely changes
+  // mid-session.
+  const [hintsEnabled] = useState(() =>
+    typeof window === 'undefined' || typeof window.matchMedia !== 'function'
+      ? true
+      : !window.matchMedia('(pointer: coarse)').matches
+  )
   // if the slider is on the slide with the selected card
   const [isCardInFocus, setIsCardInFocus] = useState(false)
   const sliderRef = useRef(null)
@@ -141,8 +149,8 @@ function MacrosMenu({ visibility, fullVisibility }) {
                   icon={pm.icon}
                   bgColor={pm.bgColor}
                   textColor={pm.textColor}
-                  hotKey={pm.key && pm.key.slice(-1)}
-                  isHintActive={isShiftPressed}
+                  hotKey={nextHintChar(pm.name, macroFilter)}
+                  isHintActive={hintsEnabled}
                   onClick={() => activateCard(pm)}/>
               </SplideSlide>
             )
@@ -151,6 +159,22 @@ function MacrosMenu({ visibility, fullVisibility }) {
       </Splide>
     </div>
   )
+}
+
+// Phase 8a polish: derive the per-card hint character from the current
+// filter. Empty filter = first char of the name. Filter substring found
+// in the name = the character immediately after the matched span. If the
+// filter matched via trigger/category (so it isn't a substring of the
+// name), fall back to the first char so the hint stays predictable.
+// Duplicate hints across cards are intentional — typing the shared char
+// keeps both filtered in, which is exactly what filtering is for.
+function nextHintChar(name, filter) {
+  if (!name) return ''
+  const lowerName = name.toLowerCase()
+  if (!filter) return lowerName[0] || ''
+  const idx = lowerName.indexOf(filter)
+  if (idx === -1) return lowerName[0] || ''
+  return lowerName[idx + filter.length] || ''
 }
 
 export default memo(MacrosMenu)

@@ -89,7 +89,11 @@ body[data-color-scheme=light] .hint {
 .hint.active {
   transform: rotate(35deg) translate(20%);
   opacity: 1;
-  transition: opacity 2.5s ease, transform 2.5s ease;
+  /* Phase 8a polish: hints are now always-on (gated only on touch). The
+     2.5s reveal made sense for the old hold-Shift peek; for always-on
+     it just delays first paint and re-animates on every filter remount.
+     Match the .2s deactivate timing. */
+  transition: opacity .2s ease, transform .2s ease;
 }
 
 .plate {
