@@ -9,6 +9,8 @@
 .wrapper {
   display: flex;
   justify-content: center;
+  flex-direction: column;
+  align-items: center;
   width: 100%;
   height: calc(50vh - var(--menu-offset));
   font-size: 5em;
@@ -25,6 +27,10 @@
 .wrapper > * {
   width: 100%;
   text-align: center;
+}
+/* The filter pill is inline and should not be stretched to full width. */
+.wrapper > :global([data-keep-focus]) {
+  width: auto;
 }
 
 .svg {

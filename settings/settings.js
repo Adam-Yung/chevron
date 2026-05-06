@@ -35,7 +35,10 @@ const template = {
       default: new types.Theme()
     },
     // hidden; TODO: realistic
-    style: new types.List('default', ['default'])
+    style: new types.List('default', ['default']),
+    macroMenu: {
+      glassmorphism: new types.Switch(false, undefined, { description: 'Frost the macros menu backdrop with a blur effect. Disable on slow GPUs.' })
+    }
   },
   chevron: {
     thickness: new types.Range(

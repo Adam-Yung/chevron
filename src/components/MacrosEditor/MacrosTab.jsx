@@ -3,6 +3,7 @@ import classes from './MacrosEditor.module.css'
 import { TextField, ChipInput, ColorField, CheckboxField } from './Fields'
 import BgColorEditor from './BgColorEditor'
 import { bgPreviewCss, makeSolid } from './colorHelpers'
+import IconPicker from './IconPicker/IconPicker'
 
 /**
  * Per-macro form list. Each macro renders as an expandable row showing
@@ -23,7 +24,7 @@ function emptyMacro() {
   }
 }
 
-function MacrosTab({ macros, iconNames, onChange }) {
+function MacrosTab({ macros, onChange }) {
   const [openIdx, setOpenIdx] = useState(null)
 
   const update = useCallback((idx, next) => {
@@ -76,7 +77,6 @@ function MacrosTab({ macros, iconNames, onChange }) {
           isOpen={openIdx === i}
           isFirst={i === 0}
           isLast={i === macros.length - 1}
-          iconNames={iconNames}
           onToggle={() => setOpenIdx((cur) => (cur === i ? null : i))}
           onUpdate={(next) => update(i, next)}
           onUpdateField={(key, value) => updateField(i, key, value)}
@@ -91,7 +91,7 @@ function MacrosTab({ macros, iconNames, onChange }) {
 }
 
 const MacroRow = memo(function MacroRow({
-  index, macro, isOpen, isFirst, isLast, iconNames,
+  index, macro, isOpen, isFirst, isLast,
   onToggle, onUpdate, onUpdateField, onRemove, onMoveUp, onMoveDown
 }) {
   const swatchStyle = useMemo(() => ({ background: bgPreviewCss(macro.bgColor) }), [macro.bgColor])
@@ -128,7 +128,7 @@ const MacroRow = memo(function MacroRow({
             <TextField label="URL" value={macro.url} onChange={(v) => onUpdateField('url', v)} />
             <TextField label="Normalised URL (host)" value={macro.normalisedURL} placeholder="example.com" onChange={(v) => onUpdateField('normalisedURL', v)} />
             <TextField label="Hotkey (e.g. KeyG)" value={macro.key} placeholder="optional" onChange={(v) => onUpdateField('key', v || undefined)} />
-            <IconField value={macro.icon} options={iconNames} onChange={(v) => onUpdateField('icon', v || undefined)} />
+            <IconPicker value={macro.icon} onChange={(v) => onUpdateField('icon', v || undefined)} />
             <ColorField label="Text color" value={macro.textColor} onChange={(v) => onUpdateField('textColor', v)} />
             <CheckboxFieldWrapped label="Pinned to macros menu" checked={macro.pinned} onChange={(v) => onUpdateField('pinned', v)} />
           </div>
@@ -163,24 +163,6 @@ function CheckboxFieldWrapped({ label, checked, onChange }) {
     </div>
   )
 }
-
-const IconField = memo(function IconField({ value, options, onChange }) {
-  return (
-    <div className={classes['field']}>
-      <label>Icon name</label>
-      <input
-        type="text"
-        value={value ?? ''}
-        list="chevron-icon-names"
-        placeholder="optional"
-        onChange={(e) => onChange(e.target.value)}
-      />
-      <datalist id="chevron-icon-names">
-        {options.map(name => <option key={name} value={name} />)}
-      </datalist>
-    </div>
-  )
-})
 
 const CommandsBlock = memo(function CommandsBlock({ commands, onChange }) {
   const entries = commands && typeof commands === 'object' ? Object.entries(commands) : []

@@ -60,11 +60,6 @@ function MacrosEditorBody({ revision = 0, onSaved }) {
     return { ok: bad.length === 0, value: cfg, bad, parseError: null }
   }, [activeTab, rawText, cfg])
 
-  const iconNames = useMemo(() => {
-    if (typeof window === 'undefined' || !window.ICONS) return []
-    return Object.keys(window.ICONS)
-  }, [])
-
   const setSlice = useCallback((key) => (next) => {
     setCfg((prev) => {
       const out = { ...prev, [key]: next }
@@ -236,7 +231,6 @@ function MacrosEditorBody({ revision = 0, onSaved }) {
         {activeTab === 'macros' && (
           <MacrosTab
             macros={cfg.macros || []}
-            iconNames={iconNames}
             onChange={setSlice('macros')}
           />
         )}

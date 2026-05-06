@@ -350,7 +350,7 @@ animations land on top of compositor-only primitives.
 - [x] **(Phase 7 lands here)** — compositor-friendly visuals so 8c's
        new animations are built on the right primitives from day one.
        See the Phase 7 entry above.
-- [ ] **8c MacrosMenu redesign** — stagger entrance built on Phase 7's
+- [x] **8c MacrosMenu redesign** — stagger entrance built on Phase 7's
        primitives, hand-rolled prefix+substring filter scorer (no new
        deps — Phase 6 spirit), `MacroFilterPill` indicator above the
        menu, ≥56 px hit targets, optional glassmorphism behind a

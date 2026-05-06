@@ -3,6 +3,7 @@ import { SettingsContext, ThemeContext } from '../../contexts/Settings'
 import { useStateSelector } from '../../contexts/Store'
 import useTransitions from '../../hooks/useTransitions'
 import ChevronTop from '../ChevronTop/ChevronTop'
+import MacroFilterPill from '../MacroFilterPill/MacroFilterPill'
 const MacrosMenu = lazy(() => import('../MacrosMenu/MacrosMenu'))
 import { motion, useAnimationControls } from 'framer-motion'
 import { easeInOutQuad, easeInQuad, easeOutCubic, easeOutQuad } from '../../functions/animUtils/easings'
@@ -261,6 +262,7 @@ function Chevron({ visibility, onAnimationEnd }) {
         <motion.div
           initial={{ translateY: '-100%' }}
           animate={bottomMenuControls}>
+          <MacroFilterPill />
           <Suspense fallback={null}>
             <MacrosMenu
               visibility={visibility}

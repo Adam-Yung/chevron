@@ -1,0 +1,32 @@
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
+  padding: 0.25em 0.75em;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--primary) 18%, transparent);
+  border: 1px solid color-mix(in srgb, var(--primary) 30%, transparent);
+  color: var(--primary);
+  font-size: 0.85em;
+  pointer-events: none;
+  user-select: none;
+  white-space: nowrap;
+  max-width: 100%;
+}
+
+.query {
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 12em;
+}
+
+.sep {
+  opacity: 0.4;
+}
+
+.count {
+  opacity: 0.65;
+  font-size: 0.9em;
+}

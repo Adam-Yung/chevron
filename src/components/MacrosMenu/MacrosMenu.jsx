@@ -1,119 +1,112 @@
 import { memo, useState, useEffect, useContext, useRef, useCallback, useMemo } from 'react'
 import useRedirect from '../../hooks/useRedirect'
-import { useStateSelector , useUpdate} from '../../contexts/Store'
+import { useStateSelector, useUpdate } from '../../contexts/Store'
 import { SettingsContext } from '../../contexts/Settings'
 import { Splide, SplideSlide } from '@splidejs/react-splide'
 import { Grid } from '@splidejs/splide-extension-grid'
+import { motion } from 'framer-motion'
 import Card from '../Card/Card'
 import { allowedModes } from '../../rules'
 import classes from './MacrosMenu.module.css'
 import '@splidejs/react-splide/css'
 
-const pinnedMacros = window.CONFIG.macros.filter(m => m.pinned)
+export const pinnedMacros = window.CONFIG.macros.filter(m => m.pinned)
+
+// Phase 8c: ranked prefix+substring scorer replacing the plain .includes()
+// check from 8a. Exported so MacroFilterPill can compute the result count
+// without duplicating the logic.
+export function score(macro, needle) {
+  const name     = (macro.name     || '').toLowerCase()
+  const category = (macro.category || '').toLowerCase()
+  const triggers = (macro.triggers || []).map(t => t.toLowerCase())
+
+  if (name === needle)                          return 100
+  if (name.startsWith(needle))                  return 80
+  if (triggers.includes(needle))                return 70
+  if (triggers.some(t => t.startsWith(needle))) return 60
+  if (name.includes(needle))                    return 40
+  if (category.includes(needle))                return 20
+  return 0
+}
+
+// Phase 8c: framer-motion stagger variants for the card grid.
+// Built on opacity+translateY only (compositor-safe, Phase 7 spirit).
+const listVariants = {
+  hidden: {},
+  visible: {
+    transition: { staggerChildren: 0.03, delayChildren: 0 }
+  }
+}
+const itemVariants = {
+  hidden:  { opacity: 0, y: 8 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.15, ease: 'easeOut' } }
+}
 
 function MacrosMenu({ visibility, fullVisibility }) {
-  // settings
   const settings = useContext(SettingsContext)
 
-  const pagination = settings.menu.pagination 
-  const arrows = settings.menu.arrows 
-  const drag = settings.menu.drag 
-  const rows = settings.menu.rows
-  const cols = settings.menu.columns
-  const gap = settings.menu.gap
+  const pagination = settings.menu.pagination
+  const arrows     = settings.menu.arrows
+  const drag       = settings.menu.drag
+  const rows       = settings.menu.rows
+  const cols       = settings.menu.columns
+  const gap        = settings.menu.gap
+  const glassmorphism = settings.appearance?.macroMenu?.glassmorphism ?? false
 
   const slideCapacity = cols * rows
 
-  /* store */
-  const mode = useStateSelector(store => store.mode)
-  // Phase 8a: typed-to-filter buffer. Empty string = show every pinned macro.
-  const macroFilter = useStateSelector(store => store.macroFilter)
-  // Phase 8b: true iff the menu was opened via Shift. Combined with the
-  // filter buffer below to decide whether per-card key hints are shown.
+  const mode             = useStateSelector(store => store.mode)
+  const macroFilter      = useStateSelector(store => store.macroFilter)
   const macroHintsKeyboard = useStateSelector(store => store.macroHintsKeyboard)
-  // ---
 
-  // Phase 8a: filter the pinned set by case-insensitive substring match
-  // against name + triggers + category. Hand-rolled (no MiniSearch dep)
-  // because the pinned set is small (<~30 entries) and Phase 6's posture
-  // is to avoid extra runtime deps where a few lines suffice.
+  // Phase 8c: ranked scorer replaces plain substring filter.
   const visibleMacros = useMemo(() => {
     const needle = macroFilter.trim().toLowerCase()
     if (!needle) return pinnedMacros
-    return pinnedMacros.filter(m => {
-      const haystack = [
-        m.name,
-        m.category,
-        ...(Array.isArray(m.triggers) ? m.triggers : [])
-      ].filter(Boolean).join(' ').toLowerCase()
-      return haystack.includes(needle)
-    })
+    return pinnedMacros
+      .map(m => ({ m, s: score(m, needle) }))
+      .filter(({ s }) => s > 0)
+      .sort((a, b) => b.s - a.s)
+      .map(({ m }) => m)
   }, [macroFilter])
 
   const isVisibleSliderHasMultipleSlides = visibleMacros.length > slideCapacity
 
-  // selected macro
-  const [selected, setSelected] = useState(null)
-  // Phase 8b: hint visibility rule. Hints help only when the user is
-  // about to use the keyboard:
-  //   - opened via Shift            → show (macroHintsKeyboard === true)
-  //   - opened by mouse/touch, then
-  //     user starts typing          → show (macroFilter.length > 0)
-  //   - opened by mouse/touch, idle → hide
-  // Touch-only devices never see hints because there's no keyboard to
-  // act on them. Modality is captured once at mount because input mode
-  // very rarely changes mid-session.
+  const [selected, setSelected]         = useState(null)
   const [isPointerCoarse] = useState(() =>
-    typeof window !== 'undefined'
-    && typeof window.matchMedia === 'function'
-    && window.matchMedia('(pointer: coarse)').matches
+    typeof window !== 'undefined' &&
+    typeof window.matchMedia === 'function' &&
+    window.matchMedia('(pointer: coarse)').matches
   )
   const hintsActive = !isPointerCoarse && (macroHintsKeyboard || macroFilter.length > 0)
-  // if the slider is on the slide with the selected card
   const [isCardInFocus, setIsCardInFocus] = useState(false)
   const sliderRef = useRef(null)
 
   const updateValue = useUpdate()
-  const redirect = useRedirect()
+  const redirect    = useRedirect()
 
   const activateCard = useCallback(macro => {
-    // Compute the slide index from the currently-rendered list, not the
-    // full pinned set, so the slider scrolls to the correct page after a
-    // filter has narrowed the rows.
     const cardIndex = visibleMacros.indexOf(macro)
     if (cardIndex < 0) return
-    
-    // select the card
     setSelected(macro)
-    // block the store
     updateValue({ redirected: true })
-    // go to the selected card
     sliderRef.current.splide.Components.Controller.go(
       Math.floor(cardIndex / slideCapacity),
-      // allow going to the current slide
       true,
       () => setIsCardInFocus(true)
     )
-    
-    // !visibility - ignore animations if the menu isn't visible
     redirect(macro.url, 'card', !visibility)
   }, [redirect, visibility, slideCapacity, updateValue, visibleMacros])
 
-  // hotkeys listener
   useEffect(() => {
     const handleKeypress = e => {
       if (!allowedModes.get('Chevron').has(mode)) return
-
       if (e.shiftKey) {
         for (const macro of pinnedMacros) {
-          if (e.code === macro.key) {
-            activateCard(macro)
-            break
-          }
+          if (e.code === macro.key) { activateCard(macro); break }
         }
       }
     }
-
     document.addEventListener('keypress', handleKeypress)
     return () => document.removeEventListener('keypress', handleKeypress)
   }, [mode, activateCard])
@@ -125,32 +118,43 @@ function MacrosMenu({ visibility, fullVisibility }) {
     options: {
       pagination,
       arrows: arrows && isVisibleSliderHasMultipleSlides,
-      drag: drag && isVisibleSliderHasMultipleSlides,
+      drag:   drag   && isVisibleSliderHasMultipleSlides,
       perPage: 1,
       wheel: true,
       keyboard: allowedModes.get('Slider').has(mode) ? 'global' : false,
       grid: {
         cols,
         rows,
-        gap: {
-          col: gap + 'px',
-          row: gap + 'px'
-        }
+        gap: { col: gap + 'px', row: gap + 'px' }
       }
     }
   }
-  // Phase 8a: keying Splide on the filter forces a clean remount whenever
-  // the visible card set changes, sidestepping Splide's internal slide
-  // index caching. The filter changes infrequently (only while typing in
-  // macro mode) so the remount cost is acceptable. Phase 8c will revisit
-  // this with a proper data-match attribute + CSS dim animation.
+
+  // Phase 8c: empty state when filter matches nothing.
+  const isEmpty = macroFilter.length > 0 && visibleMacros.length === 0
+
   return (
-    <div className={classes['container']}>
-      <Splide {...splideOptions} key={macroFilter || '__all__'}>
-        {
-          visibleMacros.map(pm => {
-            return (
-              <SplideSlide key={pm.name}>
+    <div
+      className={classes['container']}
+      data-glassmorphism={glassmorphism || undefined}>
+      {isEmpty ? (
+        <div className={classes['empty']}>
+          no matches for <span className={classes['empty-filter']}>{macroFilter}</span>
+        </div>
+      ) : (
+        // Key on macroFilter so Splide remounts on filter change (8a behavior,
+        // retained per Option A in § 3.5.3). The stagger re-fires on remount,
+        // which is the desired effect — new card set slides in fresh.
+        <Splide {...splideOptions} key={macroFilter || '__all__'}>
+          {visibleMacros.map(pm => (
+            <SplideSlide key={pm.name}>
+              {/* motion.li wrapper for stagger entrance (Phase 7 primitives:
+                  opacity + translateY only). */}
+              <motion.div
+                className={classes['slide-inner']}
+                variants={itemVariants}
+                initial="hidden"
+                animate="visible">
                 <Card
                   active={pm === selected && visibility && fullVisibility && isCardInFocus}
                   title={pm.name}
@@ -160,22 +164,15 @@ function MacrosMenu({ visibility, fullVisibility }) {
                   hotKey={nextHintChar(pm.name, macroFilter)}
                   isHintActive={hintsActive}
                   onClick={() => activateCard(pm)}/>
-              </SplideSlide>
-            )
-          })
-        }
-      </Splide>
+              </motion.div>
+            </SplideSlide>
+          ))}
+        </Splide>
+      )}
     </div>
   )
 }
 
-// Phase 8a polish: derive the per-card hint character from the current
-// filter. Empty filter = first char of the name. Filter substring found
-// in the name = the character immediately after the matched span. If the
-// filter matched via trigger/category (so it isn't a substring of the
-// name), fall back to the first char so the hint stays predictable.
-// Duplicate hints across cards are intentional — typing the shared char
-// keeps both filtered in, which is exactly what filtering is for.
 function nextHintChar(name, filter) {
   if (!name) return ''
   const lowerName = name.toLowerCase()
