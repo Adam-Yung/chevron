@@ -9,26 +9,42 @@
   font-size: var(--font-size-suggestions);
 }
 .container.default {
-  /* (half of the screen - half of the QueryField - top margin - bottom margin) */
   height: calc(50vh - 50% - 20px - 20px);
   margin-top: 20px;
-  gap: 10px;
+  gap: 8px;
   overflow-y: auto;
   overflow-x: hidden;
 }
 
+/* ── Suggestion pill ─────────────────────────────────────────────────── */
 .suggestion > div {
   color: var(--suggestions);
   display: flex;
   text-align: center;
   width: fit-content;
   margin: 0 auto;
-  padding: 7px 20px;
-  border-radius: 15px;
+  padding: 6px 18px;
+  border-radius: 999px;
   cursor: pointer;
+  /* Glass pill base */
+  background: color-mix(in srgb, var(--primary) 6%, transparent);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  transition: background 0.15s, border-color 0.15s, transform 0.15s;
+}
+@supports (backdrop-filter: blur(1px)) {
+  .suggestion > div {
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    background: color-mix(in srgb, var(--primary) 4%, transparent);
+  }
+}
+.suggestion > div:hover {
+  background: color-mix(in srgb, var(--primary) 12%, transparent);
+  border-color: rgba(255, 255, 255, 0.14);
+  transform: translateY(-1px);
 }
 
-/* sources */
+/* Sources */
 .suggestion.history-source > div {
   text-decoration: underline;
   text-decoration-color: var(--visited);
@@ -43,47 +59,39 @@
   margin-right: .5ch;
   background-color: var(--prefix);
   padding: 0 .5ch;
-  border-radius: 10px;
+  border-radius: 8px;
   color: var(--secondary);
 }
 
-/* //! */
+/* Selection state — glass highlight instead of thick solid border */
 .suggestion > div {
-  border: 5px solid transparent;
+  border: 1px solid rgba(255, 255, 255, 0.08);
 }
 .suggestion.selected > div {
-  border: 5px solid var(--primary);
+  background: color-mix(in srgb, var(--primary) 18%, transparent);
+  border-color: color-mix(in srgb, var(--primary) 55%, transparent);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--primary) 30%, transparent);
+  transform: translateY(-1px);
 }
-.suggestion:active > div, :global(.forwarding) .suggestion.selected > div {
+.suggestion:active > div,
+:global(.forwarding) .suggestion.selected > div {
   background: var(--primary);
   color: var(--secondary);
+  transform: scale(0.97);
 }
 
-/* Keyboard focus ring on individual options */
+/* Keyboard focus ring */
 .suggestion:focus-visible > div {
-  outline: 2px solid var(--accent, var(--primary));
+  outline: 2px solid color-mix(in srgb, var(--primary) 80%, transparent);
   outline-offset: 2px;
 }
 
-/* realistic button mode */
-/*
-.suggestion.realistic.selected > div {
-  background: var(--primary);
-  color: var(--secondary);
+/* Light theme */
+body[data-color-scheme=light] .suggestion > div {
+  background: rgba(255, 255, 255, 0.45);
+  border-color: rgba(0, 0, 0, 0.07);
 }
-.suggestion.realistic:active > div, :global(.forwarding) .suggestion.realistic.selected > div {
-  background: var(--secondary);
-  color: var(--primary);
+body[data-color-scheme=light] .suggestion.selected > div {
+  background: rgba(255, 255, 255, 0.75);
+  border-color: var(--primary);
 }
-.suggestion.realistic:active > div:before {
-  border-radius: 15px;
-  content: '';
-  position: absolute;
-  left: 0px;
-  top: 0px;
-  right: 0px;
-  bottom: 0px;
-  box-shadow: inset 5px 5px 7px 2px black;
-  pointer-events: none;
-}
-*/

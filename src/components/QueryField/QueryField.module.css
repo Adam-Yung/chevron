@@ -32,11 +32,11 @@
   text-transform: uppercase;
   font-family: inherit;
   cursor: default;
+  /* Subtle caret glow — the caret itself is the only "active" indicator */
+  caret-color: color-mix(in srgb, var(--query) 80%, transparent);
 }
 
-/* No focus ring on the search input — the caret and active state are
-   sufficient indicators. The field is visually dominant enough that a
-   browser-default outline would be noisy and distracting. */
+/* No focus ring — input is already the dominant visual element */
 .field:focus-visible {
   outline: none;
 }
