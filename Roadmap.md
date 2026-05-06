@@ -376,7 +376,7 @@ animations land on top of compositor-only primitives.
        state. Weather chip: recalibrated sizes. All built on
        `@supports` guards with solid fallbacks.
 
-### Phase 8.5 — Settings schema + migration  `[ ]`
+### Phase 8.5 — Settings schema + migration  `[x]`
 
 > Bumped from Phase 8 to make room for the macro redesign work.
 

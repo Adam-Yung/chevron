@@ -88,6 +88,10 @@ export function loadConfig() {
   if (bad.length > 0) {
     // eslint-disable-next-line no-console
     console.warn('[Chevron] chevron.config contains forbidden URL schemes; falling back to bundled config. Offending paths:', bad)
+    // Back up the bad config so the user can inspect it
+    try {
+      localStorage.setItem(`chevron.config.bak.${Date.now()}`, localStorage.getItem(CONFIG_STORAGE_KEY) ?? '')
+    } catch { /* ignore */ }
     return bundled
   }
 
