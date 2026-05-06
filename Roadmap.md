@@ -316,7 +316,7 @@ What actually shipped from Phase 7:
       refactor. Deferred indefinitely; the `d` morph is cheap enough
       for these two simple paths.
 
-### Phase 8 — Macro mode reimagined  `[~]`
+### Phase 8 — Macro mode reimagined  `[x]`
 
 Decouple the macro menu from the search-mode state machine, fix the
 clock under animation churn, add an OpenWeatherMap widget, type-to-
@@ -366,6 +366,15 @@ animations land on top of compositor-only primitives.
 - [x] **8e Gestures** — `useGestures` hook (swipe up/down + trackpad
        horizontal pagination); the mobile banner stays as-is in this
        phase (touch-banner restructure remains Phase 10's job).
+- [x] **Glass overhaul** — Direction 1 glassmorphic visual redesign
+       across the entire UI. Cards: `backdrop-filter` glass surface with
+       radial ambient glow from each macro's brand color, convex plate
+       highlight, diagonal hint letter visible through the glass, spring
+       hover/active transitions. MacrosMenu container: single compositor
+       backdrop-filter layer. Filter pill: glass capsule. ChevronTop:
+       faint glass shelf. Suggestions: glass pills with tinted selection
+       state. Weather chip: recalibrated sizes. All built on
+       `@supports` guards with solid fallbacks.
 
 ### Phase 8.5 — Settings schema + migration  `[ ]`
 
