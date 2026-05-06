@@ -294,24 +294,27 @@ mid-weight dependency that didn't earn its bytes.
     runtime. Phase 7 (compositor-friendly visuals) and the deferred
     `@mui/joy` swap are the right places to attack that.
 
-### Phase 7 — Compositor-friendly visuals  `[x]`
+### Phase 7 — Compositor-friendly visuals  `[~]`
 
-The current Chevron / QuickLook animations morph SVG `d` attributes,
-which forces a paint on every frame.
+The cross-fade approach (N stacked static paths opacity-faded) was
+reverted for Chevron and QuickLook after causing visual regressions:
+cross-fading between discrete shapes looked like popping/blinking
+rather than smooth morphing, and invisible overflow paths from stage 4
+(the full-width stretched bar) disrupted layout. The perf gain for
+2-bezier SVG paths is also near-zero in practice.
 
-- [x] Pre-compute a small set of path snapshots and cross-fade them
-      with `opacity` / `transform` so the entire animation runs on the
-      compositor (no main-thread paint). Chevron has 5 stage paths;
-      QuickLook has 4 (stages 2 & 3 recomputed on viewport resize only,
-      not per frame). Both components now stack all paths in the SVG
-      and animate between them with opacity cross-fades only.
-- [x] Audit remaining `transition: <length>` usages and convert any
-      that can be done with `transform` / `opacity`. Fixed
-      `LayoutButton` (`transition: all` → `transition: opacity`).
-- [x] `content-visibility: auto` on offscreen panels: N/A — Settings
-      uses conditional rendering (`{showSettings && …}`) and Cheatsheet
-      returns `null` when closed, so neither is ever in the DOM while
-      hidden. No change needed.
+What actually shipped from Phase 7:
+
+- [x] **LayoutButton**: `transition: all .3s` → `transition: opacity .3s`.
+      The button only ever animates opacity; `transition: all` was
+      needlessly animating every layout property on each state change.
+- [ ] SVG path morph → compositor cross-fade: **reverted**. The correct
+      approach would require the shapes to be visually identical at each
+      keyframe boundary so a cross-fade is imperceptible. That's only
+      possible if the shapes are redesigned as layered elements that
+      happen to share endpoints — a larger design task than a simple
+      refactor. Deferred indefinitely; the `d` morph is cheap enough
+      for these two simple paths.
 
 ### Phase 8 — Macro mode reimagined  `[~]`
 
