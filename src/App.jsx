@@ -56,12 +56,22 @@ function App() {
   const macroFilterRef = useRef(macroFilter)
   useEffect(() => { macroFilterRef.current = macroFilter }, [macroFilter])
 
-  // Phase 8a: macro mode is a pure toggle. Open from default, full-reset
-  // from anywhere else. Same semantics for the side button, the
-  // right-click handler, and Shift.
+  // Phase 8a: macro mode is a pure toggle.
+  //  - default → opened: open the menu.
+  //  - opened  → default: just transition mode. Using `updateStore` here
+  //    (rather than `resetStore`) preserves `timestamp`, so the
+  //    AnimatePresence-keyed container does NOT unmount/remount and
+  //    the Chevron plays its proper close animation in reverse instead
+  //    of cross-fading. The reducer auto-clears `macroFilter` on any
+  //    leave-opened transition, so the end state matches a full reset.
+  //  - anything else → resetStore: catches edge cases like Shift while
+  //    `searching` where we genuinely want query/selection cleared.
   function switchMacrosMenu() {
-    if (modeRef.current === 'default')
+    const liveMode = modeRef.current
+    if (liveMode === 'default')
       updateStore({ mode: 'opened' })
+    else if (liveMode === 'opened')
+      updateStore({ mode: 'default' })
     else
       resetStore()
   }
@@ -82,14 +92,16 @@ function App() {
 
     // Esc in macro mode: pop a char if the filter has content, else
     // close the menu. Owned here (not in `useMacroFilter`) so the
-    // close path lives next to the other close paths.
+    // close path lives next to the other close paths. Going via
+    // `updateStore({ mode: 'default' })` (not `resetStore`) preserves
+    // `timestamp` so the Chevron plays its close animation properly.
     if (e.key === 'Escape' && modeRef.current === 'opened') {
       if (macroFilterRef.current.length > 0) {
         e.preventDefault()
         updateStore({ macroFilter: macroFilterRef.current.slice(0, -1) })
       } else {
         e.preventDefault()
-        resetStore()
+        updateStore({ mode: 'default' })
       }
     }
 
@@ -114,15 +126,11 @@ function App() {
       }
     }
   }
-  // Phase 8a: right-click is destructive. From default it opens the menu
-  // (existing behavior); from any other mode it resets the store. This
-  // matches user expectation that the secondary action on a non-default
-  // state cancels back to default rather than toggling.
+  // Phase 8a: right-click mirrors the Shift toggle so the keyboard and
+  // mouse paths stay in sync (and the close animation plays correctly
+  // when going opened → default).
   onContextMenuRef.current = e => {
-    if (modeRef.current === 'default')
-      updateStore({ mode: 'opened' })
-    else
-      resetStore()
+    switchMacrosMenu()
     e.preventDefault()
   }
   // ---
