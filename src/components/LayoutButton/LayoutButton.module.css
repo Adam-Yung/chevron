@@ -3,7 +3,7 @@
   margin: 1.5em;
   cursor: pointer;
   z-index: 100;
-  transition: all .3s;
+  transition: opacity .3s;
 }
 .container.visited {
   opacity: 0;

@@ -294,17 +294,24 @@ mid-weight dependency that didn't earn its bytes.
     runtime. Phase 7 (compositor-friendly visuals) and the deferred
     `@mui/joy` swap are the right places to attack that.
 
-### Phase 7 — Compositor-friendly visuals  `[ ]`
+### Phase 7 — Compositor-friendly visuals  `[x]`
 
 The current Chevron / QuickLook animations morph SVG `d` attributes,
 which forces a paint on every frame.
 
-- [ ] Pre-compute a small set of path snapshots and cross-fade them
+- [x] Pre-compute a small set of path snapshots and cross-fade them
       with `opacity` / `transform` so the entire animation runs on the
-      compositor (no main-thread paint).
-- [ ] Audit remaining `transition: <length>` usages and convert any
-      that can be done with `transform` / `opacity`.
-- [ ] Optional: `content-visibility: auto` on offscreen panels.
+      compositor (no main-thread paint). Chevron has 5 stage paths;
+      QuickLook has 4 (stages 2 & 3 recomputed on viewport resize only,
+      not per frame). Both components now stack all paths in the SVG
+      and animate between them with opacity cross-fades only.
+- [x] Audit remaining `transition: <length>` usages and convert any
+      that can be done with `transform` / `opacity`. Fixed
+      `LayoutButton` (`transition: all` → `transition: opacity`).
+- [x] `content-visibility: auto` on offscreen panels: N/A — Settings
+      uses conditional rendering (`{showSettings && …}`) and Cheatsheet
+      returns `null` when closed, so neither is ever in the DOM while
+      hidden. No change needed.
 
 ### Phase 8 — Macro mode reimagined  `[~]`
 
@@ -340,7 +347,7 @@ animations land on top of compositor-only primitives.
          clobbered the CSS keyframe's `from` state. Replaced with a
          plain `<div>`; also pre-warmed the MacrosMenu lazy chunk on
          idle so the chunk is loaded before the first open (§ 3.3.3).
-- [ ] **(Phase 7 lands here)** — compositor-friendly visuals so 8c's
+- [x] **(Phase 7 lands here)** — compositor-friendly visuals so 8c's
        new animations are built on the right primitives from day one.
        See the Phase 7 entry above.
 - [ ] **8c MacrosMenu redesign** — stagger entrance built on Phase 7's
