@@ -47,9 +47,9 @@
 }
 
 /* ── Container ────────────────────────────────────────────────────────── */
-/* Always glass — the backdrop blur on the container provides the depth
-   context that makes the glass cards above it look correct. A single
-   backdrop-filter here is far cheaper than per-card filters. */
+/* No outer glass — the individual card surfaces provide all the depth
+   needed. A backdrop-filter on the whole container fought with the cards
+   and made the arrows/pagination look enclosed. */
 .container {
   width: auto;
   height: calc(50vh - var(--menu-offset) - 44px);
@@ -57,25 +57,6 @@
   overflow: hidden;
   border-radius: 18px;
   position: relative;
-  /* Glass backing — subtle enough not to fight the cards */
-  background: color-mix(in srgb, var(--card) 8%, transparent);
-  border: 1px solid rgba(255, 255, 255, 0.07);
-}
-@supports (backdrop-filter: blur(1px)) {
-  .container {
-    backdrop-filter: blur(24px) saturate(1.5);
-    -webkit-backdrop-filter: blur(24px) saturate(1.5);
-    background: color-mix(in srgb, var(--card) 5%, transparent);
-  }
-}
-/* Extra glassmorphism (opt-in setting) adds stronger tint + blur */
-@supports (backdrop-filter: blur(1px)) {
-  .container[data-glassmorphism] {
-    backdrop-filter: blur(32px) saturate(1.9);
-    -webkit-backdrop-filter: blur(32px) saturate(1.9);
-    background: color-mix(in srgb, var(--primary) 10%, transparent);
-    border-color: color-mix(in srgb, var(--primary) 18%, transparent);
-  }
 }
 
 .container[data-filtered] {

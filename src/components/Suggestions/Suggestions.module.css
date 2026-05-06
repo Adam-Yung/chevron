@@ -9,8 +9,13 @@
   font-size: var(--font-size-suggestions);
 }
 .container.default {
+  /* margin-top reduced by 6px to compensate for padding-top below, so the
+     net visual gap from the bar to the first suggestion stays the same. */
   height: calc(50vh - 50% - 20px - 20px);
-  margin-top: 20px;
+  margin-top: 14px;
+  /* padding-top gives the glass pill box-shadow headroom so the top row
+     is never clipped when selected. */
+  padding-top: 6px;
   gap: 8px;
   overflow-y: auto;
   overflow-x: hidden;
