@@ -51,7 +51,12 @@ function Weather() {
   const paramsRef = useRef({ apiKey, lat, lon, units })
   useEffect(() => { paramsRef.current = { apiKey, lat, lon, units } }, [apiKey, lat, lon, units])
 
-  const doFetch = useCallback(async (signal) => {
+  // Monotonically-increasing counter. Each effect run claims a generation;
+  // the async callback checks it before writing state so a superseded fetch
+  // (triggered by rapid lat/lon edits) never overwrites fresher data.
+  const fetchGenRef = useRef(0)
+
+  const doFetch = useCallback(async (signal, generation) => {
     const { apiKey: key, lat: la, lon: lo, units: u } = paramsRef.current
     if (!key || key.length < OWM_KEY_MIN_LEN || !la || !lo) return
     try {
@@ -59,6 +64,8 @@ function Weather() {
         fetchCurrentWeather(la, lo, u, key, signal),
         fetchForecast(la, lo, u, key, signal)
       ])
+      // Discard if a newer fetch has already started.
+      if (generation !== fetchGenRef.current) return
       setCachedCurrent(cur)
       setCachedForecast(fore)
       setCurrent({ stale: false, data: cur })
@@ -69,9 +76,10 @@ function Weather() {
   // Re-fetch only when coordinates actually change, not on every keystroke.
   useEffect(() => {
     const controller = new AbortController()
+    const generation = ++fetchGenRef.current
     setCurrent(getCachedCurrent())
     setForecast(getCachedForecast())
-    if (isOnline && lat && lon) doFetch(controller.signal)
+    if (isOnline && lat && lon) doFetch(controller.signal, generation)
     return () => controller.abort()
   }, [lat, lon, isOnline, doFetch])
 

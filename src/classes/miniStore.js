@@ -1,5 +1,5 @@
 export default class MiniStore {
-  #subscriptions = []
+  #subscriptions = new Set()
   #state
 
   constructor(initialState) {
@@ -17,15 +17,10 @@ export default class MiniStore {
   }
 
   subscribe = cb => {
-    this.#subscriptions.push(cb)
+    this.#subscriptions.add(cb)
 
     return () => {
-      const index = this.#subscriptions.indexOf(cb)
-
-      if (index === -1)
-        return
-
-      this.#subscriptions.splice(index, 1)
+      this.#subscriptions.delete(cb)
     }
   }
 }

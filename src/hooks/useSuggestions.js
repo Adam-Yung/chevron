@@ -11,6 +11,9 @@ const HIGHEST_RELEVANCE = 5000
 // the hierarchy of suggestion types: the lower index - the more higher in the hierarchy
 const hierarchy = ['calculator', 'weight', 'time', 'currency', 'macro', 'history', 'autocomplete']
 
+// Network calls fire after this delay; sync suggestions (history, calc, etc.) fire immediately.
+const NETWORK_DEBOUNCE_MS = 200
+
 // search history
 const history = new History()
 
@@ -63,40 +66,28 @@ function useSuggestions(query, autoCompleteEngine) {
       return newState
     })
   }, [])
-  
+
+  // Always-current ref so async callbacks can check staleness without
+  // being listed as effect dependencies.
   const queryRef = useRef()
   queryRef.current = query
 
+  // ── Instant path: synchronous sources fire on every query change ────────
   useEffect(() => {
-    // if query is empty
     if (!query) return
-    
-    // reset state
-    setSuggestions([])
 
-    /* autocomplete section */
-    autoCompleteEngine(query, locale)
-      .then(suggestions => {
-        // if the suggestions are outdated
-        if (query !== queryRef.current) return
-        addSuggestions(suggestions.slice(0, autocompleteLimit), 'autocomplete')
-      })
-      .catch(err => {
-        // eslint-disable-next-line no-console
-        console.warn('[Chevron] autocomplete failed:', err)
-      })
-    // ---
+    // Clear previous results immediately so stale suggestions don't linger
+    // while the debounced network calls are still pending.
+    setSuggestions([])
 
     /* history section */
     if (searchHistory)
       addSuggestions(history.suggest(query).slice(0, historyLimit), 'history')
-    // ---
 
     /* macro suggestions section */
     const macroMatches = getMacroSuggestions(query)
     if (macroMatches.length > 0)
       addSuggestions(macroMatches, 'macro')
-    // ---
 
     /* calculator section */
     const calcResult = calculate(query)
@@ -106,7 +97,6 @@ function useSuggestions(query, autoCompleteEngine) {
         type: 'calculator',
         relevance: HIGHEST_RELEVANCE
       }], 'calculator')
-    // ---
 
     /* weight converter section */
     const weightResult = convertWeight(query)
@@ -116,7 +106,6 @@ function useSuggestions(query, autoCompleteEngine) {
         type: 'weight',
         relevance: HIGHEST_RELEVANCE
       }], 'weight')
-    // ---
 
     /* time converter section */
     const timeResult = convertTime(query)
@@ -126,23 +115,41 @@ function useSuggestions(query, autoCompleteEngine) {
         type: 'time',
         relevance: HIGHEST_RELEVANCE
       }], 'time')
-    // ---
 
-    /* currency section */
-    if (currencyCommonRegex.test(query))
-      fetchCurrency(query)
-        .then(response => {
-          // if the suggestions are outdated
+  }, [query, searchHistory, historyLimit, addSuggestions])
+
+  // ── Debounced path: network calls fire only after the user pauses ────────
+  useEffect(() => {
+    if (!query) return
+
+    const timerId = setTimeout(() => {
+      /* autocomplete section */
+      autoCompleteEngine(query, locale)
+        .then(suggestions => {
           if (query !== queryRef.current) return
-          response && addSuggestions([response], 'currency')
+          addSuggestions(suggestions.slice(0, autocompleteLimit), 'autocomplete')
         })
         .catch(err => {
           // eslint-disable-next-line no-console
-          console.warn('[Chevron] currency lookup failed:', err)
+          console.warn('[Chevron] autocomplete failed:', err)
         })
-    // ---
-    
-  }, [query, searchHistory, autoCompleteEngine, autocompleteLimit, historyLimit, addSuggestions, locale])
+
+      /* currency section */
+      if (currencyCommonRegex.test(query))
+        fetchCurrency(query)
+          .then(response => {
+            if (query !== queryRef.current) return
+            response && addSuggestions([response], 'currency')
+          })
+          .catch(err => {
+            // eslint-disable-next-line no-console
+            console.warn('[Chevron] currency lookup failed:', err)
+          })
+    }, NETWORK_DEBOUNCE_MS)
+
+    return () => clearTimeout(timerId)
+
+  }, [query, autoCompleteEngine, autocompleteLimit, addSuggestions, locale])
 
   return suggestions
 }
@@ -175,40 +182,58 @@ function normaliseCurrencyCode(raw) {
   return CURRENCY_ALIASES[upper] ?? upper
 }
 
+// Cache exchange-rate responses by FROM currency code.
+// Each entry: { rates: { [code]: number }, fetchedAt: number }
+// A single FROM-code fetch covers all TO conversions, so we cache the
+// full rates map and re-use it for any amount/target change within the TTL.
+const CURRENCY_CACHE_TTL_MS = 5 * 60 * 1000 // 5 minutes
+const currencyRateCache = new Map()
+
 async function fetchCurrency(query) {
   const amount = query.match(currencyAmountRegex),
         codes = query.match(currencyCodeRegex),
         from = normaliseCurrencyCode(codes[0]),
         to = normaliseCurrencyCode(codes[1])
 
-  if (currencyCodes.includes(from) && currencyCodes.includes(to)) {
-    const parsedAmount = amount ? parseFloat(amount[0]) : 1
-    const controller = new AbortController()
-    const timeoutId = setTimeout(() => controller.abort(), 5000)
+  if (!currencyCodes.includes(from) || !currencyCodes.includes(to)) return null
 
-    try {
-      const response = await fetch(
-        `https://open.er-api.com/v6/latest/${from}`,
-        { signal: controller.signal })
-      const data = await response.json()
+  const parsedAmount = amount ? parseFloat(amount[0]) : 1
 
-      if (data.result === 'success' && data.rates?.[to]) {
-        const converted = Math.round((data.rates[to] * parsedAmount + Number.EPSILON) * 100) / 100
-        return {
-          suggestion: `${converted} ${to}`,
-          type: 'currency',
-          relevance: HIGHEST_RELEVANCE
-        }
-      }
-    } catch (err) {
-      // eslint-disable-next-line no-console
-      console.warn('[Chevron] currency request failed:', err.message || err)
-    } finally {
-      clearTimeout(timeoutId)
+  // Return cached rates if they're still fresh — no network request needed.
+  const cached = currencyRateCache.get(from)
+  if (cached && Date.now() - cached.fetchedAt < CURRENCY_CACHE_TTL_MS) {
+    if (cached.rates?.[to]) {
+      const converted = Math.round((cached.rates[to] * parsedAmount + Number.EPSILON) * 100) / 100
+      return { suggestion: `${converted} ${to}`, type: 'currency', relevance: HIGHEST_RELEVANCE }
     }
-
     return null
   }
+
+  const controller = new AbortController()
+  const timeoutId = setTimeout(() => controller.abort(), 5000)
+
+  try {
+    const response = await fetch(
+      `https://open.er-api.com/v6/latest/${from}`,
+      { signal: controller.signal })
+    const data = await response.json()
+
+    if (data.result === 'success' && data.rates) {
+      currencyRateCache.set(from, { rates: data.rates, fetchedAt: Date.now() })
+
+      if (data.rates[to]) {
+        const converted = Math.round((data.rates[to] * parsedAmount + Number.EPSILON) * 100) / 100
+        return { suggestion: `${converted} ${to}`, type: 'currency', relevance: HIGHEST_RELEVANCE }
+      }
+    }
+  } catch (err) {
+    // eslint-disable-next-line no-console
+    console.warn('[Chevron] currency request failed:', err.message || err)
+  } finally {
+    clearTimeout(timeoutId)
+  }
+
+  return null
 }
 
 // macro suggestion helper — finds all macros whose triggers start with (or equal) the query
