@@ -19,7 +19,7 @@ Status legend: `[x]` shipped &nbsp;·&nbsp; `[~]` in progress &nbsp;·&nbsp; `[ 
 
 ## Completed
 
-> Phases 0 → 6 shipped.
+> Phases 0 → 6, Phase 8, Phase 8.5, Phase 15 shipped.
 
 ### Phase 0 — Stability safety net  `[x]`  &nbsp;_(commit `92aed52`)_
 
@@ -478,22 +478,29 @@ different escape rules. Consolidate.
 - [ ] Engine-typing (autocomplete, currency, calculator) becomes a
       first-class registry instead of hard-coded `if` chains.
 
-### Phase 15 — Calculator + converters  `[ ]`
+### Phase 15 — Calculator + converters  `[x]`  `1721cb3`
 
 Builds on Phase 14's engine-typing refactor. Surfaces "instant answer"
 results above the suggestions list for math, currency, weight, and
 time queries.
 
-- [ ] **Calculator engine**: parse `2+2*3`-style queries; show inline
-      result above suggestions. ~200-line shunting-yard parser to keep
-      the bundle small (no `nerdamer` / `mathjs`).
-- [ ] **Currency converter**: formalize the existing currency path as
-      a registered engine type with the same surface as the calculator.
-- [ ] **Weight converter**: `100kg in lb`, `5oz in g`. Static unit
-      table; no external lib.
-- [ ] **Time converter**: `9am pst in tokyo`, `2h30m in seconds`. Use
-      `Intl.DateTimeFormat` for timezone resolution; no external lib.
-- [ ] All four feed into the same "instant answer" UI above suggestions.
+- [x] **Calculator engine**: `src/functions/engineUtils/calculator.js` —
+      shunting-yard parser supporting `+  -  *  /  ^  ()`, unary minus,
+      and implicit multiplication. No external library.
+- [x] **Currency converter**: existing `useSuggestions` path formalized
+      as a registered engine type alongside the new converters.
+- [x] **Weight converter**: `src/functions/engineUtils/weightConverter.js` —
+      static unit table (mg, g, kg, t, oz, lb, st + word aliases). Query
+      form: `100kg in lb`, `5 ounces to grams`.
+- [x] **Time converter**: `src/functions/engineUtils/timeConverter.js` —
+      static unit table (ms, s, min, h, d, w, month, yr). Query form:
+      `2h in min`, `90 minutes to hours`.
+- [x] All four feed into `useSuggestions` as highest-relevance instant
+      answers. Enter / click on a special result copies it to clipboard
+      and shows a "Copied!" toast instead of opening a search page.
+- [x] **Fix**: Ctrl force-search now correctly disabled while the macro
+      menu is open (`useParseQuery` gates `forceUseSearchEngine` on
+      `allowedModes.get('QueryField').has(mode)`).
 
 ### Phase 16 — README rewrite + project polish  `[ ]`
 
@@ -514,6 +521,11 @@ material that belongs elsewhere.
       instructions.
 - [ ] **Cross-link** `Roadmap.md` and `Maintainer.md` at the bottom of
       README under a "For contributors" footer.
+- [x] **Theme presets**: 6 bundled themes added to `settings/settings.js`
+      (`midnight`, `forest`, `burgundy`, `slate`, `dune`, `noir`). The
+      `Theme` constructor now accepts an optional color-override map so
+      new presets need only specify `primary`, `secondary`, and `accent`
+      per mode; derived colors are computed automatically.
 - [ ] **General polish pass**: audit naming, dead code, leftover phase
       stubs, README badges (build status when CI lands in Phase 13),
       LICENSE block visibility, package.json description / keywords /

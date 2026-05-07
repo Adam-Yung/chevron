@@ -32,7 +32,43 @@ const template = {
     colorScheme: new types.List('auto', ['auto', 'light', 'dark'], { description: 'Follow OS preference, or pin to light / dark.' }),
     activeTheme: new types.List('default', 'appearance.themes', { description: 'Currently applied theme.' }),
     themes: {
-      default: new types.Theme()
+      default: new types.Theme(),
+
+      // A deep navy + electric cyan pair — feels like a late-night terminal.
+      midnight: new types.Theme({
+        light: { primary: '#0a0f1e', secondary: '#e8edf5', accent: '#00c8ff' },
+        dark:  { primary: '#cce8ff', secondary: '#0a0f1e', accent: '#00c8ff' }
+      }),
+
+      // Warm cream paper with forest green ink — calm, readable, analog.
+      forest: new types.Theme({
+        light: { primary: '#1a2e1a', secondary: '#f4f0e6', accent: '#3d8b37' },
+        dark:  { primary: '#c8e6c0', secondary: '#1a2e1a', accent: '#5cb85c' }
+      }),
+
+      // Rich burgundy and warm ivory — like a leather-bound notebook.
+      burgundy: new types.Theme({
+        light: { primary: '#2d0a1a', secondary: '#faf6f0', accent: '#9b1a3a' },
+        dark:  { primary: '#f5d0d8', secondary: '#2d0a1a', accent: '#e05070' }
+      }),
+
+      // Slate grey with a vivid violet pop — modern, minimal, focused.
+      slate: new types.Theme({
+        light: { primary: '#1e1e2e', secondary: '#eff0f4', accent: '#7c3aed' },
+        dark:  { primary: '#e2e0f0', secondary: '#1e1e2e', accent: '#a78bfa' }
+      }),
+
+      // Warm sand and terracotta — earthy, Mediterranean, sun-soaked.
+      dune: new types.Theme({
+        light: { primary: '#3b2a1a', secondary: '#fdf5e6', accent: '#c0622a' },
+        dark:  { primary: '#f5e0c8', secondary: '#2a1a0e', accent: '#e8844a' }
+      }),
+
+      // True OLED black with neon rose — maximum contrast, cyberpunk edge.
+      noir: new types.Theme({
+        light: { primary: '#0d0d0d', secondary: '#f5f5f5', accent: '#ff2d6b' },
+        dark:  { primary: '#f5f5f5', secondary: '#000000', accent: '#ff2d6b' }
+      }),
     },
     // hidden; TODO: realistic
     style: new types.List('default', ['default']),

@@ -363,8 +363,14 @@ export class Theme {
     }
   }
 
-  constructor() {
-    this.light = new Palette(Theme.structure, Theme.defaultColors.light)
-    this.dark = new Palette(Theme.structure, Theme.defaultColors.dark)
+  constructor(colors) {
+    const light = colors?.light
+      ? { ...Theme.defaultColors.light, ...colors.light }
+      : Theme.defaultColors.light
+    const dark = colors?.dark
+      ? { ...Theme.defaultColors.dark, ...colors.dark }
+      : Theme.defaultColors.dark
+    this.light = new Palette(Theme.structure, light)
+    this.dark  = new Palette(Theme.structure, dark)
   }
 }
