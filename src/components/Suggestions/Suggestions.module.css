@@ -91,6 +91,16 @@
   outline-offset: 2px;
 }
 
+/* Macro suggestion — name + trigger split display */
+.suggestion-label {
+  font-weight: 600;
+  margin-right: .6ch;
+}
+.suggestion-trigger {
+  opacity: 0.5;
+  font-size: 0.85em;
+}
+
 /* Light theme — liquid glass pills */
 body[data-color-scheme=light] .suggestion > div {
   background: rgba(255, 255, 255, 0.52);

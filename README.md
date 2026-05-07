@@ -120,10 +120,15 @@ Calculator supports `+`, `-`, `*`, `/`, `^`, parentheses, unary minus, and impli
 
 ### Macros and commands
 
-A **macro** is a smart bookmark. Its triggers let you navigate to a URL by typing a short keyword:
+A **macro** is a smart bookmark. Its triggers let you navigate to a URL by typing a short keyword and pressing Enter — or by selecting it from suggestions.
+
+When you type a trigger exactly (e.g. `gh`) the matching macro floats to the top of the suggestions list with a bookmark icon and shows its name. The left widget updates to the macro's color as soon as it's selected. Press **Enter** or click it to navigate directly.
+
+Typing a prefix (e.g. `gi`) surfaces all macros whose triggers start with those letters, so you can discover what shortcuts exist without memorising them. Your query is still a normal search until you actively select a macro suggestion — nothing gets hijacked.
 
 ```
-> gh          →  opens github.com
+> gh          →  select the GitHub suggestion → opens github.com
+> gi          →  shows GitHub, GitLab, etc. as suggestions
 ```
 
 A **command** adds URL-template logic to a macro. Everything after the command trigger becomes the argument `{$}`:

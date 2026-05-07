@@ -12,20 +12,15 @@ function getMacro(query, normalisedURL=null) {
     for (const macro of window.CONFIG.macros) {
       // iterating through triggers
       for (const trigger of macro.triggers) {
-        // query must be equal to a trigger or ends with a command 
-        if (query.startsWith(trigger)) {
-          // query is equal to the trigger
-          if (query === trigger) {
-            return {options: macro, command: null}
-          }
-          else {
-            const command = getCommand(query.slice(trigger.length))
-            // if a command is found
-            if (typeof macro.commands === 'object' && command) {
-              // if the command is defined in the macro
-              if (Object.prototype.hasOwnProperty.call(macro.commands, command.type))
-                return {options: macro, command}
-            }
+        if (query === trigger) {
+          // exact trigger match — direct navigation
+          return {options: macro, command: null}
+        } else if (query.startsWith(trigger)) {
+          // prefix match only counts when followed by a valid command
+          const command = getCommand(query.slice(trigger.length))
+          if (typeof macro.commands === 'object' && command) {
+            if (Object.prototype.hasOwnProperty.call(macro.commands, command.type))
+              return {options: macro, command}
           }
         }
       }

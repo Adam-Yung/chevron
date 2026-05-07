@@ -1,6 +1,6 @@
 import { forwardRef, useRef } from 'react'
 import ScrollIntoViewIfNeeded from 'react-scroll-into-view-if-needed'
-import { TbCurrencyDollar, TbEqual, TbWeight, TbClock } from 'react-icons/tb'
+import { TbCurrencyDollar, TbEqual, TbWeight, TbClock, TbBookmark } from 'react-icons/tb'
 import gC from '../../functions/generationUtils/getClasses'
 import classes from './Suggestions.module.css'
 
@@ -9,6 +9,7 @@ const prefixes = {
   calculator: <TbEqual strokeWidth='.1em'/>,
   weight:     <TbWeight strokeWidth='.1em'/>,
   time:       <TbClock strokeWidth='.1em'/>,
+  macro:      <TbBookmark strokeWidth='.1em'/>,
 }
 
 // Stable id for the listbox so the input's aria-controls/activedescendant
@@ -70,6 +71,10 @@ const Suggestion = forwardRef(({ id, suggestion, selected, queryMode, buttonMode
     ? <div className={classes['prefix']}>{prefixes[suggestion.type]}</div>
     : null
 
+  const displayText = suggestion.label
+    ? <><span className={classes['suggestion-label']}>{suggestion.label}</span><span className={classes['suggestion-trigger']}>{suggestion.suggestion}</span></>
+    : suggestion.suggestion
+
   switch (queryMode) {
     case 'default': return (
       <ScrollIntoViewIfNeeded 
@@ -77,7 +82,7 @@ const Suggestion = forwardRef(({ id, suggestion, selected, queryMode, buttonMode
         active={selected}
         onMouseMove={handleMouseMove}
         onMouseLeave={handleMouseLeave}>
-          <div>{prefix}{suggestion.suggestion}</div>
+          <div>{prefix}{displayText}</div>
       </ScrollIntoViewIfNeeded>
     )
     default: throw new Error('unknown queryMode: ' + queryMode)

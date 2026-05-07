@@ -9,7 +9,7 @@ import { convertTime, formatTimeResult } from '../functions/engineUtils/timeConv
 
 const HIGHEST_RELEVANCE = 5000
 // the hierarchy of suggestion types: the lower index - the more higher in the hierarchy
-const hierarchy = ['calculator', 'weight', 'time', 'currency', 'history', 'autocomplete']
+const hierarchy = ['calculator', 'weight', 'time', 'currency', 'macro', 'history', 'autocomplete']
 
 // search history
 const history = new History()
@@ -92,6 +92,12 @@ function useSuggestions(query, autoCompleteEngine) {
       addSuggestions(history.suggest(query).slice(0, historyLimit), 'history')
     // ---
 
+    /* macro suggestions section */
+    const macroMatches = getMacroSuggestions(query)
+    if (macroMatches.length > 0)
+      addSuggestions(macroMatches, 'macro')
+    // ---
+
     /* calculator section */
     const calcResult = calculate(query)
     if (calcResult !== null)
@@ -142,14 +148,38 @@ function useSuggestions(query, autoCompleteEngine) {
 }
 
 // currency regex
-const currencyCommonRegex = new RegExp(/^(?:[+-]?([0-9]*[.])?[0-9]+\s)?\b[a-zA-Z]{3}\b \bto\b \b[a-zA-Z]{3}\b/i)
+const currencyCommonRegex = new RegExp(/^(?:[+-]?([0-9]*[.])?[0-9]+\s)?\b[a-zA-Z]{3,}\b \bto\b \b[a-zA-Z]{3,}\b/i)
 const currencyAmountRegex = new RegExp(/[+-]?([0-9]*[.])?[0-9]+/gi)
-const currencyCodeRegex = new RegExp(/[a-zA-Z]{3}/gi)
+const currencyCodeRegex = new RegExp(/[a-zA-Z]{3,}/gi)
+
+// Common informal names and longer aliases → ISO 4217 codes
+const CURRENCY_ALIASES = {
+  YEN: 'JPY', YUAN: 'CNY', RENMINBI: 'CNY', RMB: 'CNY',
+  STERLING: 'GBP', POUND: 'GBP', QUID: 'GBP',
+  BUCK: 'USD', BUCKS: 'USD', DOLLAR: 'USD', DOLLARS: 'USD',
+  EURO: 'EUR', EUROS: 'EUR',
+  RUBLE: 'RUB', ROUBLE: 'RUB',
+  RUPEE: 'INR', RUPEES: 'INR',
+  FRANC: 'CHF', FRANCS: 'CHF',
+  KRONA: 'SEK', KRONOR: 'SEK',
+  KRONE: 'NOK', KRONER: 'NOK',
+  WON: 'KRW', BAHT: 'THB',
+  LIRA: 'TRY', PESO: 'MXN',
+  REAL: 'BRL', REAIS: 'BRL',
+  DINAR: 'KWD', DIRHAM: 'AED',
+  BITCOIN: 'BTC', ETHEREUM: 'ETH',
+}
+
+function normaliseCurrencyCode(raw) {
+  const upper = raw.toUpperCase()
+  return CURRENCY_ALIASES[upper] ?? upper
+}
+
 async function fetchCurrency(query) {
   const amount = query.match(currencyAmountRegex),
         codes = query.match(currencyCodeRegex),
-        from = codes[0].toUpperCase(),
-        to = codes[1].toUpperCase()
+        from = normaliseCurrencyCode(codes[0]),
+        to = normaliseCurrencyCode(codes[1])
 
   if (currencyCodes.includes(from) && currencyCodes.includes(to)) {
     const parsedAmount = amount ? parseFloat(amount[0]) : 1
@@ -179,6 +209,37 @@ async function fetchCurrency(query) {
 
     return null
   }
+}
+
+// macro suggestion helper — finds all macros whose triggers start with (or equal) the query
+// and surfaces them as selectable suggestions. The widget reacts when one is selected.
+function getMacroSuggestions(query) {
+  if (!query || !window.CONFIG?.macros) return []
+  const seen = new Set()
+  const results = []
+
+  for (const macro of window.CONFIG.macros) {
+    for (const trigger of macro.triggers) {
+      // show the macro if the query exactly equals the trigger, or if the
+      // trigger starts with what the user typed (prefix discovery)
+      if (trigger === query || trigger.startsWith(query)) {
+        if (!seen.has(macro.name)) {
+          seen.add(macro.name)
+          // suggestion value must equal a valid trigger so ParsedQuery can
+          // resolve the macro's URL/colors when this suggestion is selected
+          results.push({
+            suggestion: trigger,
+            label: macro.name,
+            type: 'macro',
+            relevance: trigger === query ? HIGHEST_RELEVANCE : HIGHEST_RELEVANCE - 1,
+          })
+        }
+        break
+      }
+    }
+  }
+
+  return results
 }
 
 export default useSuggestions
