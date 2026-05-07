@@ -19,7 +19,7 @@ Status legend: `[x]` shipped &nbsp;·&nbsp; `[~]` in progress &nbsp;·&nbsp; `[ 
 
 ## Completed
 
-> Phases 0 → 6, Phase 8, Phase 8.5, Phase 15 shipped.
+> Phases 0 → 6, Phase 8, Phase 8.5, Phase 15, Phase 16 (partial) shipped.
 
 ### Phase 0 — Stability safety net  `[x]`  &nbsp;_(commit `92aed52`)_
 
@@ -383,15 +383,18 @@ animations land on top of compositor-only primitives.
 Right now persisted settings are trusted verbatim — an old localStorage
 shape can crash the app silently or get partially merged.
 
-- [ ] Define a JSON-schema-ish validator for the settings tree.
-- [ ] On load, validate; on mismatch, run a versioned migration step
+- [x] Define a JSON-schema-ish validator for the settings tree
+      (`src/contexts/settingsMigration.js` — `validateSettings()`).
+- [x] On load, validate; on mismatch, run a versioned migration step
       and back up the previous payload under
       `localStorage["chevron.settings.bak.<timestamp>"]`.
-- [ ] Add a `settings.version` field and bump it whenever the schema
-      changes.
-- [ ] Surface the existing "Reset settings" button alongside the new
+- [x] Add a `settings.version` field and bump it whenever the schema
+      changes (`SETTINGS_VERSION = 1`; `writeVersion()` / `getStoredVersion()`).
+- [x] Surface the existing "Reset settings" button alongside the new
       migration log.
 - [ ] Apply the same pattern to `chevron.config` (introduced in Phase 4).
+      The config schema currently has the URL-scheme guard but no versioned
+      migration wrapper.
 
 ### Phase 9 — Security hardening  `[ ]`
 
@@ -480,15 +483,22 @@ different escape rules. Consolidate.
 
 ### Phase 15 — Calculator + converters  `[x]`  `1721cb3`
 
-Builds on Phase 14's engine-typing refactor. Surfaces "instant answer"
-results above the suggestions list for math, currency, weight, and
-time queries.
+Surfaces "instant answer" results above the suggestions list for math,
+currency, weight, and time queries. All four types copy to clipboard on
+Enter / click and show a "Copied!" toast instead of opening a search page.
 
+- [x] **Special-type clipboard handler**: `QueryField.handleRedirect` checks
+      `ParsedQuery.specialTypes` and writes the result to the clipboard with a
+      `navigator.clipboard` + `execCommand` fallback. Auto-dismissing "Copied!"
+      toast in `QueryField.module.css`.
+- [x] **Currency converter**: existing `useSuggestions` fetch path formalized
+      as a registered engine type. Originally called `api.exchangerate.host`
+      (now requires a paid key); **switched to `open.er-api.com`** (free, no
+      key required) as a drive-by fix.
 - [x] **Calculator engine**: `src/functions/engineUtils/calculator.js` —
       shunting-yard parser supporting `+  -  *  /  ^  ()`, unary minus,
-      and implicit multiplication. No external library.
-- [x] **Currency converter**: existing `useSuggestions` path formalized
-      as a registered engine type alongside the new converters.
+      and implicit multiplication. No external library. Fires synchronously
+      (no network round-trip).
 - [x] **Weight converter**: `src/functions/engineUtils/weightConverter.js` —
       static unit table (mg, g, kg, t, oz, lb, st + word aliases). Query
       form: `100kg in lb`, `5 ounces to grams`.
@@ -496,23 +506,26 @@ time queries.
       static unit table (ms, s, min, h, d, w, month, yr). Query form:
       `2h in min`, `90 minutes to hours`.
 - [x] All four feed into `useSuggestions` as highest-relevance instant
-      answers. Enter / click on a special result copies it to clipboard
-      and shows a "Copied!" toast instead of opening a search page.
+      answers (relevance 5000). Local engines (calculator/weight/time) are
+      synchronous; currency is async. Google autocomplete still supplies
+      `calculator`/`weight`/`time` hints as a fallback when the query
+      doesn't match the local parsers.
 - [x] **Fix**: Ctrl force-search now correctly disabled while the macro
       menu is open (`useParseQuery` gates `forceUseSearchEngine` on
       `allowedModes.get('QueryField').has(mode)`).
 
-### Phase 16 — README rewrite + project polish  `[ ]`
+### Phase 16 — README rewrite + project polish  `[x]`
 
 After the macro redesign lands, the customer-facing README is overdue
 for a rewrite. Today's README mixes user-facing content with maintainer
 material that belongs elsewhere.
 
-- [ ] **Rewrite README** to clearly demonstrate the new behaviors and
+- [x] **Rewrite README** to clearly demonstrate the new behaviors and
       capabilities: macro mode (Shift toggle, type-to-filter, gestures),
       cheatsheet, weather widget, AI completion, offline-safe path,
-      build profiles, configurability via the in-app editor.
-- [ ] **Declutter**: pull the roadmap, TODOs, and any maintainer-only
+      build profiles, configurability via the in-app editor, calculators
+      and converters.
+- [x] **Declutter**: pulled the roadmap, legacy TODOs, and maintainer-only
       notes out of README. The roadmap lives in `Roadmap.md`; the
       maintainer guide lives in `Maintainer.md`. README stays focused
       on "what is this and how do I use it".
@@ -559,8 +572,6 @@ roadmap:
 - **Localisation** — already in the legacy TODO list. Plug in `react-intl`
   or a tiny custom message catalog; start with English + the maintainer's
   native language.
-- **Weather widget** (legacy TODO) — needs a free API and a graceful
-  offline state.
 - **Time settings** (legacy TODO) — choose 12 / 24-hour, locale.
 - **Settings field descriptions** (legacy TODO) — already half-implemented
   via `HelpTooltip`; needs copy.
@@ -570,8 +581,6 @@ roadmap:
   field for mouse / touch users.
 - **Telemetry-free analytics**: optional self-hosted Plausible / Umami
   hook so users can measure their own usage without leaking anywhere.
-- **Theme presets**: a small library of bundled themes beyond the
-  current single picker.
 - **Multi-engine results**: optionally show suggestions from multiple
   search engines side-by-side.
 - **Sync layer**: optional WebDAV / local-file sync so settings + macros
@@ -591,3 +600,4 @@ If a planned phase is bumped up in priority (as Phase 4 was), insert it
 at the desired number and renumber the later planned phases. Already-
 shipped phases never get renumbered — their numbers are immortalized in
 commit history.
+      

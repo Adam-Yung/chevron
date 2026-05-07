@@ -3,10 +3,13 @@ import { SettingsContext } from '../contexts/Settings'
 import History from '../classes/localStorage/history'
 import copyObj from '../functions/dataUtils/copyObj'
 import currencyCodes from '../currencies'
+import { calculate, formatCalcResult } from '../functions/engineUtils/calculator'
+import { convertWeight, formatWeightResult } from '../functions/engineUtils/weightConverter'
+import { convertTime, formatTimeResult } from '../functions/engineUtils/timeConverter'
 
 const HIGHEST_RELEVANCE = 5000
 // the hierarchy of suggestion types: the lower index - the more higher in the hierarchy
-const hierarchy = ['currency', 'history', 'autocomplete']
+const hierarchy = ['calculator', 'weight', 'time', 'currency', 'history', 'autocomplete']
 
 // search history
 const history = new History()
@@ -89,6 +92,36 @@ function useSuggestions(query, autoCompleteEngine) {
       addSuggestions(history.suggest(query).slice(0, historyLimit), 'history')
     // ---
 
+    /* calculator section */
+    const calcResult = calculate(query)
+    if (calcResult !== null)
+      addSuggestions([{
+        suggestion: formatCalcResult(calcResult),
+        type: 'calculator',
+        relevance: HIGHEST_RELEVANCE
+      }], 'calculator')
+    // ---
+
+    /* weight converter section */
+    const weightResult = convertWeight(query)
+    if (weightResult !== null)
+      addSuggestions([{
+        suggestion: formatWeightResult(weightResult.result, weightResult.toUnit),
+        type: 'weight',
+        relevance: HIGHEST_RELEVANCE
+      }], 'weight')
+    // ---
+
+    /* time converter section */
+    const timeResult = convertTime(query)
+    if (timeResult !== null)
+      addSuggestions([{
+        suggestion: formatTimeResult(timeResult.result, timeResult.toUnit),
+        type: 'time',
+        relevance: HIGHEST_RELEVANCE
+      }], 'time')
+    // ---
+
     /* currency section */
     if (currencyCommonRegex.test(query))
       fetchCurrency(query)
@@ -119,22 +152,24 @@ async function fetchCurrency(query) {
         to = codes[1].toUpperCase()
 
   if (currencyCodes.includes(from) && currencyCodes.includes(to)) {
-    const params = new URLSearchParams({ from, to, amount: String(amount[0]) })
+    const parsedAmount = amount ? parseFloat(amount[0]) : 1
     const controller = new AbortController()
     const timeoutId = setTimeout(() => controller.abort(), 5000)
 
     try {
       const response = await fetch(
-        `https://api.exchangerate.host/convert?${params.toString()}`,
+        `https://open.er-api.com/v6/latest/${from}`,
         { signal: controller.signal })
       const data = await response.json()
 
-      if (data.success && data.result)
-        return ({
-          suggestion: `${Math.round((data.result + Number.EPSILON) * 100) / 100} ${to}`,
+      if (data.result === 'success' && data.rates?.[to]) {
+        const converted = Math.round((data.rates[to] * parsedAmount + Number.EPSILON) * 100) / 100
+        return {
+          suggestion: `${converted} ${to}`,
           type: 'currency',
           relevance: HIGHEST_RELEVANCE
-        })
+        }
+      }
     } catch (err) {
       // eslint-disable-next-line no-console
       console.warn('[Chevron] currency request failed:', err.message || err)
