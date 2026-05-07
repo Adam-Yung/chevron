@@ -6,7 +6,7 @@ import randomHSLColor from '../functions/generationUtils/randomHSLColor'
 const URL_REDIRECT_TEXT_COLOR = '#f2f2f2'
 
 export default class ParsedQuery {
-  static specialTypes = ['calculator', 'currency']
+  static specialTypes = ['calculator', 'currency', 'weight', 'time']
 
   constructor(value, type, origin, engine, colorScheme, forceUseSearchEngine=false) {
     this.value = value

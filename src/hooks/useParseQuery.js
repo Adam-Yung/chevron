@@ -1,6 +1,8 @@
 import { useContext, useMemo, useRef } from 'react'
 import useIsKeyPressed from './useIsKeyPressed'
 import { SettingsContext , ColorSchemeContext} from '../contexts/Settings'
+import { useStateSelector } from '../contexts/Store'
+import { allowedModes } from '../rules'
 import ParsedQuery from '../classes/parsedQuery'
 
 function useParseQuery(value, type='query', origin, persist=false) {
@@ -13,8 +15,13 @@ function useParseQuery(value, type='query', origin, persist=false) {
   // color scheme
   const colorScheme = useContext(ColorSchemeContext)
 
+  // Only allow Ctrl-force-search while the query field is actually active.
+  // In macro menu mode ('opened') Ctrl has no search-related meaning and
+  // forcing the search engine would affect QuickLook even though the user
+  // is navigating the macro menu.
+  const mode = useStateSelector(s => s.mode)
   const isCtrlPressed = useIsKeyPressed('Control')
-  const forceUseSearchEngine = forceSearchEngineOnCtrl && isCtrlPressed
+  const forceUseSearchEngine = forceSearchEngineOnCtrl && isCtrlPressed && allowedModes.get('QueryField').has(mode)
   
   const parsedQuery = useMemo(() => new ParsedQuery(value, type, origin, engine, colorScheme, forceUseSearchEngine), [value, type, origin, engine, colorScheme, forceUseSearchEngine])
   

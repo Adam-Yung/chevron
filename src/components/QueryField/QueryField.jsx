@@ -6,6 +6,7 @@ import { SettingsContext } from '../../contexts/Settings'
 import { useStateSelector, useUpdate } from '../../contexts/Store'
 import Suggestions, { SUGGESTIONS_LISTBOX_ID, suggestionOptionId } from '../Suggestions/Suggestions'
 import { allowedModes, activeKeys } from '../../rules'
+import ParsedQuery from '../../classes/parsedQuery'
 
 // AIcompletion drags in react-markdown (~20KB) and the streaming completion
 // client; defer the chunk until the user double-taps space to invoke AI.
@@ -49,17 +50,47 @@ function QueryField () {
 
   // query for AI
   const [aiQuery, setAiQuery] = useState('')
+  // "Copied!" toast for special-result clipboard actions
+  const [copied, setCopied] = useState(false)
+  const copiedTimerRef = useRef(null)
 
   const redirect = useRedirect()
-    
+
+  const showCopiedToast = useCallback(() => {
+    setCopied(true)
+    clearTimeout(copiedTimerRef.current)
+    copiedTimerRef.current = setTimeout(() => setCopied(false), 1500)
+  }, [])
+
   const handleRedirect = useCallback(() => {
+    // Special results (calculator, currency, weight, time) → copy to clipboard
+    // instead of opening a search page.
+    if (ParsedQuery.specialTypes.includes(parsedQuery.type)) {
+      const text = selectedSuggestion ? selectedSuggestion.suggestion : parsedQuery.value
+      navigator.clipboard?.writeText(text).then(() => showCopiedToast()).catch(() => {
+        // Fallback for browsers without clipboard API
+        try {
+          const ta = document.createElement('textarea')
+          ta.value = text
+          ta.style.position = 'fixed'
+          ta.style.opacity = '0'
+          document.body.appendChild(ta)
+          ta.select()
+          document.execCommand('copy')
+          document.body.removeChild(ta)
+          showCopiedToast()
+        } catch {}
+      })
+      return
+    }
+
     if (searchHistory)
       // memorise only non generated queries
       if (parsedQuery._type === 'query')
         History.add({ id: parsedQuery.value, type: parsedQuery._type })
   
     redirect(parsedQuery.url, 'main')
-  }, [parsedQuery, searchHistory, redirect])
+  }, [parsedQuery, searchHistory, redirect, selectedSuggestion, showCopiedToast])
 
   const handleQueryChange = useCallback(value => {
     if (allowedModes.get('QueryField').has(mode)) {
@@ -197,6 +228,9 @@ function QueryField () {
     return () => document.removeEventListener('mousedown', grabFocus)
   }, [])
 
+  // Cleanup the copied-toast timer on unmount
+  useEffect(() => () => clearTimeout(copiedTimerRef.current), [])
+
   // re-focusing the input inputField to focus on the caret
   // Phase 8e: skip on touch/coarse-pointer devices so the on-screen
   // keyboard doesn't pop up unbidden on page load.
@@ -240,6 +274,7 @@ function QueryField () {
     <div
       className={classes['container']}
       style={variables}>
+        {copied && <div className={classes['copied-toast']} aria-live="polite">Copied!</div>}
         {aiQuery && (
           <Suspense fallback={null}>
             <AIcompletion query={aiQuery} className={classes['ai-completion']} />
