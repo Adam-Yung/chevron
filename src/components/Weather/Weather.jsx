@@ -7,26 +7,12 @@ import {
   setCachedCurrent, setCachedForecast
 } from './weatherCache'
 import WeatherModal from './WeatherModal'
+import { WeatherIcon } from './WeatherIcon'
 import Time from '../Time/Time'
 import classes from './Weather.module.css'
 
 // OWM free-tier keys are exactly 32 hex chars.
 const OWM_KEY_MIN_LEN = 32
-
-// Map OWM icon code prefix → weather emoji (no pixelated PNGs anywhere).
-export function weatherEmoji(icon) {
-  if (!icon) return '🌤'
-  const code = icon.slice(0, 2)
-  const isNight = icon.endsWith('n')
-  const map = {
-    '01': isNight ? '🌙' : '☀️',
-    '02': isNight ? '🌙' : '⛅',
-    '03': '🌥', '04': '☁️',
-    '09': '🌧', '10': '🌦',
-    '11': '⛈', '13': '❄️', '50': '🌫'
-  }
-  return map[code] ?? '🌤'
-}
 
 // Phase 8d_cont: this component renders the ENTIRE ChevronTop row:
 //   [TIME]  ·  [temp] [emoji]
@@ -106,7 +92,7 @@ function Weather() {
         <Time />
         <span className={classes['sep']}>·</span>
         <span className={classes['temp']}>{temp}{unitSymbol}</span>
-        <span className={classes['emoji']}>{weatherEmoji(icon)}</span>
+        <span className={classes['icon']}><WeatherIcon code={icon} size={20} /></span>
         {isStale && <span className={classes['stale-dot']} aria-hidden="true" />}
       </button>
 

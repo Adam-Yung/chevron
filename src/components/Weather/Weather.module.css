@@ -38,10 +38,15 @@
   opacity: 0.82;
 }
 
-/* Emoji — same visual weight as temperature text */
-.emoji {
+/* SVG icon — same visual weight as temperature text */
+.icon {
+  display: inline-flex;
+  align-items: center;
+  width: 1.1em;
+  height: 1.1em;
   font-size: 0.48em;
   line-height: 1;
+  flex-shrink: 0;
 }
 
 .stale-dot {
