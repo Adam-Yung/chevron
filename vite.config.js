@@ -49,15 +49,20 @@ function publicCacheBust() {
   }
 }
 
-// Strip the `crossorigin` attribute from <script> and <link> tags in the
-// built HTML.  Vite adds it by default for module scripts, but it causes
-// the browser to block the request when the page is opened via file://.
-function stripCrossorigin() {
+// Strip the `crossorigin` attribute and `type="module"` from <script>
+// tags in the built HTML. Browsers enforce CORS on ES module loads, which
+// blocks the page entirely when opened from file://. By emitting the JS
+// as IIFE (see rollupOptions below) and dropping these attributes, the
+// hosted build works both from an HTTP server and from the local filesystem.
+function stripModuleMarkers() {
   return {
-    name: 'chevron-strip-crossorigin',
+    name: 'chevron-strip-module-markers',
     enforce: 'post',
     transformIndexHtml(html) {
-      return html.replace(/\s+crossorigin/g, '')
+      return html
+        .replace(/\s+crossorigin/g, '')
+        .replace(/<script\s+type="module"\s+/g, '<script defer ')
+        .replace(/<link\s+rel="modulepreload"[^>]*>\s*/g, '')
     }
   }
 }
@@ -69,23 +74,23 @@ export default defineConfig(({ mode }) => {
     plugins: [
       react(),
       publicCacheBust(),
-      stripCrossorigin(),
-      // Only inline everything for the static profile. The hosted profile
-      // wants real chunks so the browser can cache them.
-      ...(isHosted ? [] : [viteSingleFile()])
+      // Only strip module markers for hosted (IIFE) builds. The static
+      // build stays as an ES module inlined by vite-plugin-singlefile.
+      ...(isHosted ? [stripModuleMarkers()] : [viteSingleFile()])
     ],
     base: '',
     define: {
       __APP_VERSION__: JSON.stringify(APP_VERSION)
     },
     build: {
-      // Vite already content-hashes asset filenames by default; the rollup
-      // output options below just make the names a touch more readable when
-      // inspecting the hosted bundle.
+      // Hosted build uses IIFE format so the browser doesn't apply module
+      // CORS rules — critical for file:// usage. inlineDynamicImports
+      // collapses lazy chunks into one file (IIFE can't do code-splitting).
       rollupOptions: isHosted ? {
         output: {
+          format: 'iife',
+          inlineDynamicImports: true,
           entryFileNames: 'assets/[name].[hash].js',
-          chunkFileNames: 'assets/[name].[hash].js',
           assetFileNames: 'assets/[name].[hash][extname]'
         }
       } : undefined
