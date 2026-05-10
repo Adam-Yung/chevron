@@ -1,7 +1,7 @@
 {
   "name": "chevron",
   "private": true,
-  "homepage": "https://kholmogorov27.github.io/chevron",
+  "homepage": "https://adam-yung.github.io/chevron",
   "version": "2.3.0",
   "type": "module",
   "scripts": {
@@ -15,7 +15,8 @@
     "compile": "pkg backend/server.cjs",
     "register_windows": "node backend/register.cjs windows",
     "register_linux": "node backend/register.cjs linux",
-    "register_mac": "node backend/register.cjs mac"
+    "register_mac": "node backend/register.cjs mac",
+    "size": "npm run build:static && size-limit"
   },
   "dependencies": {
     "@meteocons/svg": "^0.1.0",
@@ -30,7 +31,15 @@
     "react-icons": "^5.6.0",
     "react-scroll-into-view-if-needed": "^3.0.1"
   },
+  "size-limit": [
+    {
+      "path": "dist/index.html",
+      "limit": "1.1 MB"
+    }
+  ],
   "devDependencies": {
+    "size-limit": "^11.0.0",
+    "@size-limit/file": "^11.0.0",
     "@types/react": "^18.0.24",
     "@types/react-dom": "^18.0.8",
     "@vitejs/plugin-react": "^4.7.0",

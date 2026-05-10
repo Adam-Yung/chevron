@@ -1,228 +1,240 @@
-# Chevron [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](/LICENSE.md) ![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)
+# Chevron
 
 <p align="center">
   <img width="80%" src="https://i.imgur.com/Wa7HcuW.png">
 </p>
 
 <p align="center">
-  A <strong>minimalist, animated browser startpage</strong> that doubles as a productivity launcher.<br/>
-  Smart search, instant converters, AI completion, macros, weather — all offline-capable.
+  <strong>Your browser's blank tab is wasted space. Chevron turns it into a command center.</strong><br/>
+  Search, calculate, convert currencies, launch bookmarks, ask AI — all from a single animated interface that works offline.
 </p>
 
 <p align="center">
-  <a href="https://kholmogorov27.github.io/chevron/">Live Demo</a> &nbsp;·&nbsp;
-  <a href="https://github.com/kholmogorov27/chevron/releases/latest">Download</a> &nbsp;·&nbsp;
-  <a href="#installation">Install</a> &nbsp;·&nbsp;
-  <a href="#usage">Usage</a>
+  <a href="https://adam-yung.github.io/chevron/">Try the Live Demo</a> &nbsp;·&nbsp;
+  <a href="https://github.com/Adam-Yung/chevron/releases/latest">Download</a> &nbsp;·&nbsp;
+  <a href="#get-started">Get Started</a>
 </p>
 
 ---
 
-## Features
+## Why Chevron?
 
-- **Smart search** with Google autosuggestions and personal history
-- **Macros** — bookmark-like shortcuts with custom triggers (e.g. `gh` → GitHub)
-- **Commands** — extend macros with URL templates (e.g. `so?how to parse html`)
-- **Instant converters** — type `100 EUR to USD`, `100kg in lb`, `2h in min` — result appears immediately, Enter copies it to clipboard
-- **Calculator** — type `2 * (3 + 4)` or `sqrt(9)` — result appears inline, Enter copies it
-- **AI completion** — double-press Space to stream an answer from any OpenAI-compatible endpoint (OpenAI, Ollama, LM Studio, vLLM…)
-- **Weather widget** — live conditions + 5-day forecast via OpenWeatherMap
-- **Macro menu** — pinned shortcuts in a glassmorphic card carousel; press Shift or right-click to open, then type to filter
-- **Keyboard cheatsheet** — press `?` to see every hotkey
-- **Theme presets** — 6 built-in themes (midnight, forest, burgundy, slate, dune, noir) + full custom color picker
-- **Offline-safe** — the full UI loads from a single HTML file with no CDN dependencies; only live features (currency, AI, weather) need the network
-- **In-app editor** — edit macros, commands, and search engines directly from Settings; export/import JSON
+Every time you open a new tab, you get a blank page or a cluttered browser default. Chevron replaces that dead space with a fast, beautiful launcher that keeps your hands on the keyboard and your focus on what matters.
+
+- **Instant** — loads from a single HTML file, no server required, works offline
+- **Private** — all data stays in your browser's local storage, no accounts, no telemetry
+- **Portable** — runs anywhere: desktop browsers, Android tablets via Termux, Raspberry Pi kiosks, self-hosted servers
+- **Customizable** — 6 theme presets, full color control, editable macros, configurable search engines
 
 ---
 
-## Installation
+## What You Can Do
 
-Chevron can be set as your browser homepage or new-tab page.
+### Search smarter
+Start typing and Chevron shows suggestions from Google autocomplete and your personal history. Press Enter to search. That's it — no clicking, no menus.
 
-> **Focus tip**: if you want the page (not the address bar) to receive focus when opening a new tab, use the [New Tab Redirect](https://chrome.google.com/webstore/detail/new-tab-redirect/icpgjfneehieebagbmdbhnlpiopdcmna) extension with the Hosted or GitHub Pages methods on Chromium-based browsers.
+### Launch anything with macros
+Set up short triggers for your most-visited sites. Type `gh` and press Enter to go straight to GitHub. Type `so?how to center a div` to search Stack Overflow directly. Macros are fully customizable with colors, icons, and keyboard shortcuts.
 
-### Static (recommended)
+### Get instant answers
+No need to open a calculator app or Google a conversion:
 
-The static build is a single self-contained `index.html`. It loads instantly, works offline, and has no server dependency.
+| You type | You get |
+|---|---|
+| `2 * (3 + 4)` | `14` — copied to clipboard on Enter |
+| `100 EUR to USD` | Live exchange rate, no API key needed |
+| `5kg in lb` | `11.023 lb` |
+| `90min in hours` | `1.5 hours` |
 
-1. [Download the latest release](https://github.com/kholmogorov27/chevron/releases/latest)
-2. Unzip anywhere you like
-3. Point your browser's homepage / new-tab URL at the `dist/index.html` file  
-   (e.g. `file:///Users/you/chevron/dist/index.html`)
+### Ask AI inline
+Double-tap Space to stream an answer from ChatGPT, Ollama, LM Studio, or any OpenAI-compatible endpoint. The response appears right above the search bar — no context switching.
 
-### Hosted (local server)
+### See the weather at a glance
+A minimal weather chip shows current conditions. Hover for a 5-day forecast. Powered by OpenWeatherMap (free tier).
 
-Serves the app over `http://localhost` — fixes the address-bar focus issue on Chromium.
+### Browse your macros visually
+Press Shift or right-click to open a glassmorphic card carousel of your pinned sites. Type to filter. Use keyboard shortcuts to jump directly.
 
-1. Clone the repo and [build](#build)
-2. Serve `dist/` with any static file server:
+### Stay in control
+Press `?` to see every keyboard shortcut. Open Settings to configure everything from search engines to animation behavior. Export your config as JSON and carry it between machines.
 
-   ```bash
-   npx http-server dist -p 8000
-   # or
-   python3 -m http.server 8000 --directory dist
+---
+
+## Get Started
+
+Chevron works anywhere a modern browser runs. Choose the setup that fits your workflow:
+
+### Option 1: Local file (simplest)
+
+Open the HTML file directly in your browser. Zero dependencies, works offline, nothing to install.
+
+1. [Download the latest release](https://github.com/Adam-Yung/chevron/releases/latest)
+2. Unzip anywhere
+3. Set your browser's homepage or new-tab URL to the file:
+   ```
+   file:///path/to/chevron/dist/index.html
    ```
 
-3. Set `http://localhost:8000` as your new-tab URL
+**Best for:** Single machine, maximum privacy, offline-first use.
 
-### GitHub Pages
+### Option 2: Local HTTP server (recommended for daily use)
 
-> Depends on GitHub servers and your internet connection — not recommended as a daily driver.
+Serving over localhost fixes the Chromium address-bar focus issue — when you open a new tab, the cursor lands in Chevron's search field instead of the browser's URL bar.
+
+**Using Python (already on most systems):**
+```bash
+cd /path/to/chevron/dist
+python3 -m http.server 8080
+```
+
+**Using Node.js:**
+```bash
+npx http-server /path/to/chevron/dist -p 8080
+```
+
+Then set `http://localhost:8080` as your new-tab page.
+
+> **Tip for Chromium users:** Install the [New Tab Redirect](https://chrome.google.com/webstore/detail/new-tab-redirect/icpgjfneehieebagbmdbhnlpiopdcmna) extension and point it at `http://localhost:8080` for proper focus behavior on every new tab.
+
+**Best for:** Daily driver on desktop. Fast, local, and the cursor always lands in the right place.
+
+### Option 3: Android tablet or phone (Termux)
+
+Run Chevron as your mobile browser's startpage without any cloud service:
+
+1. Install [Termux](https://f-droid.org/packages/com.termux/) from F-Droid
+2. Inside Termux:
+   ```bash
+   pkg install python
+   cd ~/storage/shared/Download   # or wherever you unzipped Chevron
+   python3 -m http.server 8080
+   ```
+3. Open Chrome → Settings → Homepage → `http://localhost:8080`
+4. (Optional) Add `python3 -m http.server 8080 --directory /path/to/dist &` to your `~/.bashrc` so it starts automatically
+
+**Best for:** Android tablets as dedicated dashboards, kiosk-style setups, or replacing your phone's default new-tab page.
+
+### Option 4: Self-hosted on your network
+
+Serve Chevron from a Raspberry Pi, NAS, or home server so every device on your network can use it:
+
+```bash
+# On your server
+git clone https://github.com/Adam-Yung/chevron.git
+cd chevron
+npm install && npm run build
+python3 -m http.server 8080 --directory dist --bind 0.0.0.0
+```
+
+Then point any browser on your network to `http://<server-ip>:8080`.
+
+**Best for:** Households or teams who want a shared startpage. Each browser still gets its own config via localStorage.
+
+### Option 5: GitHub Pages (cloud-hosted)
+
+Host your own instance for free on GitHub — accessible from anywhere with an internet connection.
 
 1. Fork the repository
 2. Go to **Settings → Pages → Branch: `gh-pages` → Save**
-3. Your personal instance will be live at `https://<you>.github.io/chevron/`
+3. Your instance goes live at `https://<you>.github.io/chevron/`
+
+**Best for:** Access from multiple machines without running a server. Depends on your internet connection, so not ideal as a primary daily driver.
 
 ---
 
-## Build
+## Deployment Comparison
 
-> Requires [Node.js](https://nodejs.org/) 18+.
+| Method | Offline? | Auto-focus? | Multi-device? | Setup effort |
+|---|---|---|---|---|
+| Local file | Yes | No* | No | 1 minute |
+| Local HTTP server | Yes | Yes | No | 2 minutes |
+| Termux (Android) | Yes | Yes | No | 5 minutes |
+| Self-hosted LAN | Yes | Yes | Yes | 10 minutes |
+| GitHub Pages | No | Yes | Yes | 3 minutes |
 
-```bash
-npm install          # install dependencies (once)
-npm run build        # static single-file build → dist/
-npm run dev          # dev server with hot reload at http://localhost:5173
-npm run preview      # preview the production build at http://localhost:4173
-```
-
-Two build profiles are available:
-
-| Command | Output | Use case |
-|---|---|---|
-| `npm run build` / `build:static` | Single inlined `dist/index.html` | Static file, release zip |
-| `npm run build:hosted` | Multi-chunk build with hashed filenames | Hosted server, GitHub Pages |
-
----
-
-## Usage
-
-### Basic search
-
-Just start typing — the input always has focus. Suggestions appear from your history and Google autocomplete. Press **Enter** to search, **Esc** to clear.
-
-Use **Tab / Shift+Tab** or **↑ / ↓** to navigate suggestions.
-
-Hold **Ctrl** while pressing Enter to bypass macros and force a raw search engine query.
-
-### Instant answers
-
-Type a calculation or conversion and the result appears at the top of the suggestions list. Press **Enter** (or click the result) to copy it to your clipboard — a "Copied!" toast confirms the action.
-
-| Query | Example | Result |
-|---|---|---|
-| Calculator | `2 * (3 + 4)` | `14` |
-| Currency | `100 EUR to USD` | `117.51 USD` |
-| Weight | `100 kg in lb` | `220.462 lb` |
-| Time | `2h in min` | `120 min` |
-
-Calculator supports `+`, `-`, `*`, `/`, `^`, parentheses, unary minus, and implicit multiplication (e.g. `2(3+1)`).
-
-### Macros and commands
-
-A **macro** is a smart bookmark. Its triggers let you navigate to a URL by typing a short keyword and pressing Enter — or by selecting it from suggestions.
-
-When you type a trigger exactly (e.g. `gh`) the matching macro floats to the top of the suggestions list with a bookmark icon and shows its name. The left widget updates to the macro's color as soon as it's selected. Press **Enter** or click it to navigate directly.
-
-Typing a prefix (e.g. `gi`) surfaces all macros whose triggers start with those letters, so you can discover what shortcuts exist without memorising them. Your query is still a normal search until you actively select a macro suggestion — nothing gets hijacked.
-
-```
-> gh          →  select the GitHub suggestion → opens github.com
-> gi          →  shows GitHub, GitLab, etc. as suggestions
-```
-
-A **command** adds URL-template logic to a macro. Everything after the command trigger becomes the argument `{$}`:
-
-```
-> so?how to parse html with regex   →  opens a Stack Overflow search
-```
-
-Hold **Ctrl** while submitting to ignore macros and use the search engine instead.
-
-### Macro menu
-
-Pinned macros live in a card carousel. Open it with:
-
-- **Shift** (tap to toggle, hold to peek)
-- **Right-click** anywhere on the page
-- The toggle button in the bottom-right corner
-
-While the menu is open, **type to filter** the visible cards. Use **← →** or the mouse wheel to scroll; swipe on touch screens.
-
-Press a macro's hotkey (`Shift` + `<key>`) to jump directly to it from anywhere.
-
-### AI completion
-
-1. Type your question
-2. Double-press **Space** to stream an AI answer inline above the input
-
-Configure the provider in **Settings → Query → AI**:
-
-| Field | OpenAI | Ollama (local) |
-|---|---|---|
-| Provider | `OpenAI` | `Ollama (local)` |
-| Base URL | _(leave blank)_ | `http://localhost:11434` |
-| Model | blank → `gpt-3.5-turbo`, or e.g. `gpt-4o-mini` | required, e.g. `llama3`, `mistral` |
-| API key | required | leave blank |
-
-> **Local-LLM safety**: when set to Ollama, Chevron will not make any request unless both Base URL and Model are filled in — preventing accidental probes of localhost on machines without Ollama.
-
-### Weather widget
-
-Set up in **Settings → Weather**: enter your city or allow geolocation. Today's conditions appear in the top bar; hover (or tap) to reveal a 5-day forecast strip.
-
-### Keyboard cheatsheet
-
-Press `?` (Shift+/) at any time to open the full hotkey reference.
-
-| Key | Action |
-|---|---|
-| `Enter` | Search / copy instant answer |
-| `Esc` | Clear query (double-tap: also blur input) |
-| `Tab` / `Shift+Tab` | Cycle through suggestions |
-| `↑` / `↓` | Navigate suggestions |
-| `Shift` | Toggle macro menu |
-| `Space Space` | Trigger AI completion |
-| `?` | Open keyboard cheatsheet |
-| `Shift` + `<key>` | Activate a pinned macro's hotkey |
-| `Ctrl` + `Enter` | Force search engine (skip macros) |
-| `RMB` | Open macro menu |
+*Chromium doesn't focus page content for `file://` URLs by default.
 
 ---
 
 ## Configuration
 
 ### Settings panel
+Click the gear icon (top-right) to configure:
+- **General** — search engine, language, history on/off
+- **Appearance** — theme presets (midnight, forest, burgundy, slate, dune, noir) or full custom colors
+- **Query** — font sizes, suggestion limits, AI provider setup
+- **Weather** — API key, location, units
 
-Click the gear icon (top-right, appears on hover after your first visit) to open Settings. From here you can configure:
+### Macros editor
+Open **Settings → Edit macros** to add, remove, or reorder your bookmarks. Four tabs:
+- **Macros** — name, URL, triggers, colors, icon, hotkey
+- **Commands** — URL templates with arguments (e.g. `so?{query}`)
+- **Engines** — customize search engine names, colors, and URL patterns
+- **Raw JSON** — power-user view for bulk edits
 
-- **General**: search engine, language/locale, search history on/off
-- **Appearance**: theme preset or custom colors, UI style, animations
-- **Query**: font sizes, suggestion limits, AI provider, caret visibility
-- **Weather**: API key, location, units
+Export your config to carry it between machines. Import any compatible JSON file to restore.
 
-### In-app macros/commands/engines editor
+### AI setup
 
-Open **Settings → Edit macros** to launch the full editor. Four tabs:
+| Provider | Base URL | Model | API key |
+|---|---|---|---|
+| OpenAI | _(leave blank)_ | `gpt-4o-mini`, `gpt-3.5-turbo`, etc. | Required |
+| Ollama (local) | `http://localhost:11434` | `llama3`, `mistral`, etc. | Not needed |
+| LM Studio | `http://localhost:1234` | _(auto-detected)_ | Not needed |
+| Any OpenAI-compatible | Your endpoint URL | Your model name | If required |
 
-- **Macros** — add/remove/reorder bookmarks; set name, URL, triggers, colors, icon, hotkey, per-macro commands
-- **Commands** — define global command types and their triggers
-- **Engines** — customize search engine names, colors, and URL templates
-- **Raw JSON** — power-user view; edits sync back to the form tabs
-
-**Export** downloads your config as `chevron-config.json`. **Import** loads any compatible JSON file. **Reset** restores the bundled defaults.
-
-> All config is saved to `localStorage` — no account or server required.
+Chevron never probes localhost unless you explicitly configure a local provider with both a URL and model name.
 
 ---
 
-## For contributors
+## Keyboard Reference
 
-- [Roadmap.md](./Roadmap.md) — phased improvement plan, shipped phases, and ideas backlog
-- [Maintainer.md](./Maintainer.md) — architecture notes, release process, and dev conventions
+| Key | Action |
+|---|---|
+| Just start typing | Search — the input always has focus |
+| `Enter` | Search or copy instant answer |
+| `Esc` | Clear query (double-tap: full reset) |
+| `Tab` / `Shift+Tab` | Cycle suggestions |
+| `↑` / `↓` | Navigate suggestions |
+| `Shift` | Toggle macro menu |
+| `Space Space` | Ask AI |
+| `?` | Show all keyboard shortcuts |
+| `Ctrl+Enter` | Force search engine (skip macros) |
+
+---
+
+## Building from Source
+
+Requires [Node.js](https://nodejs.org/) 18+.
+
+```bash
+npm install          # install dependencies
+npm run build        # single-file build → dist/index.html
+npm run dev          # dev server with hot reload
+```
+
+Two build profiles:
+
+| Command | Output | Use case |
+|---|---|---|
+| `npm run build` | Single `index.html` (~1 MB, everything inlined) | Local file, release zip, Termux |
+| `npm run build:hosted` | Multi-file with cache-friendly hashes | HTTP servers, GitHub Pages |
+
+---
+
+## License
+
+MIT — use it however you want. See [LICENSE.md](./LICENSE.md).
+
+---
+
+## Contributing
+
+- [Roadmap.md](./Roadmap.md) — what's planned, what's shipped, and what's up for grabs
+- [Maintainer.md](./Maintainer.md) — architecture overview and development conventions
 
 ---
 
 <p align="center">
-  inspired by <a href="https://github.com/xvvvyz/tilde">Tilde</a>
+  Originally created by <a href="https://github.com/kholmogorov27">Ivan Kholmogorov</a>, inspired by <a href="https://github.com/xvvvyz/tilde">Tilde</a>
 </p>
