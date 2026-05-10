@@ -49,6 +49,19 @@ function publicCacheBust() {
   }
 }
 
+// Strip the `crossorigin` attribute from <script> and <link> tags in the
+// built HTML.  Vite adds it by default for module scripts, but it causes
+// the browser to block the request when the page is opened via file://.
+function stripCrossorigin() {
+  return {
+    name: 'chevron-strip-crossorigin',
+    enforce: 'post',
+    transformIndexHtml(html) {
+      return html.replace(/\s+crossorigin/g, '')
+    }
+  }
+}
+
 export default defineConfig(({ mode }) => {
   const target = resolveTarget(mode)
   const isHosted = target === 'hosted'
@@ -56,6 +69,7 @@ export default defineConfig(({ mode }) => {
     plugins: [
       react(),
       publicCacheBust(),
+      stripCrossorigin(),
       // Only inline everything for the static profile. The hosted profile
       // wants real chunks so the browser can cache them.
       ...(isHosted ? [] : [viteSingleFile()])
