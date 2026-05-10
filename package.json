@@ -19,11 +19,8 @@
     "preview": "vite preview",
     "predeploy": "npm run build:hosted",
     "deploy": "gh-pages -d dist",
-    "compile": "pkg backend/server.cjs",
-    "register_windows": "node backend/register.cjs windows",
-    "register_linux": "node backend/register.cjs linux",
-    "register_mac": "node backend/register.cjs mac",
-    "size": "npm run build:static && size-limit"
+    "size": "npm run build:static && size-limit",
+    "clean": "rm -rf dist dist-ssr node_modules/.cache"
   },
   "dependencies": {
     "@meteocons/svg": "^0.1.0",
@@ -54,7 +51,6 @@
     "eslint-plugin-react": "^7.31.11",
     "eslint-plugin-react-hooks": "^4.6.0",
     "gh-pages": "^5.0.0",
-    "http-server": "^14.1.1",
     "vite": "^5.4.21",
     "vite-plugin-singlefile": "^2.3.3"
   }
