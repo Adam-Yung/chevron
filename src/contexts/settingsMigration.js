@@ -14,7 +14,7 @@
 // increment SETTINGS_VERSION. The migration will detect the mismatch and
 // run the appropriate fixer.
 
-export const SETTINGS_VERSION = 1
+export const SETTINGS_VERSION = 2
 
 const BACKUP_KEY_PREFIX = 'chevron.settings.bak'
 const VERSION_KEY = 'chevron.settings.version'
@@ -108,6 +108,12 @@ export function migrateSettings(stored, fromVersion) {
     // so there's nothing structural to migrate — just stamp the version.
     console.info('[chevron] Stamping settings with version', SETTINGS_VERSION)
   }
-  // Future migrations: if (fromVersion < 2) { ... }
+
+  // v1 → v2: API keys are now obfuscated at rest via OBF1: prefix.
+  // The Settings localStorage class handles obfuscation/deobfuscation
+  // transparently. If an incompatible legacy OBF1: value was stored,
+  // deobfuscate() returns '' so the user re-enters the key once.
+  // No explicit data transform needed here — just bump the version.
+
   return stored
 }
