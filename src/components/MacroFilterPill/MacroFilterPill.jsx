@@ -4,11 +4,6 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { pinnedMacros, score } from '../MacrosMenu/macroData'
 import classes from './MacroFilterPill.module.css'
 
-// Phase 8c: floating pill that appears above the macros menu whenever the
-// user has typed characters into the filter buffer. Shows the current query
-// and result count so the user knows what they typed without looking away
-// from the card grid. Marked data-keep-focus so the QueryField focus grabber
-// leaves it alone.
 function MacroFilterPill() {
   const macroFilter = useStateSelector(store => store.macroFilter)
 

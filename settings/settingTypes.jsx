@@ -1,14 +1,89 @@
-import {
-  Alert,
-  Typography,
-  Select, Option, selectClasses,
-  Input as InputUI,
-  Switch as SwitchUI
-} from '@mui/joy'
 import ColorPicker from '../src/components/Settings/ColorPicker/ColorPicker'
 import { FiChevronDown } from 'react-icons/fi'
 import { getPropertyByPath, setPropertyByPath } from '../src/functions/dataUtils/propertyByPath'
 import copyObj from '../src/functions/dataUtils/copyObj'
+
+const styles = {
+  select: {
+    minWidth: 100,
+    padding: '5px 10px',
+    borderRadius: 6,
+    border: '1px solid rgba(255,255,255,0.15)',
+    background: 'rgba(255,255,255,0.05)',
+    color: 'inherit',
+    fontFamily: 'inherit',
+    fontSize: '0.85em',
+    cursor: 'pointer',
+    appearance: 'none',
+  },
+  selectWrapper: {
+    position: 'relative',
+    display: 'inline-flex',
+    alignItems: 'center',
+  },
+  selectArrow: {
+    position: 'absolute',
+    right: 8,
+    pointerEvents: 'none',
+    opacity: 0.6,
+  },
+  switchLabel: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: 8,
+    cursor: 'pointer',
+  },
+  switchTrack: {
+    position: 'relative',
+    width: 40,
+    height: 22,
+    borderRadius: 11,
+    background: 'rgba(255,255,255,0.15)',
+    transition: 'background 0.2s ease',
+  },
+  switchTrackChecked: {
+    background: 'var(--primary, #3b82f6)',
+  },
+  switchThumb: {
+    position: 'absolute',
+    top: 2,
+    left: 2,
+    width: 18,
+    height: 18,
+    borderRadius: '50%',
+    background: '#fff',
+    transition: 'transform 0.2s ease',
+  },
+  switchThumbChecked: {
+    transform: 'translateX(18px)',
+  },
+  input: {
+    padding: '5px 10px',
+    borderRadius: 6,
+    border: '1px solid rgba(255,255,255,0.15)',
+    background: 'rgba(255,255,255,0.05)',
+    color: 'inherit',
+    fontFamily: 'inherit',
+    fontSize: '0.85em',
+    minWidth: 80,
+  },
+  numberWrapper: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: 6,
+  },
+  suffix: {
+    fontSize: '0.8em',
+    opacity: 0.6,
+  },
+  alertDanger: {
+    padding: '8px 12px',
+    borderRadius: 8,
+    background: 'rgba(239,68,68,0.12)',
+    color: '#f87171',
+    fontSize: '0.85em',
+  },
+}
 
 export class SettingType {
   _dependants = null
@@ -17,7 +92,6 @@ export class SettingType {
     this.defaultValue = defaultValue ?? undefined
     this.format = typeof options.format === 'string' ? options.format : null
     this.scale = typeof options.scale === 'number' ? options.scale : null
-    // Optional one-line hint shown under the field title in the Settings UI.
     this.description = typeof options.description === 'string' ? options.description : null
   }
 
@@ -51,7 +125,6 @@ export class SettingType {
   }
 
   render(current, path, onChange) {
-    // defining onChange handler
     if (typeof onChange === 'function')
       this.selfOnChange = value => onChange(c => {
           const copy = copyObj(c)
@@ -61,15 +134,13 @@ export class SettingType {
 
     let value = getPropertyByPath(current, path)
 
-    // formating and scaling
-    const scaled = typeof value === 'number' && typeof this.scale === 'number' 
+    const scaled = typeof value === 'number' && typeof this.scale === 'number'
       ? this.scale * value
       : value
-    const formatted = this.format 
+    const formatted = this.format
       ? this.format.replaceAll('{@}', scaled)
       : scaled
 
-    // rendering
     return this.display({
       raw: value,
       scaled,
@@ -82,19 +153,15 @@ export class SettingType {
   onChange = value => {
     if (this._dependants)
       Object.values(this._dependants).forEach(dependant => dependant.onChange(value))
-    
+
     this.selfOnChange?.(value)
   }
 
-  // display fallback
   display(value) {
     return (
-      <Alert color='danger' size='sm'>
-      <Typography>
-        Can&#39;t display this property correctly! The current value is {' '}
-        <Typography variant='solid' color='info' size='sm'>{value.raw}</Typography>
-      </Typography>
-      </Alert>
+      <div style={styles.alertDanger}>
+        Can&#39;t display this property correctly! The current value is <strong>{String(value.raw)}</strong>
+      </div>
     )
   }
 }
@@ -120,33 +187,25 @@ export class List extends SettingType {
     let options
     if (Array.isArray(list))
       options = list.map(option => (
-        <Option key={option} value={option}>
+        <option key={option} value={option}>
           {option}
-        </Option>))
+        </option>))
     else
-      options = Object.entries(list).map(([value, description]) => (
-        <Option key={value} value={value}>
+      options = Object.entries(list).map(([val, description]) => (
+        <option key={val} value={val}>
           {description}
-        </Option>))
-
+        </option>))
 
     return (
-      <Select 
-        size='sm'
-        value={value.formatted}
-        indicator={<FiChevronDown/>}
-        sx={{
-          minWidth: 100,
-          [`& .${selectClasses.indicator}`]: {
-            transition: '0.2s',
-            [`&.${selectClasses.expanded}`]: {
-              transform: 'rotate(-180deg)',
-            },
-          },
-        }}
-        onChange={(e, value) => this.onChange(value)}>
-          { options }
-      </Select>
+      <div style={styles.selectWrapper}>
+        <select
+          style={styles.select}
+          value={value.formatted}
+          onChange={e => this.onChange(e.target.value)}>
+            { options }
+        </select>
+        <span style={styles.selectArrow}><FiChevronDown size="0.9em"/></span>
+      </div>
     )
   }
 }
@@ -157,18 +216,16 @@ export class Switch extends SettingType {
   }
 
   display(value) {
+    const checked = value.raw === this.positions[1]
     return (
-      <SwitchUI
-        size='md'
-        checked={value.raw === this.positions[1]}
-        startDecorator={
-          typeof value.raw === 'string' 
-            ? <Typography level='body2'>{value.raw}</Typography> 
-            : null}
-        onChange={e => this.onChange(
-          e.target.checked 
-            ? this.positions[1] 
-            : this.positions[0])}/>
+      <label style={styles.switchLabel}>
+        {typeof value.raw === 'string' && <span style={{ fontSize: '0.85em', opacity: 0.7 }}>{value.raw}</span>}
+        <span
+          style={{ ...styles.switchTrack, ...(checked ? styles.switchTrackChecked : {}) }}
+          onClick={() => this.onChange(checked ? this.positions[0] : this.positions[1])}>
+          <span style={{ ...styles.switchThumb, ...(checked ? styles.switchThumbChecked : {}) }}/>
+        </span>
+      </label>
     )
   }
 }
@@ -179,22 +236,21 @@ export class Range extends SettingType {
     this.max = options.max ?? 100
     this.step = options.step ?? 1
   }
-  
+
   display(value) {
+    const suffix = this.format?.replaceAll('{@}', '') || ''
     return (
-      <InputUI
-        size='sm'
-        type='number'
-        value={value.raw}
-        slotProps={{
-          input: {
-            min: this.min,
-            max: this.max,
-            step: this.step 
-          }
-        }}
-        endDecorator={this.format?.replaceAll('{@}', '')}
-        onChange={e => this.onChange(Number(e.target.value))}/>
+      <div style={styles.numberWrapper}>
+        <input
+          type='number'
+          style={styles.input}
+          value={value.raw}
+          min={this.min}
+          max={this.max}
+          step={this.step}
+          onChange={e => this.onChange(Number(e.target.value))}/>
+        {suffix && <span style={styles.suffix}>{suffix}</span>}
+      </div>
     )
   }
 }
@@ -206,8 +262,9 @@ export class Input extends SettingType {
 
   display(value) {
     return (
-      <InputUI 
-        size='sm'
+      <input
+        type='text'
+        style={styles.input}
         placeholder={this.placeholder}
         value={value.raw}
         onChange={e => this.onChange(e.target.value)}/>
@@ -241,7 +298,6 @@ export class Color extends SettingType {
 }
 export class Palette {
   constructor(structure, colors) {
-    // generating colors
     for (const {name, contrast } of structure) {
       const color = colors[name]
       this[name] = new Color(color, contrast)
@@ -332,7 +388,7 @@ export class Theme {
     },
     {
       name: 'card'
-    },    
+    },
     {
       name: 'prefix',
       contrast: {

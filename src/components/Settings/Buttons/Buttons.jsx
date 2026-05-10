@@ -1,17 +1,17 @@
-import { Button } from '@mui/joy'
 import { FiCheck, FiX } from 'react-icons/fi'
+import classes from './Buttons.module.css'
 
-export function ButtonCheck({ title, onClick, ...rest }) {
+export function ButtonCheck({ title, onClick, className, ...rest }) {
   return (
-    <Button color='primary' onClick={onClick} {...rest}>
+    <button type="button" className={`${classes['btn']} ${classes['primary']} ${className || ''}`} onClick={onClick} {...rest}>
       { title || <FiCheck size='1.5em'/> }
-    </Button>
+    </button>
   )
 }
-export function ButtonX({ title, onClick, ...rest }) {
+export function ButtonX({ title, onClick, className, ...rest }) {
   return (
-    <Button color='danger' onClick={onClick} {...rest}>
+    <button type="button" className={`${classes['btn']} ${classes['danger']} ${className || ''}`} onClick={onClick} {...rest}>
       { title || <FiX size='1.5em'/> }
-    </Button>
+    </button>
   )
 }

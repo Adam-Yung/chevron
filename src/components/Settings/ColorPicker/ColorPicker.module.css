@@ -3,6 +3,121 @@
   border-bottom-right-radius: 0 !important;
 }
 
-.centered > input {
+.picker-container {
+  position: relative;
+  display: inline-flex;
+}
+
+.trigger-btn {
+  border: 0;
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-family: inherit;
+  font-size: 0.85em;
+  font-weight: 500;
+  cursor: pointer;
+  transition: filter 0.12s ease;
+}
+.trigger-btn:hover { filter: brightness(1.1); }
+.trigger-btn:active { filter: brightness(0.9); }
+
+.popover {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10000;
+  box-shadow: 0 0 20px 5px rgba(0,0,0,0.13);
+  border-radius: 10px;
+}
+
+.card {
+  background: var(--secondary, #1e1e1e);
+  border-radius: 10px;
+  overflow: hidden;
+  min-width: 200px;
+}
+
+.hex-input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 8px 12px;
+  border: 0;
+  border-top: 1px solid rgba(255,255,255,0.08);
+  background: rgba(255,255,255,0.04);
+  color: inherit;
+  font-family: inherit;
+  font-size: 0.9em;
   text-align: center;
+  outline: none;
+}
+.hex-input:focus {
+  background: rgba(255,255,255,0.08);
+}
+
+.btn-row {
+  display: flex;
+  gap: 8px;
+  padding: 10px;
+}
+.btn-half {
+  flex: 1;
+}
+
+.alert {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  margin: 0 10px 10px;
+  border-radius: 8px;
+  font-size: 0.82em;
+}
+.alert-success { background: rgba(34, 197, 94, 0.15); color: #4ade80; }
+.alert-neutral { background: rgba(128, 128, 128, 0.15); color: #aaa; }
+.alert-warning { background: rgba(245, 166, 35, 0.15); color: #f5a623; }
+.alert-danger { background: rgba(239, 68, 68, 0.15); color: #f87171; }
+
+.alert-text {
+  flex: 1;
+}
+
+.contrast-example {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  border-radius: 6px;
+}
+
+.tooltip-trigger {
+  position: relative;
+  display: inline-flex;
+  cursor: help;
+  opacity: 0.7;
+}
+.tooltip-trigger:hover { opacity: 1; }
+
+.tooltip-trigger::after {
+  content: attr(data-tip);
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(20, 20, 20, 0.96);
+  color: #eee;
+  font-size: 0.85em;
+  padding: 6px 10px;
+  border-radius: 6px;
+  white-space: normal;
+  max-width: 220px;
+  text-align: center;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+  z-index: 10001;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+}
+.tooltip-trigger:hover::after {
+  opacity: 1;
 }

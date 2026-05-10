@@ -1,11 +1,11 @@
-import { Tooltip } from '@mui/joy'
 import { BsQuestionCircle } from 'react-icons/bs'
+import classes from './HelpTooltip.module.css'
 
 function HelpTooltip({ title }) {
   return (
-    <Tooltip sx={{ zIndex: 10000 }} placement='top' title={title}>
-      <div style={{display: 'inline-flex'}}><BsQuestionCircle/></div>
-    </Tooltip>
+    <span className={classes['wrapper']} data-tooltip={title}>
+      <BsQuestionCircle/>
+    </span>
   )
 }
 

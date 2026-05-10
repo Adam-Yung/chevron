@@ -9,32 +9,16 @@ import { easeInOutQuad, easeInQuad, easeOutCubic, easeOutQuad } from '../../func
 import dC from '../../functions/generationUtils/dCommandToString'
 import classes from './Chevron.module.css'
 
-/* 
-animations:
-- appear
-  1) appear
-- smashToSide
-  1) moving to the left side
-  2) flattering
-- menu (open/close)
-  1) flattering
-  2) stretching
-  3) menu elements appear
-*/
 const timings = {
   appear: [1],
   smashToSide: [.6, .4],
   menu: [.4, .5, .5]
 }
-// coefficient of shape smoothing
 const smoothing = .1
-// multiplier of stretching the svg element in "opened" mode
 const stretchMultiplier = 8
 
 function Chevron({ visibility, onAnimationEnd }) {
-  // settings
   const settings = useContext(SettingsContext)
-  // theme
   const theme = useContext(ThemeContext)
   
   const duration = settings.general.animationSpeed / 1000
@@ -42,9 +26,7 @@ function Chevron({ visibility, onAnimationEnd }) {
   const color = theme.chevron
   const size = settings.chevron.size / 100
 
-  // mode
   const mode = useStateSelector(store => store.mode)
-  // for some animations
   const modeRef = useRef(mode)
   useEffect(() => {
     modeRef.current = mode
@@ -53,45 +35,33 @@ function Chevron({ visibility, onAnimationEnd }) {
   const [isMacrosMenuRendered, setIsMacrosMenuRendered] = useState(false)
 
   const { stages, pivotOffset } = useMemo(() => {
-    // stages of the shape for animating 
     const stages = [
-      // normal shape
-      // M50,50 c0,0,0,0,-50,50 M50,50 c0,0,0,0,-50,-50
       dC('M', [.5, .5/size], size) +
       dC('c', [0, 0, 0, 0, -.5, .5], size) +
       dC('M', [.5, .5/size], size) +
       dC('c', [0, 0, 0, 0, -.5, -.5], size),
       
-      // smoothed shape
-      // M50,50 c0,10,-50,50,-50,50 M50,50 c0,-10,-50,-50,-50,-50
       dC('M', [.5, .5/size], size) +
       dC('c', [0, smoothing, -.5, .5, -.5, .5], size) +
       dC('M', [.5, .5/size], size) +
       dC('c', [0, -smoothing, -.5, -.5, -.5, -.5], size),
       
-      // flat shape (for toQuickLook)
-      // M0,50 c0,0,0,0,0,50 M0,50 c0,0,0,0,0,-50
       dC('M', [0, .5]) +
       dC('c', [0, smoothing*2, 0, .5, 0, .5]) +
       dC('M', [0, .5]) +
       dC('c', [0, -smoothing*2, 0, -.5, 0, -.5]),
   
-      // flat shape (for "opened" mode)
-      // M50,50 c0,0,0,0,-50,0 M50,50 c0,0,0,0,-50,0
       dC('M', [.5, .5/size], size) +
       dC('c', [0, 0, 0, 0, -.5, 0], size) +
       dC('M', [.5, .5/size], size) +
       dC('c', [0, 0, 0, 0, -.5, 0], size),
   
-      // flat shape stretched (for "opened" mode)
-      // M100,50 c0,0,0,0,-100,0 M100,50 c0,0,0,0,-100,0
       dC('M', [.5*stretchMultiplier/2, .5/size], size) +
       dC('c', [0, 0, 0, 0, -.5*stretchMultiplier, 0], size) +
       dC('M', [.5*stretchMultiplier/2, .5/size], size) +
       dC('c', [0, 0, 0, 0, -.5*stretchMultiplier, 0], size)
     ]
 
-    // values in px for translate
     const pivotOffset = {
       x: -.25*size
     }
@@ -99,7 +69,6 @@ function Chevron({ visibility, onAnimationEnd }) {
     return { stages, pivotOffset }
   }, [size])
   
-  // element animation controls
   const svgControls = useAnimationControls(),
         pathControls = useAnimationControls(),
         topMenuControls = useAnimationControls(),
@@ -118,7 +87,6 @@ function Chevron({ visibility, onAnimationEnd }) {
       transitions: {
         default: {
           async searching() {
-            // unflattening
             await controls.path.start({
               translateX: pivotOffset.x,
               d: stages[1],
@@ -127,7 +95,6 @@ function Chevron({ visibility, onAnimationEnd }) {
                 duration: duration * timings.smashToSide[1]
               }
             })
-            // moving to the center and resetting "pivot"
             controls.svg.start({
               left: '50%',
               transition: {
@@ -135,7 +102,6 @@ function Chevron({ visibility, onAnimationEnd }) {
                 duration: duration * timings.smashToSide[0]
               }
             })
-            // straightening the figure
             return await controls.path.start({
               d: stages[0],
               transition: {
@@ -146,7 +112,6 @@ function Chevron({ visibility, onAnimationEnd }) {
           },
           async opened() {
             setIsMacrosMenuRendered(false)
-            // closing top menu element — clip collapses down into the bar
             controls.topMenu.start({
               clipPath: 'inset(100% 0 0 0)',
               transition: {
@@ -154,7 +119,6 @@ function Chevron({ visibility, onAnimationEnd }) {
                 duration: duration * timings.menu[2]
               }
             })
-            // closing bottom menu element
             await controls.bottomMenu.start({
               translateY: '-100%',
               transition: {
@@ -162,9 +126,7 @@ function Chevron({ visibility, onAnimationEnd }) {
                 duration: duration * timings.menu[2]
               }
             })
-            //!
             if (mode !== modeRef.current) return 
-            // shrinking and correcting "pivot"
             await controls.path.start({
               translateX: pivotOffset.x,
               d: stages[3],
@@ -173,9 +135,7 @@ function Chevron({ visibility, onAnimationEnd }) {
                 duration: duration * timings.menu[1]
               }
             })
-            //!
             if (mode !== modeRef.current) return
-            // transforming into the initial shape
             return await controls.path.start({
               d: stages[0],
               transition: {
@@ -188,7 +148,6 @@ function Chevron({ visibility, onAnimationEnd }) {
         },
         searching: {
           async default() {
-            // moving to the left side
             controls.svg.start({
               left: 0,
               transition: {
@@ -196,7 +155,6 @@ function Chevron({ visibility, onAnimationEnd }) {
                 duration: duration * timings.smashToSide[0]
               }
             })
-            // smoothing the figure (for better animation transition) and resetting "pivot"
             await controls.path.start({
               translateX: 0,
               d: stages[1],
@@ -205,7 +163,6 @@ function Chevron({ visibility, onAnimationEnd }) {
                 duration: duration * timings.smashToSide[0]
               }
             })
-            // flattening
             await controls.path.start({
               translateY: 0,
               d: stages[2],
@@ -219,7 +176,6 @@ function Chevron({ visibility, onAnimationEnd }) {
         },
         opened: {
           async default() {
-            // make sure the svg element in the correct position
             controls.svg.start({
               left: '50%',
               transition: {
@@ -227,7 +183,6 @@ function Chevron({ visibility, onAnimationEnd }) {
                 duration: duration * timings.menu[0]
               }
             })
-            // flattening (for "opened" mode)
             await controls.path.start({
               d: stages[3],
               transition: {
@@ -235,7 +190,6 @@ function Chevron({ visibility, onAnimationEnd }) {
                 duration: duration * timings.menu[0]
               }
             })
-            // stretching
             await controls.path.start({
               translateX: 0,
               d: stages[4],
@@ -245,7 +199,6 @@ function Chevron({ visibility, onAnimationEnd }) {
                 duration: duration * timings.menu[1]
               }
             })
-            // opening top menu element — clip reveals upward from the bar
             controls.topMenu.start({
               clipPath: 'inset(0% 0 0 0)',
               transition: {
@@ -253,7 +206,6 @@ function Chevron({ visibility, onAnimationEnd }) {
                 duration: duration * timings.menu[2]
               }
             })
-            // opening bottom menu element
             await controls.bottomMenu.start({
               translateY: 0,
               transition: {

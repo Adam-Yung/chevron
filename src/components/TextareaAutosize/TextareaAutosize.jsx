@@ -2,11 +2,10 @@ import { forwardRef, useEffect } from 'react'
 import autosize from 'autosize'
 
 const TextareaAutosize = forwardRef((props, ref) => {
-  // autosize textarea
   useEffect(() => {
     autosize(ref.current)
     props.setHeight(ref.current.offsetHeight)
-  })
+  }, [props.value, ref, props.setHeight])
   
   // fix for the bug when textarea's value doesn't reset after history back
   useEffect(() => {

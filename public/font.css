@@ -1,70 +1,49 @@
-/* Onest (default font) */
+/* Onest — Latin subset (U+0000-024F, U+2000-22FF, ligatures).
+   Single WOFF2 file covers the ExtraBold weight used for the UI.
+   The body font-weight is baked into the subset; all other text
+   inherits this face and uses font-weight: normal rendering.
+
+   ─── Future: CJK support ───────────────────────────────────────
+   To support Chinese/Japanese/Korean characters, add a second
+   @font-face with `unicode-range` so the browser only downloads
+   it when CJK glyphs are needed:
+
+   @font-face {
+     font-family: 'Onest';
+     src: url('./fonts/Onest/Onest-CJK.woff2') format('woff2');
+     font-display: swap;
+     unicode-range: U+4E00-9FFF, U+3000-303F, U+3400-4DBF,
+                    U+F900-FAFF, U+FE30-FE4F, U+20000-2A6DF,
+                    U+2A700-2B73F, U+2B740-2B81F, U+2B820-2CEAF,
+                    U+2CEB0-2EBEF, U+30000-3134F, U+31350-323AF,
+                    U+2EBF0-2F7FF;
+   }
+
+   Generate the CJK subset with:
+     python3 -m fontTools.subset Onest-Variable.ttf \
+       --output-file=Onest-CJK.woff2 \
+       --flavor=woff2 \
+       --layout-features='*' \
+       --unicodes="U+4E00-9FFF,U+3000-303F,U+3400-4DBF,U+F900-FAFF,U+FE30-FE4F"
+
+   Or use Noto Sans CJK / Source Han Sans as the CJK fallback:
+   @font-face {
+     font-family: 'Onest';
+     src: url('./fonts/NotoSansCJK-Regular.woff2') format('woff2');
+     font-display: swap;
+     unicode-range: U+4E00-9FFF, U+3000-303F, U+3400-4DBF;
+   }
+   ─────────────────────────────────────────────────────────────── */
+
 @font-face {
   font-family: 'Onest';
-  src: url('./fonts/Onest/OnestMedium.ttf');
-}
-@font-face {
-  font-family: 'Onest Bold';
-  src: url('./fonts/Onest/OnestExtraBold.ttf');
-}
-@font-face {
-  font-family: 'Onest Light';
-  src: url('./fonts/Onest/OnestThin.ttf');
+  src: url('./fonts/Onest/Onest.woff2') format('woff2');
+  font-display: swap;
+  unicode-range: U+0000-007F, U+00A0-00FF, U+0100-024F, U+0300-036F,
+                 U+2000-206F, U+2070-209F, U+20A0-20CF, U+2100-214F,
+                 U+2200-22FF, U+FB00-FB06;
 }
 
 :root {
-  --font: 'Onest Bold'
+  --font: 'Onest'
 }
-
-/* Blogger Sans */
-/* 
-@font-face {
-  font-family: 'Blogger Sans';
-  src: url('./fonts/Blogger Sans/Blogger Sans Bold.ttf');
-}
-@font-face {
-  font-family: 'Blogger Sans Light';
-  src: url('./fonts/Blogger Sans/Blogger Sans Light.ttf.ttf');
-} 
-*/
-
-/* Uni Sans */
-/* 
-@font-face {
-  font-family: 'Uni Sans';
-  src: url('./fonts/Uni Sans/Uni Sans Heavy.otf');
-}
-@font-face {
-  font-family: 'Uni Sans Light';
-  src: url('./fonts/Uni Sans/Uni Sans Thin.otf');
-} 
-*/
-
-/* Rubik */
-/* 
-@font-face {
-  font-family: 'Rubik';
-  src: url('./fonts/Rubik/Rubik.ttf');
-} 
-*/
-
-/* Figtree */
-/* 
-@font-face {
-  font-family: 'Figtree';
-  src: url('./fonts/Figtree/Figtree-VariableFont_wght.ttf');
-}
-@font-face {
-  font-family: 'Figtree';
-  src: url('./fonts/Figtree/Figtree-Italic-VariableFont_wght.ttf');
-  font-style: italic;
-} 
-*/
-
-/* Public Sans (Joy UI dependency) */
-/* 
-@font-face {
-  font-family: 'Public Sans';
-  src: url('./fonts/Public Sans/PublicSans-Regular.ttf');
-} 
-*/

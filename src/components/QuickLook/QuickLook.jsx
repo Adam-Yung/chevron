@@ -10,16 +10,6 @@ import { easeInBack, easeInOutQuart, easeOutElastic } from '../../functions/anim
 import dC from '../../functions/generationUtils/dCommandToString'
 import classes from './QuickLook.module.css'
 
-/*
-animations:
-- open
-  1) opening
-- forward
-  1) horizontal stretch
-  2) vertical stretch
-- close
-  1) closing
-*/
 const timings = {
   open: [2.5],
   forward: [1, 1],
@@ -27,9 +17,7 @@ const timings = {
 }
 
 function QuickLook ({ visibility, onAnimationEnd }) {
-  // settings
   const settings = useContext(SettingsContext)
-  // theme
   const theme = useContext(ThemeContext)
   
   const duration = settings.general.animationSpeed / 1000
@@ -40,21 +28,17 @@ function QuickLook ({ visibility, onAnimationEnd }) {
   const showMacrosLabel = settings.chevron.quickLook.showMacrosLabel
   const notifyAboutForcedSearchEngine = settings.query.notifyAboutForcedSearchEngine
   
-  /* store */
   const mode = useStateSelector(store => store.mode)
   const query = useStateSelector(store => store.query)
   const redirected = useStateSelector(store => store.redirected)
   const selectedSuggestion = useStateSelector(store => store.selectedSuggestion)
-  // ---
 
-  // persist query when query (queryOptions.value) becomes empty (on closing QuickLook)
   const [persistedQuery, setPersistedQuery] = useState(query)
   useEffect(() => {
     if (query) 
       setPersistedQuery(query)
   }, [query])
 
-  // parse query
   const [parsedQuery, isSearchEngineForced] = useParseQuery(
     selectedSuggestion ? selectedSuggestion.suggestion : persistedQuery, 
     selectedSuggestion ? selectedSuggestion.type : undefined, 
@@ -65,11 +49,7 @@ function QuickLook ({ visibility, onAnimationEnd }) {
   if (parsedQuery.type === 'macro' && !showMacrosLabel)
     label = ''
 
-  // stages of the shape for animating
   const stages = useMemo(() => [
-    // do not change the proportion of shape, it must always be {height} 1:0.5 {width}
-
-    // initial (flat) shape
     dC('M', [0, .5]) +
     dC('c', [0, 0, 0, 0, 0, .5]) +
     dC('c', [0, 0, 0, 0, 0, -.5]) +
@@ -77,7 +57,6 @@ function QuickLook ({ visibility, onAnimationEnd }) {
     dC('c', [0, 0, 0, 0, 0, -.5]) +
     dC('c', [0, 0, 0, 0, 0, .5]),
     
-    // normal shape
     dC('M', [0, .5]) +
     dC('c', [0, 0, 0, 0, 0, .5]) +
     dC('c', [0, -bottomCurvature, .5, -topCurvature, .5, -.5]) +
@@ -85,7 +64,6 @@ function QuickLook ({ visibility, onAnimationEnd }) {
     dC('c', [0, 0, 0, 0, 0, -.5]) +
     dC('c', [0, bottomCurvature, .5, topCurvature, .5, .5]),
     
-    // horizontal stretch (function of viewport ratio)
     (ratio) => (
       dC('M', [0, .5]) +
       dC('c', [0, 0, 0, 0, 0, .5]) +
@@ -95,7 +73,6 @@ function QuickLook ({ visibility, onAnimationEnd }) {
       dC('c', [0, bottomCurvature, .5, topCurvature, ratio*2, .5])
     ),
 
-    // vertical stretch (function of viewport ratio)
     (ratio) => (
       dC('M', [0, .5]) +
       dC('c', [0, 0, 0, 0, 0, .5]) +
@@ -106,13 +83,9 @@ function QuickLook ({ visibility, onAnimationEnd }) {
     )
   ], [bottomCurvature, topCurvature])
 
-  // window dimensions, batched through a single rAF-debounced resize
-  // subscription so a window drag doesn't fire dozens of recalculations
-  // per second
   const viewport = useViewportSize()
   const { width, height } = viewport
 
-  // element animation controls
   const pathControls = useAnimationControls(),
         textControls = useAnimationControls()
   const controls = useMemo(() => {
@@ -127,7 +100,6 @@ function QuickLook ({ visibility, onAnimationEnd }) {
       transitions: {
         default: {
           async searching() {
-            // changing the shape to flat shape
             controls.path.start({
               d: stages[0],
               transition: {
@@ -135,7 +107,6 @@ function QuickLook ({ visibility, onAnimationEnd }) {
                 duration: duration * timings.close[0]
               }
             })
-            // animating text
             await controls.text.start({
               translateX: '-100%',
               transition: {
@@ -151,7 +122,6 @@ function QuickLook ({ visibility, onAnimationEnd }) {
         },
         searching: {
           async default() {
-            // opening
             controls.path.start({
               d: stages[1],
               transition: {
@@ -159,7 +129,6 @@ function QuickLook ({ visibility, onAnimationEnd }) {
                 duration: duration * timings.open[0]
               }
             })
-            // animating text
             return await controls.text.start({
               translateX: '0%',
               transition: {
@@ -171,7 +140,6 @@ function QuickLook ({ visibility, onAnimationEnd }) {
         },
         redirected: {
           async any() {
-            // horizontal stretch
             controls.path.start({
               d: stages[2](window.innerWidth/window.innerHeight),
               transition: {
@@ -179,7 +147,6 @@ function QuickLook ({ visibility, onAnimationEnd }) {
                 duration: duration * timings.forward[0]
               }
             })
-            // label to the center
             await controls.text.start({
               left: window.innerWidth/2,
               x: '-50%',
@@ -188,7 +155,6 @@ function QuickLook ({ visibility, onAnimationEnd }) {
                 duration: duration * timings.forward[0]
               }
             })
-            // vertical stretch
             await controls.path.start({
               d: stages[3](window.innerWidth/window.innerHeight),
               transition: {

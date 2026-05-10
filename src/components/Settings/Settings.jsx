@@ -1,6 +1,5 @@
 import { useCallback, useContext, useRef, useState, useEffect, useMemo } from 'react'
 import { SettingsContext, SetSettingsContext } from '../../contexts/Settings'
-import { CssVarsProvider } from '@mui/joy'
 import { FiX, FiEye, FiEyeOff, FiSettings, FiLayout, FiZap, FiSearch, FiGrid, FiCommand, FiRotateCcw, FiTrash2, FiCloud } from 'react-icons/fi'
 import Category from './Category/Category'
 import MacrosEditorBody from '../MacrosEditor/MacrosEditorBody'
@@ -231,11 +230,9 @@ function Settings({ onClose }) {
             </button>
           </nav>
 
-          <CssVarsProvider>
-            <main className={classes['pane']} role="tabpanel">
+          <main className={classes['pane']} role="tabpanel">
               {renderPane()}
             </main>
-          </CssVarsProvider>
         </div>
       </div>
     </div>

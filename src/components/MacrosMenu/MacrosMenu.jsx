@@ -12,14 +12,6 @@ import { readableMatchColor } from '../MacrosEditor/colorHelpers'
 import classes from './MacrosMenu.module.css'
 import '@splidejs/react-splide/css'
 
-// Phase 8c: framer-motion stagger variants for the card grid.
-// Built on opacity+translateY only (compositor-safe, Phase 7 spirit).
-const listVariants = {
-  hidden: {},
-  visible: {
-    transition: { staggerChildren: 0.03, delayChildren: 0 }
-  }
-}
 const itemVariants = {
   hidden:  { opacity: 0, y: 8 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.15, ease: 'easeOut' } }
@@ -215,8 +207,6 @@ function MacrosMenu({ visibility, fullVisibility }) {
             const matchColor = readableMatchColor(pm.bgColor, isDarkMode, pm.textColor)
             return (
               <SplideSlide key={pm.name}>
-                {/* motion.li wrapper for stagger entrance (Phase 7 primitives:
-                    opacity + translateY only). */}
                 <motion.div
                   className={classes['slide-inner']}
                   variants={itemVariants}

@@ -232,78 +232,78 @@ export default function WeatherModal({ current, forecast, units, maxDays, isStal
           exit={{ opacity: 0, scale: 0.93, y: 16 }}
           transition={{ duration: 0.26, ease: [0.16, 1, 0.3, 1] }}>
 
-          {/* ── Hero panel with animated scene ── */}
-          <div className={`${classes['hero']} ${classes[`hero--${scene}`]}`}>
-            <AnimatedScene scene={scene} />
+        {/* ── Hero panel with animated scene ── */}
+        <div className={`${classes['hero']} ${classes[`hero--${scene}`]}`}>
+          <AnimatedScene scene={scene} />
 
-            {/* close */}
-            <button
-              type="button"
-              className={classes['close']}
-              onClick={onClose}
-              aria-label="Close weather">
-              <FiX size={16} />
-            </button>
+          {/* close */}
+          <button
+            type="button"
+            className={classes['close']}
+            onClick={onClose}
+            aria-label="Close weather">
+            <FiX size={16} />
+          </button>
 
-            {/* city + stale badge */}
-            <div className={classes['hero-meta']}>
-              <span className={classes['city']}>{cityName}</span>
-              {isStale && <span className={classes['stale-badge']}>Cached data</span>}
+          {/* city + stale badge */}
+          <div className={classes['hero-meta']}>
+            <span className={classes['city']}>{cityName}</span>
+            {isStale && <span className={classes['stale-badge']}>Cached data</span>}
+          </div>
+
+          {/* main current weather */}
+          <div className={classes['hero-body']}>
+            <div className={classes['hero-icon']}>
+              <WeatherIcon code={icon} size={80} />
             </div>
-
-            {/* main current weather */}
-            <div className={classes['hero-body']}>
-              <div className={classes['hero-icon']}>
-                <WeatherIcon code={icon} size={80} />
+            <div className={classes['hero-info']}>
+              <div className={classes['hero-temp']} style={{ color: mainColor }}>
+                {temp}{units}
               </div>
-              <div className={classes['hero-info']}>
-                <div className={classes['hero-temp']} style={{ color: mainColor }}>
-                  {temp}{units}
-                </div>
-                <div className={classes['hero-desc']}>{desc}</div>
-                <div className={classes['hero-hilo']}>
-                  <span style={{ color: highColor }}>↑ {high}{units}</span>
-                  <span style={{ opacity: 0.4, margin: '0 6px' }}>·</span>
-                  <span style={{ color: lowColor }}>↓ {low}{units}</span>
-                </div>
+              <div className={classes['hero-desc']}>{desc}</div>
+              <div className={classes['hero-hilo']}>
+                <span style={{ color: highColor }}>↑ {high}{units}</span>
+                <span style={{ opacity: 0.4, margin: '0 6px' }}>·</span>
+                <span style={{ color: lowColor }}>↓ {low}{units}</span>
               </div>
             </div>
           </div>
+        </div>
 
-          {/* ── Stats row ── */}
-          <div className={classes['stats']}>
-            {stats.map(s => (
-              <div key={s.label} className={classes['stat']}>
-                <span className={classes['stat-icon']}>{s.icon}</span>
-                <span className={classes['stat-val']}>{s.value}</span>
-                <span className={classes['stat-label']}>{s.label}</span>
-              </div>
-            ))}
-          </div>
+        {/* ── Stats row ── */}
+        <div className={classes['stats']}>
+          {stats.map(s => (
+            <div key={s.label} className={classes['stat']}>
+              <span className={classes['stat-icon']}>{s.icon}</span>
+              <span className={classes['stat-val']}>{s.value}</span>
+              <span className={classes['stat-label']}>{s.label}</span>
+            </div>
+          ))}
+        </div>
 
-          {/* ── Forecast strip ── */}
-          {days.length > 0 && (
-            <div className={classes['forecast']}>
-              {days.map(({ label, high: h, low: l, icon: ic }) => {
-                const hc = tempColor(h, units)
-                const lc = tempColor(l, units)
-                return (
-                  <div key={label} className={classes['day-card']}>
-                    <div className={classes['day-label']}>{label.split(',')[0]}</div>
-                    <div className={classes['day-date']}>{label.split(',').slice(1).join(',').trim()}</div>
-                    <div className={classes['day-icon']}>
-                      <WeatherIcon code={ic} size={36} />
-                    </div>
-                    <div className={classes['day-high']} style={{ color: hc }}>↑ {h}{units}</div>
-                    <div className={classes['day-low']}  style={{ color: lc }}>↓ {l}{units}</div>
+        {/* ── Forecast strip ── */}
+        {days.length > 0 && (
+          <div className={classes['forecast']}>
+            {days.map(({ label, high: h, low: l, icon: ic }) => {
+              const hc = tempColor(h, units)
+              const lc = tempColor(l, units)
+              return (
+                <div key={label} className={classes['day-card']}>
+                  <div className={classes['day-label']}>{label.split(',')[0]}</div>
+                  <div className={classes['day-date']}>{label.split(',').slice(1).join(',').trim()}</div>
+                  <div className={classes['day-icon']}>
+                    <WeatherIcon code={ic} size={36} />
                   </div>
-                )
-              })}
-            </div>
-          )}
+                  <div className={classes['day-high']} style={{ color: hc }}>↑ {h}{units}</div>
+                  <div className={classes['day-low']}  style={{ color: lc }}>↓ {l}{units}</div>
+                </div>
+              )
+            })}
+          </div>
+        )}
 
-        </motion.div>
       </motion.div>
+    </motion.div>
     </AnimatePresence>,
     document.getElementById('root')
   )

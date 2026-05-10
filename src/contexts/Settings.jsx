@@ -1,7 +1,25 @@
 import { createContext, useEffect, useRef, useState } from 'react'
 import useColorSchemeDetector from '../hooks/useColorSchemeDetector'
-import assignDeep from 'assign-deep'
 import settings from '../../settings/settings'
+
+function deepMerge(target, source) {
+  const result = { ...target }
+  for (const key of Object.keys(source)) {
+    if (
+      source[key] != null &&
+      typeof source[key] === 'object' &&
+      !Array.isArray(source[key]) &&
+      typeof target[key] === 'object' &&
+      !Array.isArray(target[key]) &&
+      target[key] != null
+    ) {
+      result[key] = deepMerge(target[key], source[key])
+    } else {
+      result[key] = source[key]
+    }
+  }
+  return result
+}
 import LocalSettings from '../classes/localStorage/settings'
 import {
   validateSettings, backupSettings,
@@ -35,7 +53,7 @@ function loadSettings() {
     writeVersion(SETTINGS_VERSION)
   }
 
-  return assignDeep(settings.defaults, migrated)
+  return deepMerge(settings.defaults, migrated)
 }
 
 const assignedSettings = loadSettings()
@@ -85,11 +103,6 @@ export default function SettingsProvider({ children }) {
       flush()
     }
   }, [settings])
-
-  // sync JOY UI color scheme
-  useEffect(() => {
-    localStorage.setItem('joy-mode', colorScheme)
-  }, [colorScheme])
 
   return (
     <SettingsContext.Provider value={settings}>

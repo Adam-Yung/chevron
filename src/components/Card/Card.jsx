@@ -11,7 +11,6 @@ import classes from './Card.module.css'
 const PLATE_TRANSITION_DURATION = .75
 const LOGO_TRANSITION_DURATION = .15
 const LOGO_TRANSITION_DELAY = .25
-// from min(height, width) of the viewport
 const LOGO_SCALE_SIZE = .3
 
 function Card({ active=false, visibility=true, icon, bgColor, textColor, macroName='', matchStart=0, matchLength=0, matchColor='', revealCount=0, isHintActive=false, tabFocused=false, onClick }) {
@@ -25,7 +24,7 @@ function Card({ active=false, visibility=true, icon, bgColor, textColor, macroNa
       },
       transition: {
         ease: 'easeOut',
-        duratiovn: LOGO_TRANSITION_DURATION,
+        duration: LOGO_TRANSITION_DURATION,
         delay: LOGO_TRANSITION_DELAY
       }
     },
@@ -59,15 +58,10 @@ function Card({ active=false, visibility=true, icon, bgColor, textColor, macroNa
         animate={styles?.plate?.animate}
         transition={styles?.plate?.transition}
         onAnimationComplete={() => {
-          // Fire the redirect-end callback when the actual plate animation
-          // finishes (the slowest of the two), instead of guessing the
-          // duration with setTimeout. Only fire while in the "active"
-          // (redirecting) state so it doesn't leak on hover transitions.
           if (active) window.cardRedirectAnimationEnd?.()
         }}/>
     </>
 
-  // state (for transitions)
   const state = active ? 'activated' : 'default'
   const animations = useMemo(() => {
     return ({
@@ -83,27 +77,14 @@ function Card({ active=false, visibility=true, icon, bgColor, textColor, macroNa
                 / Math.min(logoRect.width, logoRect.height) 
                 * LOGO_SCALE_SIZE,
               plate: 
-                /* 
-                  D_[circle] = sqrt(a^2 + b^2)
-    
-                  pos_correction = max(offset from center)
-                  (pos_correction to fully cover the viewport by the circle from any position)
-                  
-                  scale = D_[end] / D_[start] * pos_correction
-                */
-    
-                // D_[end]
                 Math.sqrt(window.innerWidth**2 + window.innerHeight**2)
-                // D_[start]
                 / Math.min(plateRect.width, plateRect.height)
-                // pos_correction
                 * Math.max(
                   ((window.innerWidth - plateRect.right) + plateRect.width/2) / window.innerWidth, 
                   (plateRect.left + plateRect.width/2) / window.innerWidth, 
                   (plateRect.top + plateRect.height/2) / window.innerHeight, 
                   ((window.innerHeight - plateRect.bottom) + plateRect.height/2) / window.innerHeight
                 )
-                // pos_correction scale constant
                 * 2
                 + .1
             }
@@ -147,10 +128,6 @@ function Card({ active=false, visibility=true, icon, bgColor, textColor, macroNa
                 }
               })
             })
-            // The redirect callback now fires from the plate's
-            // onAnimationComplete handler (declared on the motion.div),
-            // so it tracks the real animation duration instead of a
-            // hard-coded setTimeout that could fire early or late.
           }
         }
       }
@@ -174,21 +151,9 @@ function Card({ active=false, visibility=true, icon, bgColor, textColor, macroNa
           : detachableElements
         }
       </div>
-      {/* Label row: three segments
-          1. prefix  — chars before the matched region, default colour
-          2. match   — the typed chars, brand colour (var(--match-color))
-          3. hint    — one char ahead of the match, default colour, slides in
-
-          When hints are inactive or revealCount is 0 nothing renders.
-          The sliding animation fires only on the single hint character,
-          preserving the existing char-slide-in flair. */}
       <div className={classes['label-row']}>
         {isHintActive && revealCount > 0 && (() => {
-          // matchStart/matchLength are only meaningful when a filter is active
-          // (matchLength > 0). When hints are on but no filter is set, show
-          // the first character of the name as the hint (legacy behaviour).
           if (matchLength === 0) {
-            // No filter: just show the first character as a hint
             return (
               <span key="h0" className={gC(classes['label-char'], classes['label-char-new'])}>
                 {macroName[0] ?? ''}
@@ -202,15 +167,12 @@ function Card({ active=false, visibility=true, icon, bgColor, textColor, macroNa
 
           return (
             <>
-              {/* prefix */}
               {macroName.slice(0, prefixEnd).split('').map((ch, i) => (
                 <span key={`p${i}`} className={classes['label-char']}>{ch}</span>
               ))}
-              {/* matched region */}
               {macroName.slice(prefixEnd, matchEnd).split('').map((ch, i) => (
                 <span key={`m${i}`} className={gC(classes['label-char'], classes['label-char-match'])}>{ch}</span>
               ))}
-              {/* hint */}
               {hintChar && (
                 <span key="hint" className={gC(classes['label-char'], classes['label-char-new'])}>{hintChar}</span>
               )}
@@ -223,15 +185,12 @@ function Card({ active=false, visibility=true, icon, bgColor, textColor, macroNa
 }
 
 function getIcon(icon, color) {
-  // if icon passed as a react element
   if (isValidElement(icon))
     return <div>{icon}</div>
 
-  // if icon name passed
   else if (typeof icon === 'string' && Object.prototype.hasOwnProperty.call(window.ICONS, icon)) 
     return <div dangerouslySetInnerHTML={{__html: window.ICONS?.[icon]}}/>
 
-  // fallback icon
   return <div><TbBan color={color}/></div>
 }
 

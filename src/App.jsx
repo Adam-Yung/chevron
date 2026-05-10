@@ -3,7 +3,7 @@ import { ColorSchemeContext, SettingsContext, ThemeContext } from './contexts/Se
 import { useReset, useStateSelector, useUpdate } from './contexts/Store'
 import useMacroFilter from './hooks/useMacroFilter'
 import useGestures from './hooks/useGestures'
-import { AnimatePresence, motion} from 'framer-motion'
+import { AnimatePresence, motion } from 'framer-motion'
 import ActiveElements from './components/ActiveElements/ActiveElements'
 import QueryField from './components/QueryField/QueryField'
 import LayoutButton from './components/LayoutButton/LayoutButton'
