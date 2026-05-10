@@ -3,7 +3,7 @@
 // MacrosMenu chunk can both import it without creating a circular
 // dependency or forcing MacrosMenu to be eagerly loaded.
 
-export const pinnedMacros = window.CONFIG.macros.filter(m => m.pinned)
+export const pinnedMacros = (window.CONFIG?.macros ?? []).filter(m => m.pinned)
 
 // Ranked prefix+substring scorer. Returns a score > 0 if the macro
 // matches the needle; higher score = better match. Caller should

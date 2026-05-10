@@ -36,25 +36,19 @@ function useSuggestions(query, autoCompleteEngine) {
     
     setSuggestions(state => {
       const newState = [...state]
-      // remove duplicates
-      for (let i=0; i < newState.length; i++) {
-        // eslint-disable-next-line no-constant-condition
-        while (true) {
-          const oldSuggestion = newState[i]
-          const occurrenceIndex = suggestions.findIndex(newSuggestion => newSuggestion.suggestion === oldSuggestion.suggestion)
-          // break if no occurrencies were found
-          if (occurrenceIndex === -1) break
+      // Deduplicate: for each existing suggestion, if the incoming batch
+      // has one with the same text, keep whichever ranks higher in the
+      // type hierarchy.
+      for (let i = newState.length - 1; i >= 0; i--) {
+        const oldSuggestion = newState[i]
+        const dupeIdx = suggestions.findIndex(s => s.suggestion === oldSuggestion.suggestion)
+        if (dupeIdx === -1) continue
 
-          const newSuggestion = suggestions[occurrenceIndex]
-          // if the new suggestion is higher in the hierarchy than the old one
-          if (hierarchy.indexOf(newSuggestion.type) > hierarchy.indexOf(oldSuggestion.type)) {
-            // delete the old suggestion
-            newState.splice(i, 1)
-            break
-          } else {
-            // delete the new suggestion
-            suggestions.splice(occurrenceIndex, 1)
-          }
+        const newSuggestion = suggestions[dupeIdx]
+        if (hierarchy.indexOf(newSuggestion.type) > hierarchy.indexOf(oldSuggestion.type)) {
+          newState.splice(i, 1)
+        } else {
+          suggestions.splice(dupeIdx, 1)
         }
       }
       // push new suggestions

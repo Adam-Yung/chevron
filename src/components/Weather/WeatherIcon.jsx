@@ -59,9 +59,11 @@ function uniquifySvg(svgString, uid) {
 
 export function WeatherIcon({ code, size = 32 }) {
   const uid = useId()
-  const svgRaw = CODE_TO_SVG[code] ?? clearDaySvg
+  const svgRaw = CODE_TO_SVG[code]
 
-  const html = useMemo(() => uniquifySvg(svgRaw, uid), [svgRaw, uid])
+  const html = useMemo(() => svgRaw ? uniquifySvg(svgRaw, uid) : null, [svgRaw, uid])
+
+  if (!html) return null
 
   return (
     <span

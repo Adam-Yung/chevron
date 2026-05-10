@@ -20,37 +20,34 @@ function useTransitions(state, options, visibility=true) {
     }
   })
 
-  useEffect(() => {
-    /*
-      transition types:
-      - no-anim: neither named nor "any" animation was found
-      - any: "any" animation was played
-      - named: named animation was played
-    */
+  const optionsRef = useRef(options)
+  optionsRef.current = options
 
-    // if it's not the same state and state animations defined
-    if (prevState.current !== _state && options.transitions[_state]) {
-      // if animations from previous state defined
-      if (typeof options.transitions[_state][prevState.current] === 'function') {
-        currentTransition.current.func = options.transitions[_state][prevState.current]
-      // if animations from any previous state defined
-      } else if (typeof options.transitions[_state].any === 'function') {
-        currentTransition.current.func = options.transitions[_state].any
+  useEffect(() => {
+    const opts = optionsRef.current
+    if (prevState.current !== _state && opts.transitions[_state]) {
+      if (typeof opts.transitions[_state][prevState.current] === 'function') {
+        currentTransition.current.func = opts.transitions[_state][prevState.current]
+      } else if (typeof opts.transitions[_state].any === 'function') {
+        currentTransition.current.func = opts.transitions[_state].any
       }
     }
     
-    // fire animation if the element is visible
     visibility && currentTransition.current.fire()
     
-    // for the next execution
     prevState.current = _state
-  }, [_state, visibility, options.transitions])
+  }, [_state, visibility])
 
+  const visibilityRef = useRef(visibility)
   useEffect(() => {
-    visibility 
-      ? options?.visibility?.show?.call() 
-      : options?.visibility?.hide?.call()
-  }, [visibility, options?.visibility])
+    const prev = visibilityRef.current
+    visibilityRef.current = visibility
+    if (prev === visibility) return
+    const opts = optionsRef.current
+    visibility
+      ? opts?.visibility?.show?.call()
+      : opts?.visibility?.hide?.call()
+  }, [visibility])
 }
 
 export default useTransitions

@@ -8,7 +8,7 @@ import ParsedQuery from '../classes/parsedQuery'
 function useParseQuery(value, type='query', origin, persist=false) {
   /* settings */
   const settings = useContext(SettingsContext)
-  const engine = window.CONFIG.engines[settings.general.searchEngine]
+  const engine = window.CONFIG?.engines?.[settings.general.searchEngine] ?? {}
   const forceSearchEngineOnCtrl = settings.query.forceSearchEngineOnCtrl
   // ---
 

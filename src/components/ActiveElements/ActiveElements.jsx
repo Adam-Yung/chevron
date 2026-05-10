@@ -11,7 +11,9 @@ const getElement = mode => {
       return 'Chevron'
     case 'searching':
       return 'QuickLook'
-    default: throw new Error('Unknown mode: ' + mode)
+    default:
+      console.warn('[Chevron] ActiveElements: unexpected mode', mode)
+      return 'Chevron'
   }
 }
 
