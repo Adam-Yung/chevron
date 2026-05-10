@@ -123,8 +123,7 @@ function useSuggestions(query, autoCompleteEngine) {
           addSuggestions(suggestions.slice(0, autocompleteLimit), 'autocomplete')
         })
         .catch(err => {
-          // eslint-disable-next-line no-console
-          console.warn('[Chevron] autocomplete failed:', err)
+          if (import.meta.env.DEV) console.warn('[Chevron] autocomplete failed:', err)
         })
 
       /* currency section */
@@ -135,8 +134,7 @@ function useSuggestions(query, autoCompleteEngine) {
             response && addSuggestions([response], 'currency')
           })
           .catch(err => {
-            // eslint-disable-next-line no-console
-            console.warn('[Chevron] currency lookup failed:', err)
+            if (import.meta.env.DEV) console.warn('[Chevron] currency lookup failed:', err)
           })
     }, NETWORK_DEBOUNCE_MS)
 
@@ -220,8 +218,7 @@ async function fetchCurrency(query) {
       }
     }
   } catch (err) {
-    // eslint-disable-next-line no-console
-    console.warn('[Chevron] currency request failed:', err.message || err)
+    if (import.meta.env.DEV) console.warn('[Chevron] currency request failed:', err.message || err)
   } finally {
     clearTimeout(timeoutId)
   }

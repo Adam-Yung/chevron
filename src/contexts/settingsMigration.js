@@ -65,7 +65,7 @@ export function backupSettings(stored) {
   try {
     const key = `${BACKUP_KEY_PREFIX}.${Date.now()}`
     localStorage.setItem(key, JSON.stringify(stored))
-    console.warn('[chevron] Settings backed up under', key)
+    if (import.meta.env.DEV) console.warn('[chevron] Settings backed up under', key)
   } catch {
     // ignore
   }
@@ -103,10 +103,7 @@ export function writeVersion(version = SETTINGS_VERSION) {
  */
 export function migrateSettings(stored, fromVersion) {
   if (fromVersion === undefined) {
-    // Pre-versioning: the stored object might have stale keys. The
-    // assignDeep in Settings.jsx already fills missing keys with defaults,
-    // so there's nothing structural to migrate — just stamp the version.
-    console.info('[chevron] Stamping settings with version', SETTINGS_VERSION)
+    if (import.meta.env.DEV) console.info('[chevron] Stamping settings with version', SETTINGS_VERSION)
   }
 
   // v1 → v2: API keys are now obfuscated at rest via OBF1: prefix.

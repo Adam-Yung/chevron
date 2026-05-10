@@ -83,6 +83,10 @@ export default defineConfig(({ mode }) => {
       __APP_VERSION__: JSON.stringify(APP_VERSION)
     },
     build: {
+      // The hosted IIFE bundle is ~580 KB which exceeds Vite's default
+      // 500 KB warning. This is acceptable for a start page that loads
+      // once and caches forever.
+      chunkSizeWarningLimit: 700,
       // Hosted build uses IIFE format so the browser doesn't apply module
       // CORS rules — critical for file:// usage. inlineDynamicImports
       // collapses lazy chunks into one file (IIFE can't do code-splitting).

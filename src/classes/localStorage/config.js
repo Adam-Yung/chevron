@@ -96,10 +96,7 @@ export function loadConfig() {
   }
 
   if (version !== CONFIG_SCHEMA_VERSION) {
-    // Future: run a migration step here. For now, accept any v that
-    // matches the v1 shape (we already validated the shape above).
-    // eslint-disable-next-line no-console
-    console.info('[Chevron] chevron.config has unknown version, accepting v1 shape:', version)
+    if (import.meta.env.DEV) console.info('[Chevron] chevron.config has unknown version, accepting v1 shape:', version)
   }
 
   return candidate
