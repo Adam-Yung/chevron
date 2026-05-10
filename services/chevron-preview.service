@@ -1,0 +1,14 @@
+[Unit]
+Description=Chevron start page preview server
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory={{PROJECT_DIR}}
+ExecStart={{NPX_PATH}} vite preview --port 4173
+Restart=on-failure
+RestartSec=5
+Environment=PATH={{PATH}}
+
+[Install]
+WantedBy=default.target

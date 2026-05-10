@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.chevron.preview</string>
+    <key>WorkingDirectory</key>
+    <string>{{PROJECT_DIR}}</string>
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>PATH</key>
+        <string>{{PATH}}</string>
+    </dict>
+    <key>ProgramArguments</key>
+    <array>
+        <string>{{NPX_PATH}}</string>
+        <string>vite</string>
+        <string>preview</string>
+        <string>--port</string>
+        <string>4173</string>
+    </array>
+    <key>RunAtLoad</key>
+    <true/>
+    <key>KeepAlive</key>
+    <true/>
+    <key>StandardOutPath</key>
+    <string>/tmp/chevron-preview.log</string>
+    <key>StandardErrorPath</key>
+    <string>/tmp/chevron-preview.err</string>
+</dict>
+</plist>
