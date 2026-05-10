@@ -183,7 +183,7 @@ const template = {
     lat:          new types.Input('', undefined, { description: 'Latitude (auto-filled by Resolve).' }),
     lon:          new types.Input('', undefined, { description: 'Longitude (auto-filled by Resolve).' }),
     units:        new types.List('metric', ['metric', 'imperial', 'standard'], { description: 'Temperature units: metric (°C), imperial (°F), or standard (K).' }),
-    forecastDays: new types.Range(5, { min: 0, max: 7 }, { description: 'Number of forecast days to show on hover. 0 = current conditions only.' })
+    forecastDays: new types.Range(7, { min: 0, max: 7 }, { description: 'Number of forecast days to show on hover. 0 = current conditions only.' })
   }
 }
 

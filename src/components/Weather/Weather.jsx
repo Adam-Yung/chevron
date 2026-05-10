@@ -27,7 +27,7 @@ function Weather() {
   const lat     = settings.weather?.lat     ?? ''
   const lon     = settings.weather?.lon     ?? ''
   const units   = settings.weather?.units   ?? 'metric'
-  const maxDays = settings.weather?.forecastDays ?? 5
+  const maxDays = settings.weather?.forecastDays ?? 7
 
   const [current,   setCurrent]   = useState(() => getCachedCurrent())
   const [forecast,  setForecast]  = useState(() => getCachedForecast())
@@ -92,8 +92,7 @@ function Weather() {
         <Time />
         <span className={classes['sep']}>·</span>
         <span className={classes['temp']}>{temp}{unitSymbol}</span>
-        <span className={classes['icon']}><WeatherIcon code={icon} size={20} /></span>
-        {isStale && <span className={classes['stale-dot']} aria-hidden="true" />}
+        <span className={classes['icon']}><WeatherIcon code={icon} size={48} /></span>
       </button>
 
       {showModal && (

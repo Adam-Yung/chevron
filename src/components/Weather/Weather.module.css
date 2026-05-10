@@ -38,24 +38,16 @@
   opacity: 0.82;
 }
 
-/* SVG icon — same visual weight as temperature text */
+/* SVG icon — visually matched to temperature text height */
 .icon {
   display: inline-flex;
   align-items: center;
-  width: 1.1em;
-  height: 1.1em;
-  font-size: 0.48em;
+  justify-content: center;
+  font-size: 0.46em;
   line-height: 1;
   flex-shrink: 0;
 }
-
-.stale-dot {
-  width: 0.2em;
-  height: 0.2em;
-  border-radius: 50%;
-  background: currentColor;
-  opacity: 0.28;
-  flex-shrink: 0;
-  align-self: flex-start;
-  margin-top: 0.08em;
+.icon svg {
+  width: 1em;
+  height: 1em;
 }

@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef } from 'react'
 import { createPortal } from 'react-dom'
 import { motion, AnimatePresence } from 'framer-motion'
+import { FiDroplet, FiWind, FiEye, FiThermometer, FiX } from 'react-icons/fi'
 import { WeatherIcon, iconToScene } from './WeatherIcon'
 import classes from './WeatherModal.module.css'
 
@@ -16,11 +17,14 @@ function tempColor(temp, units) {
 }
 
 // Derive per-day high/low/icon from the OWM 3-hour forecast list.
+// Skips the current day (already shown in hero) to maximize future days shown.
 function buildForecastDays(list, maxDays) {
   if (!list?.length) return []
+  const today = new Date().toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })
   const byDay = new Map()
   for (const entry of list) {
     const key = new Date(entry.dt * 1000).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })
+    if (key === today) continue
     if (!byDay.has(key)) byDay.set(key, { key, temps: [], icons: [] })
     const d = byDay.get(key)
     d.temps.push(entry.main.temp)
@@ -199,10 +203,10 @@ export default function WeatherModal({ current, forecast, units, maxDays, isStal
   const days = buildForecastDays(forecast?.list, maxDays)
 
   const stats = [
-    { icon: '💧', value: `${humidity}%`,              label: 'Humidity' },
-    { icon: '🌬', value: `${windSpeed} m/s ${windCardinal}`, label: 'Wind' },
-    ...(visibility ? [{ icon: '👁', value: visibility, label: 'Visibility' }] : []),
-    { icon: '🌡', value: `${feelsLike}${units}`,      label: 'Feels like' },
+    { icon: <FiDroplet size={18} />, value: `${humidity}%`,              label: 'Humidity' },
+    { icon: <FiWind size={18} />, value: `${windSpeed} m/s ${windCardinal}`, label: 'Wind' },
+    ...(visibility ? [{ icon: <FiEye size={18} />, value: visibility, label: 'Visibility' }] : []),
+    { icon: <FiThermometer size={18} />, value: `${feelsLike}${units}`,      label: 'Feels like' },
   ]
 
   return createPortal(
@@ -238,7 +242,7 @@ export default function WeatherModal({ current, forecast, units, maxDays, isStal
               className={classes['close']}
               onClick={onClose}
               aria-label="Close weather">
-              ✕
+              <FiX size={16} />
             </button>
 
             {/* city + stale badge */}
