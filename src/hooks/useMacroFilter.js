@@ -30,6 +30,7 @@ function useMacroFilter() {
 
     const onKey = e => {
       if (e.metaKey || e.ctrlKey || e.altKey) return
+      if (document.activeElement?.closest?.('[data-keep-focus]')) return
       // Skip when Shift is held: Shift+letter is reserved for macro
       // hotkey activation (handled by `MacrosMenu`'s keypress listener).
       // If we preventDefault'd the keydown here, the keypress would never

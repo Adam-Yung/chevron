@@ -11,8 +11,8 @@ import { WeatherIcon } from './WeatherIcon'
 import Time from '../Time/Time'
 import classes from './Weather.module.css'
 
-// OWM free-tier keys are exactly 32 hex chars.
-const OWM_KEY_MIN_LEN = 32
+// OWM free-tier keys are exactly 32 hex characters.
+const OWM_KEY_RE = /^[0-9a-f]{32}$/i
 
 // Phase 8d_cont: this component renders the ENTIRE ChevronTop row:
 //   [TIME]  ·  [temp] [emoji]
@@ -27,7 +27,7 @@ function Weather() {
   const lat     = settings.weather?.lat     ?? ''
   const lon     = settings.weather?.lon     ?? ''
   const units   = settings.weather?.units   ?? 'metric'
-  const maxDays = settings.weather?.forecastDays ?? 7
+  const maxDays = settings.weather?.forecastDays ?? 5
 
   const [current,   setCurrent]   = useState(() => getCachedCurrent())
   const [forecast,  setForecast]  = useState(() => getCachedForecast())
@@ -44,7 +44,7 @@ function Weather() {
 
   const doFetch = useCallback(async (signal, generation) => {
     const { apiKey: key, lat: la, lon: lo, units: u } = paramsRef.current
-    if (!key || key.length < OWM_KEY_MIN_LEN || !la || !lo) return
+    if (!key || !OWM_KEY_RE.test(key) || !la || !lo) return
     try {
       const [cur, fore] = await Promise.all([
         fetchCurrentWeather(la, lo, u, key, signal),

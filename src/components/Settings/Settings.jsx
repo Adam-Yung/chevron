@@ -257,6 +257,10 @@ function GeocodeRow({ current, onChange }) {
 
   const handleResolve = useCallback(async () => {
     if (!apiKey || !city) return
+    if (!/^[0-9a-f]{32}$/i.test(apiKey)) {
+      setError('API key must be a 32-character hex string from openweathermap.org.')
+      return
+    }
     abortRef.current?.abort()
     abortRef.current = new AbortController()
     setLoading(true)

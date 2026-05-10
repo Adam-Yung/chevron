@@ -17,14 +17,13 @@ function tempColor(temp, units) {
 }
 
 // Derive per-day high/low/icon from the OWM 3-hour forecast list.
-// Skips the current day (already shown in hero) to maximize future days shown.
+// Includes today (partial data from remaining hours) so the user sees
+// the full forecast window.  OWM free-tier provides up to 5 days.
 function buildForecastDays(list, maxDays) {
   if (!list?.length) return []
-  const today = new Date().toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })
   const byDay = new Map()
   for (const entry of list) {
     const key = new Date(entry.dt * 1000).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })
-    if (key === today) continue
     if (!byDay.has(key)) byDay.set(key, { key, temps: [], icons: [] })
     const d = byDay.get(key)
     d.temps.push(entry.main.temp)

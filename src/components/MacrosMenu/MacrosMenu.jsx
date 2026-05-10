@@ -85,6 +85,7 @@ function MacrosMenu({ visibility, fullVisibility }) {
   useEffect(() => {
     const handleKeypress = e => {
       if (!allowedModes.get('Chevron').has(mode)) return
+      if (document.activeElement?.closest?.('[data-keep-focus]')) return
       if (e.shiftKey) {
         for (const macro of pinnedMacros) {
           if (e.code === macro.key) { activateCard(macro); break }
@@ -101,6 +102,7 @@ function MacrosMenu({ visibility, fullVisibility }) {
   useEffect(() => {
     const handleKeydown = e => {
       if (!allowedModes.get('Chevron').has(mode)) return
+      if (document.activeElement?.closest?.('[data-keep-focus]')) return
       if (visibleMacros.length === 0) return
 
       if (e.code === 'Tab') {
