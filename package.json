@@ -1,7 +1,14 @@
 {
   "name": "chevron",
   "private": true,
+  "description": "Keyboard-driven browser start page with search, macros, AI, and weather.",
+  "author": "Adam Yung",
   "homepage": "https://adam-yung.github.io/chevron",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Adam-Yung/chevron.git"
+  },
+  "keywords": ["startpage", "new-tab", "browser", "search", "macros", "keyboard"],
   "version": "2.3.0",
   "type": "module",
   "scripts": {

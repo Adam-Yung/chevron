@@ -6,10 +6,6 @@ for (const key in window.CONFIG.engines)
 
 const template = {
   general: {
-    /* TODO
-      mode: new types.List('chevron', ['chevron', 'legacy']),
-    */
-    // from confing.engines (keys)
     searchEngine: new types.List('google', searchEngines, { description: 'Default search engine used when nothing else matches.' }),
     searchHistory: new types.Switch(true, undefined, { description: 'Remember recent queries and surface them as suggestions.' }),
     quickRedirect: new types.Switch(false, undefined, { description: 'Submit immediately when an exact macro match is found — no Enter required.' }),
@@ -70,7 +66,6 @@ const template = {
         dark:  { primary: '#f5f5f5', secondary: '#000000', accent: '#ff2d6b' }
       }),
     },
-    // hidden; TODO: realistic
     style: new types.List('default', ['default']),
     macroMenu: {
       glassmorphism: new types.Switch(false, undefined, { description: 'Frost the macros menu backdrop with a blur effect. Disable on slow GPUs.' })
