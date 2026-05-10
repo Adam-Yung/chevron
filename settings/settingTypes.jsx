@@ -1,7 +1,6 @@
 import ColorPicker from '../src/components/Settings/ColorPicker/ColorPicker'
 import { FiChevronDown } from 'react-icons/fi'
 import { getPropertyByPath, setPropertyByPath } from '../src/functions/dataUtils/propertyByPath'
-import copyObj from '../src/functions/dataUtils/copyObj'
 
 const styles = {
   select: {
@@ -127,7 +126,7 @@ export class SettingType {
   render(current, path, onChange) {
     if (typeof onChange === 'function')
       this.selfOnChange = value => onChange(c => {
-          const copy = copyObj(c)
+          const copy = structuredClone(c)
           setPropertyByPath(copy, path, value)
           return copy
         })

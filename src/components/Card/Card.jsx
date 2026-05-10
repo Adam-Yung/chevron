@@ -4,7 +4,6 @@ import useTransitions from '../../hooks/useTransitions'
 import { motion } from 'framer-motion'
 import { TbBan } from 'react-icons/tb'
 import getCssGradient from '../../functions/generationUtils/getCssGradient'
-import copyObj from '../../functions/dataUtils/copyObj'
 import gC from '../../functions/generationUtils/getClasses'
 import classes from './Card.module.css'
 
@@ -89,7 +88,7 @@ function Card({ active=false, visibility=true, icon, bgColor, textColor, macroNa
                 + .1
             }
             setStyles(s => {
-              const styles = copyObj(s)
+              const styles = structuredClone(s)
               return ({
                 ...styles,
                 logo: {

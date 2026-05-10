@@ -1,7 +1,6 @@
 import { useState, useCallback, useRef, useEffect, useContext } from 'react'
 import { SettingsContext } from '../contexts/Settings'
 import History from '../classes/localStorage/history'
-import copyObj from '../functions/dataUtils/copyObj'
 import currencyCodes from '../currencies'
 import { calculate, formatCalcResult } from '../functions/engineUtils/calculator'
 import { convertWeight, formatWeightResult } from '../functions/engineUtils/weightConverter'
@@ -36,7 +35,7 @@ function useSuggestions(query, autoCompleteEngine) {
     suggestions.forEach(suggestion => suggestion.source = source)
     
     setSuggestions(state => {
-      const newState = copyObj(state)
+      const newState = [...state]
       // remove duplicates
       for (let i=0; i < newState.length; i++) {
         // eslint-disable-next-line no-constant-condition

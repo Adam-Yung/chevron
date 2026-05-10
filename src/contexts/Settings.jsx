@@ -1,6 +1,12 @@
 import { createContext, useEffect, useRef, useState } from 'react'
 import useColorSchemeDetector from '../hooks/useColorSchemeDetector'
 import settings from '../../settings/settings'
+import LocalSettings from '../classes/localStorage/settings'
+import {
+  validateSettings, backupSettings,
+  getStoredVersion, writeVersion, migrateSettings,
+  SETTINGS_VERSION
+} from './settingsMigration'
 
 function deepMerge(target, source) {
   const result = { ...target }
@@ -20,12 +26,6 @@ function deepMerge(target, source) {
   }
   return result
 }
-import LocalSettings from '../classes/localStorage/settings'
-import {
-  validateSettings, backupSettings,
-  getStoredVersion, writeVersion, migrateSettings,
-  SETTINGS_VERSION
-} from './settingsMigration'
 
 const localSettings = new LocalSettings()
 

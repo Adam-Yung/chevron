@@ -74,17 +74,16 @@ function InteractiveBackground({
     .container element must be a square with sides >= diagonal of the window
     to be bigger than .viewport at any angle of rotation
   */
-  const diagonal = Math.sqrt(Math.pow(width, 2) + Math.pow(height, 2))
+  const diagonal = useMemo(() => Math.sqrt(width * width + height * height), [width, height])
   
-  // css variables
-  const variables = {
+  const variables = useMemo(() => ({
     '--diagonal': diagonal + 'px',
     '--rotation-angle': marqueeAngle + 'deg',
     '--text-color': textColor,
     '--text-size': textSize,
     '--text-opacity': textOpacity,
     '--secondary': getCssGradient(color)
-  }
+  }), [diagonal, marqueeAngle, textColor, textSize, textOpacity, color])
   
 
   return (

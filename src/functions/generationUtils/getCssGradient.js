@@ -1,5 +1,3 @@
-import copyObj from '../dataUtils/copyObj'
-
 function getCssGradient(options) {
   switch (options.type) {
     case 'solid':
@@ -11,7 +9,7 @@ function getCssGradient(options) {
       if (_angle)
         _angle += ','
     
-      let _colors = copyObj(options.colors)
+      let _colors = [...options.colors]
       
       if (options.stops)
         options.stops.forEach((value, index) => _colors[index] += ` ${value}%`)

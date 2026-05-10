@@ -218,7 +218,8 @@ function Chevron({ visibility, onAnimationEnd }) {
         }
       }
     })
-  }, [controls, duration, stages, mode, pivotOffset, onAnimationEnd])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [controls, duration, stages, pivotOffset, onAnimationEnd])
 
   useTransitions(mode, animations, visibility)
 
