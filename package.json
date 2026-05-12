@@ -22,7 +22,8 @@
     "size": "npm run build:static && size-limit",
     "clean": "rm -rf dist dist-ssr node_modules/.cache",
     "install_mac_service": "node services/install.cjs mac",
-    "install_linux_service": "node services/install.cjs linux"
+    "install_linux_service": "node services/install.cjs linux",
+    "install_windows_service": "node services/install.cjs windows"
   },
   "dependencies": {
     "@meteocons/svg": "^0.1.0",

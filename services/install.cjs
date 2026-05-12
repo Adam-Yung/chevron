@@ -1,4 +1,4 @@
-const { execSync } = require('child_process');
+const { execSync, spawnSync } = require('child_process');
 const fs = require('fs');
 const path = require('path');
 const os = require('os');
@@ -9,6 +9,14 @@ const projectDir = path.resolve(__dirname, '..');
 function which(cmd) {
   try {
     return execSync(`which ${cmd}`, { encoding: 'utf8' }).trim();
+  } catch {
+    return null;
+  }
+}
+
+function whichWin(cmd) {
+  try {
+    return execSync(`where.exe ${cmd}`, { encoding: 'utf8' }).trim().split(/\r?\n/)[0];
   } catch {
     return null;
   }
@@ -80,6 +88,69 @@ function installLinux() {
   console.log('To logs:    journalctl --user -u chevron-preview -f');
 }
 
+function installWindows() {
+  const npxPath = whichWin('npx');
+  if (!npxPath) {
+    console.error('Error: npx not found in PATH. Make sure Node.js is installed.');
+    process.exit(1);
+  }
+
+  const taskName = 'ChevronPreview';
+  const user = os.userInfo().username;
+  const vars = { PROJECT_DIR: projectDir, NPX_PATH: npxPath, USER: user };
+
+  const src = path.join(__dirname, 'chevron-preview.xml');
+  const tmpXml = path.join(os.tmpdir(), 'chevron-preview-task.xml');
+
+  const content = template(fs.readFileSync(src, 'utf8'), vars);
+
+  // Task Scheduler XML must be UTF-16 LE
+  fs.writeFileSync(tmpXml, '\ufeff' + content, 'utf16le');
+  console.log(`Wrote task XML to ${tmpXml}`);
+
+  // Delete existing task silently, then import
+  spawnSync('schtasks.exe', ['/Delete', '/TN', taskName, '/F'], { stdio: 'ignore' });
+  const result = spawnSync(
+    'schtasks.exe',
+    ['/Create', '/TN', taskName, '/XML', tmpXml],
+    { encoding: 'utf8', stdio: 'pipe' }
+  );
+
+  if (result.status !== 0) {
+    console.error('Failed to register scheduled task:');
+    console.error(result.stderr || result.stdout);
+    process.exit(1);
+  }
+
+  console.log(`Task "${taskName}" registered successfully.`);
+
+  // Kill any existing vite preview on port 4173 so we can start fresh
+  spawnSync('powershell.exe', [
+    '-NoProfile', '-Command',
+    `$p = (Get-NetTCPConnection -LocalPort 4173 -ErrorAction SilentlyContinue).OwningProcess; if ($p) { Stop-Process -Id $p -Force -ErrorAction SilentlyContinue }`
+  ], { stdio: 'ignore' });
+
+  // Spawn the server in the current interactive session so it's available immediately
+  const { spawn } = require('child_process');
+  const child = spawn(
+    'cmd.exe',
+    ['/c', 'npx', 'vite', 'preview', '--port', '4173'],
+    {
+      cwd: projectDir,
+      detached: true,
+      stdio: 'ignore',
+      windowsHide: true,
+    }
+  );
+  child.unref();
+  console.log(`Server started (pid ${child.pid}). Access at http://localhost:4173/`);
+
+  console.log('');
+  console.log(`To stop:    schtasks /End /TN ${taskName}`);
+  console.log(`To disable: schtasks /Change /TN ${taskName} /Disable`);
+  console.log(`To delete:  schtasks /Delete /TN ${taskName} /F`);
+}
+
 const dist = path.join(projectDir, 'dist');
 if (!fs.existsSync(dist)) {
   console.log('Building project first (dist/ not found)...');
@@ -90,8 +161,10 @@ if (platform === 'darwin' || platform === 'mac') {
   installMac();
 } else if (platform === 'linux') {
   installLinux();
+} else if (platform === 'win32' || platform === 'windows') {
+  installWindows();
 } else {
   console.error(`Unsupported platform: ${platform}`);
-  console.error('Usage: node services/install.cjs [mac|linux]');
+  console.error('Usage: node services/install.cjs [mac|linux|windows]');
   process.exit(1);
 }
