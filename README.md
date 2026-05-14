@@ -172,6 +172,30 @@ Open **Settings → Edit macros** to add, remove, or reorder your bookmarks. Fou
 - **Engines** — customize search engine names, colors, and URL patterns
 - **Raw JSON** — power-user view for bulk edits
 
+#### Adding custom icons
+
+Icons live in `public/icons.js` as a dictionary of SVG strings. The icon picker searches by key name, so choose something memorable.
+
+**Quick way — use the helper script:**
+
+```bash
+# Single site with a custom name
+node scripts/add-icon.mjs freepacman.org --name pacman --write
+
+# Multiple sites at once (names derived from domain)
+node scripts/add-icon.mjs github.com reddit.com spotify.com --write
+
+# Preview without writing (prints the entry to paste manually)
+node scripts/add-icon.mjs freepacman.org --name pacman
+```
+
+The script fetches the site's favicon via Google's favicon API, embeds it as a base64 PNG inside an SVG wrapper, and inserts it into `public/icons.js`. After a rebuild (or on next dev server reload), the icon appears in the picker — searchable by the name you gave it.
+
+**Manual way:** Open `public/icons.js` and add a line:
+```javascript
+  mysite: '<svg xmlns="http://www.w3.org/2000/svg" ...>...</svg>',
+```
+
 Export your config to carry it between machines. Import any compatible JSON file to restore.
 
 ### AI setup

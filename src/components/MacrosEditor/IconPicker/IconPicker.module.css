@@ -56,6 +56,10 @@
   max-width: 120px;
   opacity: 0.8;
 }
+.trigger-name em {
+  font-style: normal;
+  opacity: 0.5;
+}
 
 /* ── Popover ────────────────────────────────────────────────────────────── */
 .backdrop {
@@ -134,4 +138,17 @@
   text-align: center;
   opacity: 0.45;
   font-size: 0.85em;
+}
+
+/* ── Hint ──────────────────────────────────────────────────────────────── */
+.hint {
+  font-size: 0.75em;
+  opacity: 0.45;
+  padding: 4px 2px 0;
+  border-top: 1px solid rgba(128, 128, 128, 0.15);
+}
+.hint code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.9em;
+  opacity: 0.8;
 }

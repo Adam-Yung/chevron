@@ -2,25 +2,15 @@ import { memo, useCallback, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import classes from './IconPicker.module.css'
 
-// Phase 8c: visual icon picker replacing the text+datalist field on each
-// macro row. A small trigger button shows the current icon (or a placeholder);
-// clicking it opens a floating popover with a search input and a scrollable
-// grid of all available icons.
-//
-// The popover renders via a portal to escape any overflow:hidden ancestors.
-// It is marked [data-keep-focus] so the QueryField focus grabber leaves it
-// alone. Selection writes the icon name back to the parent via onChange and
-// closes the popover.
-
 const ALL_ICON_NAMES = typeof window !== 'undefined' && window.ICONS
   ? Object.keys(window.ICONS)
   : []
 
 function IconPicker({ value, onChange }) {
-  const [open, setOpen]       = useState(false)
-  const [query, setQuery]     = useState('')
-  const triggerRef            = useRef(null)
-  const popoverRef            = useRef(null)
+  const [open, setOpen]   = useState(false)
+  const [query, setQuery] = useState('')
+  const triggerRef        = useRef(null)
+  const popoverRef        = useRef(null)
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase()
@@ -38,7 +28,6 @@ function IconPicker({ value, onChange }) {
     setOpen(false)
   }, [onChange])
 
-  // Close on click-outside
   const handleBackdropPointerDown = useCallback((e) => {
     if (popoverRef.current && !popoverRef.current.contains(e.target) &&
         triggerRef.current && !triggerRef.current.contains(e.target)) {
@@ -46,7 +35,6 @@ function IconPicker({ value, onChange }) {
     }
   }, [])
 
-  // Position popover near the trigger button
   const [popoverStyle, setPopoverStyle] = useState({})
   const handleTriggerClick = useCallback(() => {
     if (open) { setOpen(false); return }
@@ -77,12 +65,13 @@ function IconPicker({ value, onChange }) {
           ? <span className={classes['svg-wrap']} dangerouslySetInnerHTML={{ __html: currentSvg }} />
           : <span className={classes['placeholder']}>?</span>
         }
-        <span className={classes['trigger-name']}>{value || <em>none</em>}</span>
+        <span className={classes['trigger-name']}>
+          {value || <em>none</em>}
+        </span>
       </button>
 
       {open && createPortal(
         <>
-          {/* Invisible full-screen layer to catch outside clicks */}
           <div
             className={classes['backdrop']}
             onPointerDown={handleBackdropPointerDown}
@@ -115,6 +104,9 @@ function IconPicker({ value, onChange }) {
                   <span dangerouslySetInnerHTML={{ __html: window.ICONS[name] }} />
                 </button>
               ))}
+            </div>
+            <div className={classes['hint']}>
+              Add custom icons: <code>node scripts/add-icon.mjs domain.com --write</code>
             </div>
           </div>
         </>,

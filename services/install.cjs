@@ -89,6 +89,11 @@ function installLinux() {
 }
 
 function installWindows() {
+  if (process.platform !== 'win32') {
+    console.error('Error: install_windows_service must be run on Windows.');
+    process.exit(1);
+  }
+
   const npxPath = whichWin('npx');
   if (!npxPath) {
     console.error('Error: npx not found in PATH. Make sure Node.js is installed.');
@@ -96,8 +101,10 @@ function installWindows() {
   }
 
   const taskName = 'ChevronPreview';
+  const hostname = os.hostname();
   const user = os.userInfo().username;
-  const vars = { PROJECT_DIR: projectDir, NPX_PATH: npxPath, USER: user };
+  const qualifiedUser = `${hostname}\\${user}`;
+  const vars = { PROJECT_DIR: projectDir, NPX_PATH: npxPath, USER: qualifiedUser };
 
   const src = path.join(__dirname, 'chevron-preview.xml');
   const tmpXml = path.join(os.tmpdir(), 'chevron-preview-task.xml');
