@@ -106,7 +106,8 @@ function IconPicker({ value, onChange }) {
               ))}
             </div>
             <div className={classes['hint']}>
-              Add custom icons: <code>node scripts/add-icon.mjs domain.com --write</code>
+              Add icons: <code>node scripts/add-icon.mjs domain.com --write</code>
+              <br />or paste SVG markup into <code>public/icons.js</code>
             </div>
           </div>
         </>,

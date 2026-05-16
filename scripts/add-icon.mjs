@@ -5,14 +5,20 @@ import { readFileSync, writeFileSync } from 'fs'
 import { resolve } from 'path'
 
 const ICONS_PATH = resolve(import.meta.dirname, '..', 'public', 'icons.js')
+const TIMEOUT_MS = 8000
+
+// ── HTTP helper ──────────────────────────────────────────────────────
 
 function fetchBuffer(url, redirects = 5) {
   return new Promise((resolve, reject) => {
     if (redirects <= 0) return reject(new Error('Too many redirects'))
     const client = url.startsWith('https') ? https : http
-    client.get(url, (res) => {
+    const req = client.get(url, (res) => {
       if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
-        return fetchBuffer(res.headers.location, redirects - 1).then(resolve, reject)
+        let loc = res.headers.location
+        if (loc.startsWith('/')) loc = new URL(loc, url).href
+        res.resume()
+        return fetchBuffer(loc, redirects - 1).then(resolve, reject)
       }
       if (res.statusCode !== 200) {
         res.resume()
@@ -22,9 +28,19 @@ function fetchBuffer(url, redirects = 5) {
       res.on('data', (c) => chunks.push(c))
       res.on('end', () => resolve(Buffer.concat(chunks)))
       res.on('error', reject)
-    }).on('error', reject)
+    })
+    req.on('error', reject)
+    req.setTimeout(TIMEOUT_MS, () => {
+      req.destroy(new Error(`Timed out after ${TIMEOUT_MS / 1000}s: ${url}`))
+    })
   })
 }
+
+function fetchText(url) {
+  return fetchBuffer(url).then(b => b.toString('utf-8'))
+}
+
+// ── Arg helpers ──────────────────────────────────────────────────────
 
 function domainFromArg(arg) {
   if (arg.includes('://')) return new URL(arg).hostname
@@ -35,13 +51,81 @@ function nameFromDomain(domain) {
   return domain.replace(/\.[^.]+$/, '').replace(/[^a-zA-Z0-9]/g, '')
 }
 
-async function generateEntry(domain, name) {
+// ── SVG sanitisation ─────────────────────────────────────────────────
+
+/** Strip XML preamble, comments, and normalise to single-quoted, one-line SVG. */
+function sanitiseSvg(raw) {
+  let svg = raw.trim()
+  // strip <?xml ...?>
+  svg = svg.replace(/<\?xml[^?]*\?>\s*/g, '')
+  // strip <!-- comments -->
+  svg = svg.replace(/<!--[\s\S]*?-->/g, '')
+  // strip <title>...</title>
+  svg = svg.replace(/<title>[^<]*<\/title>/g, '')
+  // collapse whitespace
+  svg = svg.replace(/\s+/g, ' ').trim()
+  // ensure fill="currentColor" on root <svg> if no fill is set
+  if (!/<svg[^>]*\bfill\s*=/.test(svg)) {
+    svg = svg.replace('<svg ', '<svg fill="currentColor" ')
+  }
+  return svg
+}
+
+// ── Icon sources (tried in order) ────────────────────────────────────
+
+/**
+ * 1. Simple Icons (simpleicons.org) — clean vector SVGs for thousands of
+ *    brands.  Uses the slug (lowercase, no spaces/dots).
+ *    Fetches from raw GitHub to avoid Cloudflare bot-blocking on the CDN.
+ */
+async function trySimpleIcons(domain) {
+  const slug = nameFromDomain(domain).toLowerCase()
+  const url = `https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/${slug}.svg`
+  const text = await fetchText(url)
+  if (!text.includes('<svg')) throw new Error('Not an SVG response')
+  return sanitiseSvg(text)
+}
+
+/**
+ * 2. Site's own /favicon.svg — some modern sites serve vector favicons.
+ */
+async function trySiteFaviconSvg(domain) {
+  const url = `https://${domain}/favicon.svg`
+  const text = await fetchText(url)
+  if (!text.includes('<svg')) throw new Error('Not an SVG response')
+  return sanitiseSvg(text)
+}
+
+/**
+ * 3. Google favicon service — always returns a PNG, so we embed it as a
+ *    base64 <image> inside an SVG.  This is the fallback of last resort.
+ */
+async function tryGoogleFavicon(domain) {
   const url = `https://www.google.com/s2/favicons?domain=${domain}&sz=128`
   const buf = await fetchBuffer(url)
   const b64 = buf.toString('base64')
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128"><image href="data:image/png;base64,${b64}" width="128" height="128"/></svg>`
-  return { name, svg }
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128"><image href="data:image/png;base64,${b64}" width="128" height="128"/></svg>`
 }
+
+const SOURCES = [
+  { name: 'Simple Icons', fn: trySimpleIcons },
+  { name: 'site favicon.svg', fn: trySiteFaviconSvg },
+  { name: 'Google favicon (raster)', fn: tryGoogleFavicon },
+]
+
+async function generateEntry(domain, name) {
+  for (const source of SOURCES) {
+    try {
+      const svg = await source.fn(domain)
+      return { name, svg, source: source.name }
+    } catch {
+      // try next source
+    }
+  }
+  throw new Error('All icon sources failed')
+}
+
+// ── File insertion ───────────────────────────────────────────────────
 
 function insertIntoFile(entries) {
   let content = readFileSync(ICONS_PATH, 'utf-8')
@@ -62,14 +146,15 @@ function insertIntoFile(entries) {
   const after = content.slice(closingBrace)
   const needsComma = before.trimEnd().endsWith("'") || before.trimEnd().endsWith('"') || before.trimEnd().endsWith(',')
 
-  const lines = entries.map(({ name, svg }) => `  ${name}: '${svg}'`)
+  const lines = entries.map(({ name, svg }) => `  ${name}: '${svg.replace(/'/g, "\\'")}'`)
   const insertion = (needsComma ? ',\n' : '\n') + lines.join(',\n') + '\n'
 
   content = before + insertion + after
   writeFileSync(ICONS_PATH, content, 'utf-8')
 }
 
-// --- CLI ---
+// ── CLI ──────────────────────────────────────────────────────────────
+
 const args = process.argv.slice(2)
 
 const shouldWrite = args.includes('--write')
@@ -88,9 +173,12 @@ const domains = positional.map(domainFromArg)
 if (domains.length === 0) {
   console.log(`Usage: node scripts/add-icon.mjs <domain> [domain2 ...] [--name customName] [--write]
 
+Fetches a vector SVG icon for a website and adds it to public/icons.js.
+Sources tried in order: Simple Icons → site /favicon.svg → Google favicon (raster fallback).
+
 Examples:
-  node scripts/add-icon.mjs freepacman.org --name pacman
-  node scripts/add-icon.mjs github.com reddit.com --write
+  node scripts/add-icon.mjs github.com --write
+  node scripts/add-icon.mjs reddit.com twitch.tv --write
   node scripts/add-icon.mjs https://news.ycombinator.com --name hackernews --write
 
 Options:
@@ -107,11 +195,11 @@ if (customName && domains.length > 1) {
 const entries = []
 for (const domain of domains) {
   const name = customName || nameFromDomain(domain)
-  process.stderr.write(`Fetching favicon for ${domain}...`)
+  process.stderr.write(`Fetching icon for ${domain}...`)
   try {
     const entry = await generateEntry(domain, name)
     entries.push(entry)
-    process.stderr.write(' done\n')
+    process.stderr.write(` done (${entry.source})\n`)
   } catch (err) {
     process.stderr.write(` FAILED: ${err.message}\n`)
   }
@@ -125,11 +213,11 @@ if (entries.length === 0) {
 if (shouldWrite) {
   insertIntoFile(entries)
   console.log(`Wrote ${entries.length} icon(s) to ${ICONS_PATH}:`)
-  entries.forEach(e => console.log(`  • ${e.name}`))
+  entries.forEach(e => console.log(`  • ${e.name} (via ${e.source})`))
 } else {
   console.log('\n// Add the following to public/icons.js inside window.ICONS = { ... }:\n')
   entries.forEach(({ name, svg }) => {
-    console.log(`  ${name}: '${svg}',`)
+    console.log(`  ${name}: '${svg.replace(/'/g, "\\'")}',`)
   })
   console.log('\n// Or re-run with --write to auto-insert.')
 }
