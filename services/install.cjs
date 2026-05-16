@@ -131,17 +131,35 @@ function installWindows() {
 
   console.log(`Task "${taskName}" registered successfully.`);
 
+  // Enforce constraints via PowerShell — matches AHK install.bat pattern.
+  // Redundant with the XML settings but guarantees they are applied.
+  const psResult = spawnSync('powershell.exe', [
+    '-NoProfile', '-NonInteractive', '-Command',
+    `$name = '${taskName}'; $task = Get-ScheduledTask -TaskName $name; $s = $task.Settings; ` +
+    `$s.ExecutionTimeLimit = 'PT0S'; $s.DisallowStartIfOnBatteries = $false; ` +
+    `$s.StopIfGoingOnBatteries = $false; $s.IdleSettings.StopOnIdleEnd = $false; ` +
+    `Set-ScheduledTask -TaskName $name -Settings $s | Out-Null; Write-Host 'Settings applied: no time limit, runs on battery, ignores idle.'`
+  ], { encoding: 'utf8', stdio: 'pipe' });
+
+  if (psResult.status !== 0) {
+    console.warn('Warning: PowerShell settings update failed. Task was created but may have default constraints.');
+    console.warn(psResult.stderr || psResult.stdout);
+  } else {
+    console.log(psResult.stdout.trim());
+  }
+
   // Kill any existing vite preview on port 4173 so we can start fresh
   spawnSync('powershell.exe', [
     '-NoProfile', '-Command',
     `$p = (Get-NetTCPConnection -LocalPort 4173 -ErrorAction SilentlyContinue).OwningProcess; if ($p) { Stop-Process -Id $p -Force -ErrorAction SilentlyContinue }`
   ], { stdio: 'ignore' });
 
-  // Spawn the server in the current interactive session so it's available immediately
+  // Spawn the server in the current interactive session so it's available immediately.
+  // Use the resolved npxPath (not bare 'npx') to avoid PATH lookup failures.
   const { spawn } = require('child_process');
   const child = spawn(
-    'cmd.exe',
-    ['/c', 'npx', 'vite', 'preview', '--port', '4173'],
+    npxPath,
+    ['vite', 'preview', '--port', '4173'],
     {
       cwd: projectDir,
       detached: true,
