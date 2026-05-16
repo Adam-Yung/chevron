@@ -3,6 +3,7 @@ import https from 'https'
 import http from 'http'
 import { readFileSync, writeFileSync } from 'fs'
 import { resolve } from 'path'
+import { execSync } from 'child_process'
 
 const ICONS_PATH = resolve(import.meta.dirname, '..', 'public', 'icons.js')
 const TIMEOUT_MS = 8000
@@ -71,6 +72,56 @@ function sanitiseSvg(raw) {
   return svg
 }
 
+// ── Brand colour lookup ──────────────────────────────────────────────
+
+let _simpleIconsData = null
+
+/** Fetch the Simple Icons dataset (cached across calls). */
+async function getSimpleIconsData() {
+  if (_simpleIconsData) return _simpleIconsData
+  const url = 'https://raw.githubusercontent.com/simple-icons/simple-icons/develop/data/simple-icons.json'
+  const text = await fetchText(url)
+  _simpleIconsData = Object.values(JSON.parse(text))
+  return _simpleIconsData
+}
+
+/** Simple Icons derives slugs from titles: lowercase, strip non-alnum. */
+function titleToSlug(title) {
+  return title
+    .toLowerCase()
+    .replace(/\+/g, 'plus')
+    .replace(/\./g, 'dot')
+    .replace(/&/g, 'and')
+    .replace(/[^a-z0-9]/g, '')
+}
+
+/** Look up a brand colour from Simple Icons by domain-derived slug. */
+async function lookupBrandColor(domain) {
+  try {
+    const slug = nameFromDomain(domain).toLowerCase()
+    const icons = await getSimpleIconsData()
+    const match = icons.find(i => titleToSlug(i.title) === slug)
+    if (match?.hex) return '#' + match.hex
+  } catch {
+    // non-fatal — colour suggestion is best-effort
+  }
+  return null
+}
+
+/** Extract hex colours from SVG fill/stroke attributes (for non-Simple-Icons sources). */
+function extractSvgColors(svg) {
+  const hexes = new Set()
+  const re = /(?:fill|stroke)\s*[:=]\s*["']?\s*(#[0-9a-fA-F]{3,8})\b/g
+  let m
+  while ((m = re.exec(svg))) {
+    const c = m[1].toLowerCase()
+    if (c !== '#000' && c !== '#000000' && c !== '#fff' && c !== '#ffffff') {
+      hexes.add(c.length === 4 ? '#' + c[1]+c[1]+c[2]+c[2]+c[3]+c[3] : c)
+    }
+  }
+  return [...hexes]
+}
+
 // ── Icon sources (tried in order) ────────────────────────────────────
 
 /**
@@ -117,12 +168,36 @@ async function generateEntry(domain, name) {
   for (const source of SOURCES) {
     try {
       const svg = await source.fn(domain)
-      return { name, svg, source: source.name }
+      return { name, svg, source: source.name, domain }
     } catch {
       // try next source
     }
   }
   throw new Error('All icon sources failed')
+}
+
+// ── Colour suggestion ────────────────────────────────────────────────
+
+async function suggestColors(entry) {
+  // Try Simple Icons brand colour first (works for any source)
+  const brand = await lookupBrandColor(entry.domain)
+  if (brand) return { colors: [brand], via: 'Simple Icons brand color' }
+
+  // Parse colours from the SVG itself
+  const svgColors = extractSvgColors(entry.svg)
+  if (svgColors.length > 0) return { colors: svgColors, via: 'extracted from SVG' }
+
+  return null
+}
+
+function formatColorSuggestion(suggestion) {
+  if (!suggestion) return '  (no color suggestion available)'
+  const { colors, via } = suggestion
+  if (colors.length === 1) {
+    return `  Suggested bgColor (${via}):  { type: 'solid', color: '${colors[0]}' }`
+  }
+  const arr = colors.map(c => `'${c}'`).join(', ')
+  return `  Suggested bgColor (${via}):  { type: 'gradient', gradientType: 'linear', angle: 45, colors: [${arr}] }`
 }
 
 // ── File insertion ───────────────────────────────────────────────────
@@ -158,6 +233,7 @@ function insertIntoFile(entries) {
 const args = process.argv.slice(2)
 
 const shouldWrite = args.includes('--write')
+const noBuild = args.includes('--no-build')
 let customName = null
 const nameIdx = args.indexOf('--name')
 if (nameIdx !== -1) customName = args[nameIdx + 1]
@@ -175,6 +251,7 @@ if (domains.length === 0) {
 
 Fetches a vector SVG icon for a website and adds it to public/icons.js.
 Sources tried in order: Simple Icons → site /favicon.svg → Google favicon (raster fallback).
+Also suggests brand colours for use in your config.js bgColor entries.
 
 Examples:
   node scripts/add-icon.mjs github.com --write
@@ -183,7 +260,8 @@ Examples:
 
 Options:
   --name <name>   Custom key name (only for single domain)
-  --write         Auto-insert into public/icons.js`)
+  --write         Auto-insert into public/icons.js and rebuild
+  --no-build      Skip the build step after writing`)
   process.exit(0)
 }
 
@@ -210,14 +288,37 @@ if (entries.length === 0) {
   process.exit(1)
 }
 
+// Fetch colour suggestions (best-effort, in parallel)
+process.stderr.write('Looking up brand colours...')
+const colorResults = await Promise.all(entries.map(e => suggestColors(e)))
+process.stderr.write(' done\n')
+
 if (shouldWrite) {
   insertIntoFile(entries)
   console.log(`Wrote ${entries.length} icon(s) to ${ICONS_PATH}:`)
-  entries.forEach(e => console.log(`  • ${e.name} (via ${e.source})`))
+  entries.forEach((e, i) => {
+    console.log(`  • ${e.name} (via ${e.source})`)
+    console.log(formatColorSuggestion(colorResults[i]))
+  })
+
+  if (!noBuild) {
+    console.log('\nRebuilding...')
+    try {
+      execSync('npm run build', {
+        cwd: resolve(import.meta.dirname, '..'),
+        stdio: 'inherit',
+      })
+    } catch {
+      console.error('Build failed. You can retry with: npm run build')
+      process.exit(1)
+    }
+  }
 } else {
   console.log('\n// Add the following to public/icons.js inside window.ICONS = { ... }:\n')
-  entries.forEach(({ name, svg }) => {
+  entries.forEach(({ name, svg }, i) => {
     console.log(`  ${name}: '${svg.replace(/'/g, "\\'")}',`)
+    console.log(formatColorSuggestion(colorResults[i]))
+    console.log()
   })
-  console.log('\n// Or re-run with --write to auto-insert.')
+  console.log('// Or re-run with --write to auto-insert and rebuild.')
 }
