@@ -112,32 +112,34 @@ function installWindows() {
     process.exit(1);
   }
 
-  // Re-launch elevated if not already running as admin.
-  // Uses a temp batch file + cmd.exe as the elevation vehicle because
-  // directly elevating node.exe via ShellExecuteEx (-Verb RunAs) fails with
-  // version manager shims (volta, fnm, nvm) — they don't pass PE validation.
-  // cmd.exe is always a valid Win32 app; the batch just calls node via PATH.
   if (!isAdminWindows()) {
-    console.log('Administrator privileges required. Requesting elevation via UAC...');
-    const tmpBat = path.join(os.tmpdir(), 'chevron_install_elevate.bat');
-    fs.writeFileSync(tmpBat, `@echo off\nnode "${__filename}" windows\n`);
-    const batPs = tmpBat.replace(/'/g, "''");   // escape single-quotes for PS
-    const elevated = spawnSync('powershell.exe', [
-      '-NoProfile', '-Command',
-      `Start-Process cmd.exe -ArgumentList @('/c', '${batPs}') -Verb RunAs -Wait`
-    ], { stdio: 'inherit' });
-    try { fs.unlinkSync(tmpBat); } catch {}
-    process.exit(elevated.status ?? 0);
+    console.error('');
+    console.error('ERROR: Administrator privileges are required to register a scheduled task.');
+    console.error('');
+    console.error('Please re-run from an elevated terminal:');
+    console.error('  1. Search "Terminal" in Start');
+    console.error('  2. Right-click → "Run as administrator"');
+    console.error('  3. cd to the chevron directory and run: npm run install_windows_service');
+    console.error('');
+    process.exit(1);
   }
 
-  const npxPath = whichWin('npx');
-  if (!npxPath) {
-    console.error('Error: npx not found in PATH. Make sure Node.js is installed.');
+  const nodePath = whichWin('node');
+  if (!nodePath) {
+    console.error('Error: node.exe not found in PATH. Make sure Node.js is installed.');
+    process.exit(1);
+  }
+
+  // Use node.exe + vite's JS entry point directly — no npx, no PATH dependency.
+  // This is what runs both in the scheduled task (at logon) and the immediate spawn.
+  const viteJs = path.join(projectDir, 'node_modules', 'vite', 'bin', 'vite.js');
+  if (!fs.existsSync(viteJs)) {
+    console.error(`Error: vite not found at ${viteJs}. Run npm install first.`);
     process.exit(1);
   }
 
   const taskName = 'ChevronPreview';
-  const vars = { PROJECT_DIR: projectDir };
+  const vars = { PROJECT_DIR: projectDir, NODE_EXE: nodePath, VITE_JS: viteJs };
 
   const src = path.join(__dirname, 'chevron-preview.xml');
   const tmpXml = path.join(os.tmpdir(), 'chevron-preview-task.xml');
@@ -164,23 +166,6 @@ function installWindows() {
 
   console.log(`Task "${taskName}" registered successfully.`);
 
-  // Enforce constraints via PowerShell — matches AHK install.bat pattern.
-  // Redundant with the XML settings but guarantees they are applied.
-  const psResult = spawnSync('powershell.exe', [
-    '-NoProfile', '-NonInteractive', '-Command',
-    `$name = '${taskName}'; $task = Get-ScheduledTask -TaskName $name; $s = $task.Settings; ` +
-    `$s.ExecutionTimeLimit = 'PT0S'; $s.DisallowStartIfOnBatteries = $false; ` +
-    `$s.StopIfGoingOnBatteries = $false; $s.IdleSettings.StopOnIdleEnd = $false; ` +
-    `Set-ScheduledTask -TaskName $name -Settings $s | Out-Null; Write-Host 'Settings applied: no time limit, runs on battery, ignores idle.'`
-  ], { encoding: 'utf8', stdio: 'pipe' });
-
-  if (psResult.status !== 0) {
-    console.warn('Warning: PowerShell settings update failed. Task was created but may have default constraints.');
-    console.warn(psResult.stderr || psResult.stdout);
-  } else {
-    console.log(psResult.stdout.trim());
-  }
-
   // Kill any existing vite preview on port 4173 so we can start fresh
   spawnSync('powershell.exe', [
     '-NoProfile', '-Command',
@@ -190,8 +175,8 @@ function installWindows() {
   // Spawn the server in the current interactive session so it's available immediately.
   const { spawn } = require('child_process');
   const child = spawn(
-    'cmd.exe',
-    ['/c', 'npx', 'vite', 'preview', '--port', '4173'],
+    nodePath,
+    [viteJs, 'preview', '--port', '4173'],
     {
       cwd: projectDir,
       detached: true,
