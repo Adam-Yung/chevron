@@ -188,8 +188,6 @@ function installWindows() {
   ], { stdio: 'ignore' });
 
   // Spawn the server in the current interactive session so it's available immediately.
-  // Use cmd.exe /c so .cmd shims (npx.cmd, etc.) are handled correctly — Node's
-  // spawn() on Windows only auto-wraps .cmd when shell:true, but we need detached.
   const { spawn } = require('child_process');
   const child = spawn(
     'cmd.exe',
