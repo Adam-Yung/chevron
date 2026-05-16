@@ -88,10 +88,32 @@ function installLinux() {
   console.log('To logs:    journalctl --user -u chevron-preview -f');
 }
 
+function isAdminWindows() {
+  try {
+    execSync('net session', { stdio: 'ignore' });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 function installWindows() {
   if (process.platform !== 'win32') {
     console.error('Error: install_windows_service must be run on Windows.');
     process.exit(1);
+  }
+
+  // Re-launch elevated if not already running as admin.
+  // Uses the same Start-Process -Verb RunAs pattern as install.bat.
+  if (!isAdminWindows()) {
+    console.log('Administrator privileges required. Requesting elevation...');
+    const nodeExe = process.execPath.replace(/'/g, "''");   // escape PS single-quotes
+    const script  = __filename.replace(/'/g, "''");
+    const elevated = spawnSync('powershell.exe', [
+      '-NoProfile', '-Command',
+      `Start-Process -FilePath '${nodeExe}' -ArgumentList @('${script}', 'windows') -Verb RunAs -Wait`
+    ], { stdio: 'inherit' });
+    process.exit(elevated.status ?? 0);
   }
 
   const npxPath = whichWin('npx');
