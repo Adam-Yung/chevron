@@ -31,8 +31,8 @@
   </Settings>
   <Actions Context="Author">
     <Exec>
-      <Command>{{NPX_PATH}}</Command>
-      <Arguments>vite preview --port 4173</Arguments>
+      <Command>cmd.exe</Command>
+      <Arguments>/c npx vite preview --port 4173</Arguments>
       <WorkingDirectory>{{PROJECT_DIR}}</WorkingDirectory>
     </Exec>
   </Actions>

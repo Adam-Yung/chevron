@@ -16,7 +16,16 @@ function which(cmd) {
 
 function whichWin(cmd) {
   try {
-    return execSync(`where.exe ${cmd}`, { encoding: 'utf8' }).trim().split(/\r?\n/)[0];
+    // where.exe lists all matches: POSIX shell script, .ps1, .cmd, .exe
+    // Prefer .exe then .cmd — Task Scheduler and spawn() both need a real
+    // Windows executable; bare shebang scripts (no extension) fail both.
+    const results = execSync(`where.exe ${cmd}`, { encoding: 'utf8' })
+      .trim().split(/\r?\n/);
+    return (
+      results.find(p => /\.exe$/i.test(p)) ||
+      results.find(p => /\.cmd$/i.test(p)) ||
+      results[0]
+    );
   } catch {
     return null;
   }
@@ -128,7 +137,7 @@ function installWindows() {
   }
 
   const taskName = 'ChevronPreview';
-  const vars = { PROJECT_DIR: projectDir, NPX_PATH: npxPath };
+  const vars = { PROJECT_DIR: projectDir };
 
   const src = path.join(__dirname, 'chevron-preview.xml');
   const tmpXml = path.join(os.tmpdir(), 'chevron-preview-task.xml');
@@ -179,11 +188,12 @@ function installWindows() {
   ], { stdio: 'ignore' });
 
   // Spawn the server in the current interactive session so it's available immediately.
-  // Use the resolved npxPath (not bare 'npx') to avoid PATH lookup failures.
+  // Use cmd.exe /c so .cmd shims (npx.cmd, etc.) are handled correctly — Node's
+  // spawn() on Windows only auto-wraps .cmd when shell:true, but we need detached.
   const { spawn } = require('child_process');
   const child = spawn(
-    npxPath,
-    ['vite', 'preview', '--port', '4173'],
+    'cmd.exe',
+    ['/c', 'npx', 'vite', 'preview', '--port', '4173'],
     {
       cwd: projectDir,
       detached: true,
