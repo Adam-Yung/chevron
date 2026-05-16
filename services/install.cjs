@@ -101,10 +101,7 @@ function installWindows() {
   }
 
   const taskName = 'ChevronPreview';
-  const hostname = os.hostname();
-  const user = os.userInfo().username;
-  const qualifiedUser = `${hostname}\\${user}`;
-  const vars = { PROJECT_DIR: projectDir, NPX_PATH: npxPath, USER: qualifiedUser };
+  const vars = { PROJECT_DIR: projectDir, NPX_PATH: npxPath };
 
   const src = path.join(__dirname, 'chevron-preview.xml');
   const tmpXml = path.join(os.tmpdir(), 'chevron-preview-task.xml');

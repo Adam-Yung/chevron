@@ -6,7 +6,6 @@
   <Triggers>
     <LogonTrigger>
       <Enabled>true</Enabled>
-      <UserId>{{USER}}</UserId>
     </LogonTrigger>
   </Triggers>
   <Principals>
