@@ -104,15 +104,20 @@ function installWindows() {
   }
 
   // Re-launch elevated if not already running as admin.
-  // Uses the same Start-Process -Verb RunAs pattern as install.bat.
+  // Uses a temp batch file + cmd.exe as the elevation vehicle because
+  // directly elevating node.exe via ShellExecuteEx (-Verb RunAs) fails with
+  // version manager shims (volta, fnm, nvm) — they don't pass PE validation.
+  // cmd.exe is always a valid Win32 app; the batch just calls node via PATH.
   if (!isAdminWindows()) {
-    console.log('Administrator privileges required. Requesting elevation...');
-    const nodeExe = process.execPath.replace(/'/g, "''");   // escape PS single-quotes
-    const script  = __filename.replace(/'/g, "''");
+    console.log('Administrator privileges required. Requesting elevation via UAC...');
+    const tmpBat = path.join(os.tmpdir(), 'chevron_install_elevate.bat');
+    fs.writeFileSync(tmpBat, `@echo off\nnode "${__filename}" windows\n`);
+    const batPs = tmpBat.replace(/'/g, "''");   // escape single-quotes for PS
     const elevated = spawnSync('powershell.exe', [
       '-NoProfile', '-Command',
-      `Start-Process -FilePath '${nodeExe}' -ArgumentList @('${script}', 'windows') -Verb RunAs -Wait`
+      `Start-Process cmd.exe -ArgumentList @('/c', '${batPs}') -Verb RunAs -Wait`
     ], { stdio: 'inherit' });
+    try { fs.unlinkSync(tmpBat); } catch {}
     process.exit(elevated.status ?? 0);
   }
 
