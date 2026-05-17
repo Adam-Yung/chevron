@@ -79,6 +79,9 @@ export default defineConfig(({ mode }) => {
       ...(isHosted ? [stripModuleMarkers()] : [viteSingleFile()])
     ],
     base: '',
+    preview: {
+      host: '::'
+    },
     define: {
       __APP_VERSION__: JSON.stringify(APP_VERSION)
     },

@@ -32,7 +32,7 @@
   <Actions Context="Author">
     <Exec>
       <Command>{{NODE_EXE}}</Command>
-      <Arguments>{{VITE_JS}} preview --port 4173</Arguments>
+      <Arguments>{{VITE_JS}} preview --port 4173 --host ::</Arguments>
       <WorkingDirectory>{{PROJECT_DIR}}</WorkingDirectory>
     </Exec>
   </Actions>

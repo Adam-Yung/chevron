@@ -176,7 +176,7 @@ function installWindows() {
   const { spawn } = require('child_process');
   const child = spawn(
     nodePath,
-    [viteJs, 'preview', '--port', '4173'],
+    [viteJs, 'preview', '--port', '4173', '--host', '::'],
     {
       cwd: projectDir,
       detached: true,
