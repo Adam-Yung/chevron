@@ -67,6 +67,7 @@ const template = {
       }),
     },
     style: new types.List('default', ['default']),
+    performanceMode: new types.Switch(false, undefined, { description: 'Disable backdrop blur effects for smoother animations. Recommended on Windows or slow GPUs.' }),
     macroMenu: {
       glassmorphism: new types.Switch(false, undefined, { description: 'Frost the macros menu backdrop with a blur effect. Disable on slow GPUs.' })
     },

@@ -43,6 +43,11 @@
     background: color-mix(in srgb, var(--primary) 4%, transparent);
   }
 }
+body[data-performance-mode] .suggestion > div {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  background: color-mix(in srgb, var(--primary) 8%, transparent) !important;
+}
 .suggestion > div:hover {
   background: color-mix(in srgb, var(--primary) 12%, transparent);
   border-color: rgba(255, 255, 255, 0.14);
@@ -116,6 +121,11 @@ body[data-color-scheme=light] .suggestion > div {
     -webkit-backdrop-filter: blur(14px) saturate(1.6);
     background: rgba(255, 255, 255, 0.42);
   }
+}
+body[data-performance-mode][data-color-scheme=light] .suggestion > div {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  background: rgba(255, 255, 255, 0.72) !important;
 }
 body[data-color-scheme=light] .suggestion > div:hover {
   background: rgba(255, 255, 255, 0.72);

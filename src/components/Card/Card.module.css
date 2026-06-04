@@ -7,7 +7,6 @@
   margin: 2px;
   border-radius: 22%;
   overflow: hidden;
-  will-change: transform;
 
   background: color-mix(in srgb, var(--card) 55%, transparent);
   border: 1px solid rgba(255, 255, 255, 0.10);
@@ -21,6 +20,11 @@
     -webkit-backdrop-filter: blur(12px) saturate(1.3);
     background: color-mix(in srgb, var(--card) 38%, transparent);
   }
+}
+body[data-performance-mode] .card {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  background: color-mix(in srgb, var(--card) 55%, transparent) !important;
 }
 
 /* Ambient glow tinted by the macro's brand colour */
@@ -208,7 +212,6 @@ body[data-color-scheme=light] .plate.detached::before { opacity: 0; }
   width: 38%;
   margin: 10%;
   z-index: 10001;
-  will-change: transform;
   filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.3));
 }
 .logo svg {

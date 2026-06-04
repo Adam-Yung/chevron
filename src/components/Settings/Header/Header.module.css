@@ -11,6 +11,10 @@
   background: rgba(60, 60, 60, 0.4);
   backdrop-filter: blur(10px);
 }
+body[data-performance-mode] .bar {
+  backdrop-filter: none;
+  background: rgba(60, 60, 60, 0.75);
+}
 
 .title {
   margin: 0 12px;

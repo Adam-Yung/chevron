@@ -262,6 +262,16 @@ function App() {
   }, [colorScheme]) 
   // ---
 
+  /* performance mode — disables backdrop-filter blurs on slow platforms */
+  useEffect(() => {
+    if (settings.appearance.performanceMode) {
+      document.body.setAttribute('data-performance-mode', '')
+    } else {
+      document.body.removeAttribute('data-performance-mode')
+    }
+  }, [settings.appearance.performanceMode])
+  // ---
+
   /* return-to-blank after navigating away (back button, bfcache, tab refocus)
      Replaces the old "Cancel" button flow: now we just auto-reset the store
      so the startpage is blank when the user returns. */

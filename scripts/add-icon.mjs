@@ -6,15 +6,21 @@ import { resolve } from 'path'
 import { execSync } from 'child_process'
 
 const ICONS_PATH = resolve(import.meta.dirname, '..', 'public', 'icons.js')
-const TIMEOUT_MS = 8000
+const TIMEOUT_MS = 10000
 
 // ── HTTP helper ──────────────────────────────────────────────────────
+// Uses the https module with a relaxed TLS agent so it works behind
+// corporate proxies / Zscaler that inject self-signed certificates.
+
+const tlsAgent = new https.Agent({ rejectUnauthorized: false })
 
 function fetchBuffer(url, redirects = 5) {
   return new Promise((resolve, reject) => {
     if (redirects <= 0) return reject(new Error('Too many redirects'))
-    const client = url.startsWith('https') ? https : http
-    const req = client.get(url, (res) => {
+    const isHttps = url.startsWith('https')
+    const client = isHttps ? https : http
+    const opts = isHttps ? { agent: tlsAgent } : {}
+    const req = client.get(url, opts, (res) => {
       if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
         let loc = res.headers.location
         if (loc.startsWith('/')) loc = new URL(loc, url).href
@@ -26,13 +32,14 @@ function fetchBuffer(url, redirects = 5) {
         return reject(new Error(`HTTP ${res.statusCode} for ${url}`))
       }
       const chunks = []
-      res.on('data', (c) => chunks.push(c))
+      res.on('data', c => chunks.push(c))
       res.on('end', () => resolve(Buffer.concat(chunks)))
       res.on('error', reject)
     })
     req.on('error', reject)
     req.setTimeout(TIMEOUT_MS, () => {
-      req.destroy(new Error(`Timed out after ${TIMEOUT_MS / 1000}s: ${url}`))
+      req.destroy()
+      reject(new Error(`Timed out after ${TIMEOUT_MS / 1000}s: ${url}`))
     })
   })
 }
@@ -43,6 +50,13 @@ function fetchText(url) {
 
 // ── Arg helpers ──────────────────────────────────────────────────────
 
+/** Returns true if the arg looks like a domain or URL (contains a dot or ://) */
+function looksLikeDomain(arg) {
+  if (arg.includes('://')) return true
+  // must contain a dot and the TLD part must be letters only (no spaces)
+  return /^[^\s]+\.[a-zA-Z]{2,}$/.test(arg)
+}
+
 function domainFromArg(arg) {
   if (arg.includes('://')) return new URL(arg).hostname
   return arg.replace(/^www\./, '')
@@ -52,20 +66,19 @@ function nameFromDomain(domain) {
   return domain.replace(/\.[^.]+$/, '').replace(/[^a-zA-Z0-9]/g, '')
 }
 
+function nameFromQuery(query) {
+  return query.toLowerCase().replace(/[^a-zA-Z0-9]/g, '')
+}
+
 // ── SVG sanitisation ─────────────────────────────────────────────────
 
 /** Strip XML preamble, comments, and normalise to single-quoted, one-line SVG. */
 function sanitiseSvg(raw) {
   let svg = raw.trim()
-  // strip <?xml ...?>
   svg = svg.replace(/<\?xml[^?]*\?>\s*/g, '')
-  // strip <!-- comments -->
   svg = svg.replace(/<!--[\s\S]*?-->/g, '')
-  // strip <title>...</title>
   svg = svg.replace(/<title>[^<]*<\/title>/g, '')
-  // collapse whitespace
   svg = svg.replace(/\s+/g, ' ').trim()
-  // ensure fill="currentColor" on root <svg> if no fill is set
   if (!/<svg[^>]*\bfill\s*=/.test(svg)) {
     svg = svg.replace('<svg ', '<svg fill="currentColor" ')
   }
@@ -76,7 +89,6 @@ function sanitiseSvg(raw) {
 
 let _simpleIconsData = null
 
-/** Fetch the Simple Icons dataset (cached across calls). */
 async function getSimpleIconsData() {
   if (_simpleIconsData) return _simpleIconsData
   const url = 'https://raw.githubusercontent.com/simple-icons/simple-icons/develop/data/simple-icons.json'
@@ -85,7 +97,6 @@ async function getSimpleIconsData() {
   return _simpleIconsData
 }
 
-/** Simple Icons derives slugs from titles: lowercase, strip non-alnum. */
 function titleToSlug(title) {
   return title
     .toLowerCase()
@@ -95,7 +106,6 @@ function titleToSlug(title) {
     .replace(/[^a-z0-9]/g, '')
 }
 
-/** Look up a brand colour from Simple Icons by domain-derived slug. */
 async function lookupBrandColor(domain) {
   try {
     const slug = nameFromDomain(domain).toLowerCase()
@@ -103,12 +113,12 @@ async function lookupBrandColor(domain) {
     const match = icons.find(i => titleToSlug(i.title) === slug)
     if (match?.hex) return '#' + match.hex
   } catch {
-    // non-fatal — colour suggestion is best-effort
+    // non-fatal
   }
   return null
 }
 
-/** Extract hex colours from SVG fill/stroke attributes (for non-Simple-Icons sources). */
+/** Extract hex colours from SVG fill/stroke attributes. */
 function extractSvgColors(svg) {
   const hexes = new Set()
   const re = /(?:fill|stroke)\s*[:=]\s*["']?\s*(#[0-9a-fA-F]{3,8})\b/g
@@ -122,12 +132,11 @@ function extractSvgColors(svg) {
   return [...hexes]
 }
 
-// ── Icon sources (tried in order) ────────────────────────────────────
+// ── Domain icon sources ───────────────────────────────────────────────
 
 /**
- * 1. Simple Icons (simpleicons.org) — clean vector SVGs for thousands of
- *    brands.  Uses the slug (lowercase, no spaces/dots).
- *    Fetches from raw GitHub to avoid Cloudflare bot-blocking on the CDN.
+ * Simple Icons (simpleicons.org) — brand SVGs for thousands of tech brands.
+ * Fetches from raw GitHub to avoid Cloudflare bot-blocking on the CDN.
  */
 async function trySimpleIcons(domain) {
   const slug = nameFromDomain(domain).toLowerCase()
@@ -137,9 +146,7 @@ async function trySimpleIcons(domain) {
   return sanitiseSvg(text)
 }
 
-/**
- * 2. Site's own /favicon.svg — some modern sites serve vector favicons.
- */
+/** Site's own /favicon.svg — some modern sites serve vector favicons. */
 async function trySiteFaviconSvg(domain) {
   const url = `https://${domain}/favicon.svg`
   const text = await fetchText(url)
@@ -147,10 +154,7 @@ async function trySiteFaviconSvg(domain) {
   return sanitiseSvg(text)
 }
 
-/**
- * 3. Google favicon service — always returns a PNG, so we embed it as a
- *    base64 <image> inside an SVG.  This is the fallback of last resort.
- */
+/** Google favicon service — always PNG, embedded as base64 <image> inside SVG. */
 async function tryGoogleFavicon(domain) {
   const url = `https://www.google.com/s2/favicons?domain=${domain}&sz=128`
   const buf = await fetchBuffer(url)
@@ -158,17 +162,95 @@ async function tryGoogleFavicon(domain) {
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128"><image href="data:image/png;base64,${b64}" width="128" height="128"/></svg>`
 }
 
-const SOURCES = [
+const DOMAIN_SOURCES = [
   { name: 'Simple Icons', fn: trySimpleIcons },
   { name: 'site favicon.svg', fn: trySiteFaviconSvg },
   { name: 'Google favicon (raster)', fn: tryGoogleFavicon },
 ]
 
-async function generateEntry(domain, name) {
-  for (const source of SOURCES) {
+// ── General search sources ────────────────────────────────────────────
+
+/**
+ * Iconify API — structured REST search across 200k+ icons (Material, Phosphor,
+ * Tabler, Heroicons, Feather, game-icons, and many more). No auth required.
+ *
+ * Uses the JSON data API (/{prefix}.json?icons={name}) rather than the SVG
+ * CDN endpoint, which returns intermittent 500s.
+ */
+async function tryIconify(query) {
+  const searchUrl = `https://api.iconify.design/search?query=${encodeURIComponent(query)}&limit=1`
+  const searchData = JSON.parse(await fetchText(searchUrl))
+  if (!searchData.icons?.length) throw new Error('No Iconify result')
+
+  const iconRef = searchData.icons[0]  // e.g. "tabler:pacman"
+  const [prefix, iconName] = iconRef.split(':')
+
+  const dataUrl = `https://api.iconify.design/${prefix}.json?icons=${iconName}`
+  const iconData = JSON.parse(await fetchText(dataUrl))
+  const icon = iconData.icons?.[iconName]
+  if (!icon?.body) throw new Error('No icon body in data')
+
+  const w = iconData.width || 24
+  const h = iconData.height || 24
+  return sanitiseSvg(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${w} ${h}">${icon.body}</svg>`)
+}
+
+/**
+ * Game Icons (game-icons.net) via GitHub raw — 4000+ icons covering games,
+ * fantasy, sci-fi, food, animals, and general symbols. Great for queries like
+ * "pacman", "chess", "potion", "skull", "rocket", etc.
+ */
+let _gameIconsIndex = null
+async function getGameIconsIndex() {
+  if (_gameIconsIndex) return _gameIconsIndex
+  const url = 'https://raw.githubusercontent.com/game-icons/icons/master/index.json'
+  const data = JSON.parse(await fetchText(url))
+  _gameIconsIndex = (Array.isArray(data) ? data : []).map(e => (typeof e === 'string' ? e : e.name ?? '')).filter(Boolean)
+  return _gameIconsIndex
+}
+
+async function tryGameIcons(query) {
+  const index = await getGameIconsIndex()
+  const q = query.toLowerCase().replace(/\s+/g, '-')
+  const match = index.find(n => n === q)
+    || index.find(n => n.startsWith(q))
+    || index.find(n => n.includes(q))
+  if (!match) throw new Error('No Game Icons match')
+  const url = `https://raw.githubusercontent.com/game-icons/icons/master/svg/ffffff/transparent/${match}.svg`
+  const text = await fetchText(url)
+  if (!text.includes('<svg')) throw new Error('Not an SVG response')
+  return sanitiseSvg(text)
+}
+
+/**
+ * Simple Icons fuzzy fallback — searches the brand dataset by title for cases
+ * where a query term loosely matches a brand (e.g. "apple", "spotify").
+ */
+async function trySimpleIconsFuzzy(query) {
+  const icons = await getSimpleIconsData()
+  const q = query.toLowerCase().replace(/\s+/g, '')
+  const match = icons.find(i => titleToSlug(i.title).includes(q) || q.includes(titleToSlug(i.title)))
+  if (!match) throw new Error('No Simple Icons fuzzy match')
+  const slug = titleToSlug(match.title)
+  const url = `https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/${slug}.svg`
+  const text = await fetchText(url)
+  if (!text.includes('<svg')) throw new Error('Not an SVG response')
+  return sanitiseSvg(text)
+}
+
+const SEARCH_SOURCES = [
+  { name: 'Iconify', fn: tryIconify },
+  { name: 'Game Icons', fn: tryGameIcons },
+  { name: 'Simple Icons (fuzzy)', fn: trySimpleIconsFuzzy },
+]
+
+// ── Entry generation ─────────────────────────────────────────────────
+
+async function generateEntryFromDomain(domain, name) {
+  for (const source of DOMAIN_SOURCES) {
     try {
       const svg = await source.fn(domain)
-      return { name, svg, source: source.name, domain }
+      return { name, svg, source: source.name, domain, isSearch: false }
     } catch {
       // try next source
     }
@@ -176,17 +258,27 @@ async function generateEntry(domain, name) {
   throw new Error('All icon sources failed')
 }
 
+async function generateEntryFromSearch(query, name) {
+  for (const source of SEARCH_SOURCES) {
+    try {
+      const svg = await source.fn(query)
+      return { name, svg, source: source.name, query, isSearch: true }
+    } catch {
+      // try next source
+    }
+  }
+  throw new Error('All search sources failed')
+}
+
 // ── Colour suggestion ────────────────────────────────────────────────
 
 async function suggestColors(entry) {
-  // Try Simple Icons brand colour first (works for any source)
-  const brand = await lookupBrandColor(entry.domain)
-  if (brand) return { colors: [brand], via: 'Simple Icons brand color' }
-
-  // Parse colours from the SVG itself
+  if (!entry.isSearch) {
+    const brand = await lookupBrandColor(entry.domain)
+    if (brand) return { colors: [brand], via: 'Simple Icons brand color' }
+  }
   const svgColors = extractSvgColors(entry.svg)
   if (svgColors.length > 0) return { colors: svgColors, via: 'extracted from SVG' }
-
   return null
 }
 
@@ -232,7 +324,6 @@ function insertIntoFile(entries) {
 
 const args = process.argv.slice(2)
 
-const shouldWrite = args.includes('--write')
 const noBuild = args.includes('--no-build')
 let customName = null
 const nameIdx = args.indexOf('--name')
@@ -244,38 +335,47 @@ const positional = args.filter((a, i) => {
   return true
 })
 
-const domains = positional.map(domainFromArg)
+if (positional.length === 0) {
+  console.log(`Usage: npm run icons -- <domain|query> [domain|query ...] [--name customName] [--no-build]
 
-if (domains.length === 0) {
-  console.log(`Usage: node scripts/add-icon.mjs <domain> [domain2 ...] [--name customName] [--write]
+Fetches a vector SVG icon and adds it to public/icons.js.
 
-Fetches a vector SVG icon for a website and adds it to public/icons.js.
-Sources tried in order: Simple Icons → site /favicon.svg → Google favicon (raster fallback).
-Also suggests brand colours for use in your config.js bgColor entries.
+If the argument looks like a domain/URL, it searches brand icon sources:
+  Simple Icons → site /favicon.svg → Google favicon (raster fallback)
+
+If it doesn't look like a domain, it searches general SVG libraries:
+  Iconify → SVGRepo → Simple Icons (fuzzy)
 
 Examples:
-  node scripts/add-icon.mjs github.com --write
-  node scripts/add-icon.mjs reddit.com twitch.tv --write
-  node scripts/add-icon.mjs https://news.ycombinator.com --name hackernews --write
+  npm run icons -- github.com
+  npm run icons -- reddit.com twitch.tv
+  npm run icons -- https://news.ycombinator.com --name hackernews
+  npm run icons -- pacman
+  npm run icons -- "stock market" --name stocks
+  npm run icons -- "chess knight" --name chess
 
 Options:
-  --name <name>   Custom key name (only for single domain)
-  --write         Auto-insert into public/icons.js and rebuild
-  --no-build      Skip the build step after writing`)
+  --name <name>   Custom key name in icons.js (only for single argument)
+  --no-build      Skip the rebuild step after writing`)
   process.exit(0)
 }
 
-if (customName && domains.length > 1) {
-  console.error('--name can only be used with a single domain')
+if (customName && positional.length > 1) {
+  console.error('--name can only be used with a single argument')
   process.exit(1)
 }
 
 const entries = []
-for (const domain of domains) {
-  const name = customName || nameFromDomain(domain)
-  process.stderr.write(`Fetching icon for ${domain}...`)
+for (const arg of positional) {
+  const isDomain = looksLikeDomain(arg)
+  const name = customName || (isDomain ? nameFromDomain(domainFromArg(arg)) : nameFromQuery(arg))
+  const label = isDomain ? domainFromArg(arg) : `"${arg}"`
+  const mode = isDomain ? 'domain' : 'search'
+  process.stderr.write(`Fetching icon for ${label} (${mode})...`)
   try {
-    const entry = await generateEntry(domain, name)
+    const entry = isDomain
+      ? await generateEntryFromDomain(domainFromArg(arg), name)
+      : await generateEntryFromSearch(arg, name)
     entries.push(entry)
     process.stderr.write(` done (${entry.source})\n`)
   } catch (err) {
@@ -293,32 +393,22 @@ process.stderr.write('Looking up brand colours...')
 const colorResults = await Promise.all(entries.map(e => suggestColors(e)))
 process.stderr.write(' done\n')
 
-if (shouldWrite) {
-  insertIntoFile(entries)
-  console.log(`Wrote ${entries.length} icon(s) to ${ICONS_PATH}:`)
-  entries.forEach((e, i) => {
-    console.log(`  • ${e.name} (via ${e.source})`)
-    console.log(formatColorSuggestion(colorResults[i]))
-  })
+insertIntoFile(entries)
+console.log(`Wrote ${entries.length} icon(s) to ${ICONS_PATH}:`)
+entries.forEach((e, i) => {
+  console.log(`  • ${e.name} (via ${e.source})`)
+  console.log(formatColorSuggestion(colorResults[i]))
+})
 
-  if (!noBuild) {
-    console.log('\nRebuilding...')
-    try {
-      execSync('npm run build', {
-        cwd: resolve(import.meta.dirname, '..'),
-        stdio: 'inherit',
-      })
-    } catch {
-      console.error('Build failed. You can retry with: npm run build')
-      process.exit(1)
-    }
+if (!noBuild) {
+  console.log('\nRebuilding...')
+  try {
+    execSync('npm run build', {
+      cwd: resolve(import.meta.dirname, '..'),
+      stdio: 'inherit',
+    })
+  } catch {
+    console.error('Build failed. You can retry with: npm run build')
+    process.exit(1)
   }
-} else {
-  console.log('\n// Add the following to public/icons.js inside window.ICONS = { ... }:\n')
-  entries.forEach(({ name, svg }, i) => {
-    console.log(`  ${name}: '${svg.replace(/'/g, "\\'")}',`)
-    console.log(formatColorSuggestion(colorResults[i]))
-    console.log()
-  })
-  console.log('// Or re-run with --write to auto-insert and rebuild.')
 }
