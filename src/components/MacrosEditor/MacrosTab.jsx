@@ -1,6 +1,7 @@
 import { memo, useCallback, useMemo, useState } from 'react'
 import classes from './MacrosEditor.module.css'
-import { TextField, ChipInput, ColorField, CheckboxField } from './Fields'
+import { TextField, ChipInput, CheckboxField } from './Fields'
+import ColorPicker from './ColorPicker/ColorPicker'
 import BgColorEditor from './BgColorEditor'
 import { bgPreviewCss, makeSolid } from './colorHelpers'
 import IconPicker from './IconPicker/IconPicker'
@@ -129,7 +130,7 @@ const MacroRow = memo(function MacroRow({
             <TextField label="Normalised URL (host)" value={macro.normalisedURL} placeholder="example.com" onChange={(v) => onUpdateField('normalisedURL', v)} />
             <TextField label="Hotkey (e.g. KeyG)" value={macro.key} placeholder="optional" onChange={(v) => onUpdateField('key', v || undefined)} />
             <IconPicker value={macro.icon} onChange={(v) => onUpdateField('icon', v || undefined)} />
-            <ColorField label="Text color" value={macro.textColor} onChange={(v) => onUpdateField('textColor', v)} />
+            <ColorPicker label="Text color" value={macro.textColor} onChange={(v) => onUpdateField('textColor', v)} />
             <CheckboxFieldWrapped label="Pinned to macros menu" checked={macro.pinned} onChange={(v) => onUpdateField('pinned', v)} />
           </div>
 

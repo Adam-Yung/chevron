@@ -1,6 +1,7 @@
 import { memo, useCallback, useMemo, useState } from 'react'
 import classes from './MacrosEditor.module.css'
-import { TextField, ColorField } from './Fields'
+import { TextField } from './Fields'
+import ColorPicker from './ColorPicker/ColorPicker'
 import BgColorEditor from './BgColorEditor'
 import { bgPreviewCss, makeSolid } from './colorHelpers'
 
@@ -156,7 +157,7 @@ const EngineRow = memo(function EngineRow({ id, engine, isOpen, onToggle, onUpda
           <div className={classes['grid']}>
             <TextField label="Name" value={engine.name} onChange={(v) => onUpdate({ ...engine, name: v })} />
             <TextField label="Engine id (key)" value={id} onChange={(v) => onRename(v)} />
-            <ColorField label="Text color" value={engine.textColor} onChange={(v) => onUpdate({ ...engine, textColor: v })} />
+            <ColorPicker label="Text color" value={engine.textColor} onChange={(v) => onUpdate({ ...engine, textColor: v })} />
           </div>
 
           <p className={classes['subhead']}>Background</p>

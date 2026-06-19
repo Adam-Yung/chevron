@@ -1,0 +1,80 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.label {
+  font-size: 0.8em;
+  opacity: 0.7;
+}
+
+.trigger {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 8px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(0, 0, 0, 0.3);
+  color: inherit;
+  cursor: pointer;
+  font-size: 0.9em;
+  min-height: 36px;
+  transition: opacity 0.15s, border-color 0.15s;
+}
+.trigger:hover {
+  border-color: rgba(255, 255, 255, 0.25);
+}
+.trigger:focus-visible {
+  border-color: var(--accent, var(--primary, #4a86ff));
+  outline: none;
+}
+
+.swatch {
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  flex-shrink: 0;
+}
+
+.hexText {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  opacity: 0.8;
+  font-size: 0.9em;
+}
+
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 9998;
+}
+
+.popover {
+  z-index: 9999;
+  background: var(--background, #1a1a1a);
+  border: 1px solid rgba(128, 128, 128, 0.25);
+  border-radius: 10px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  padding: 10px;
+  width: 240px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.hexInput {
+  width: 100%;
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(0, 0, 0, 0.3);
+  color: inherit;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.9em;
+  outline: none;
+  box-sizing: border-box;
+}
+.hexInput:focus {
+  border-color: var(--accent, var(--primary, #4a86ff));
+}

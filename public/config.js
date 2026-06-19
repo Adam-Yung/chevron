@@ -604,6 +604,122 @@ window.CONFIG = {
       },
       textColor: '#000'
     },
+    {
+      category: 'Other',
+      name: 'Maps',
+      triggers: ['map', 'maps', 'gm'],
+      icon: 'maps',
+      url: 'https://maps.google.com',
+      normalisedURL: 'google.com/maps',
+      commands: {
+        search: {
+          template: '{@}/search/{$}',
+          description: 'search for a place'
+        }
+      },
+      bgColor: {
+        type: 'gradient',
+        gradientType: 'radial',
+        colors: ['#34a853', '#fbbc04', '#ea4335', '#4285f4'],
+        stops: [0, 33, 66, 100]
+      },
+      textColor: '#ffffff',
+      pinned: true
+    },
+    {
+      category: 'Finance',
+      name: 'Stocks',
+      triggers: ['stock', 'stocks', 'finance'],
+      icon: 'stocks',
+      url: 'https://finance.yahoo.com',
+      normalisedURL: 'finance.yahoo.com',
+      commands: {
+        search: {
+          template: '{@}/quote/{$}',
+          description: 'look up a ticker'
+        }
+      },
+      bgColor: {
+        type: 'solid',
+        color: '#6c3ec1'
+      },
+      textColor: '#ffffff',
+      pinned: true
+    },
+    {
+      category: 'Finance',
+      name: 'Fidelity',
+      triggers: ['fi', 'fid', 'fidelity'],
+      icon: 'fidelity',
+      url: 'https://www.fidelity.com',
+      normalisedURL: 'fidelity.com',
+      bgColor: {
+        type: 'solid',
+        color: '#4a8526'
+      },
+      textColor: '#ffffff',
+      pinned: true
+    },
+    {
+      category: 'Programming',
+      name: 'Gemini',
+      triggers: ['gem', 'gemini', 'ai'],
+      icon: 'gemini',
+      url: 'https://gemini.google.com',
+      normalisedURL: 'gemini.google.com',
+      commands: {
+        search: {
+          template: '{@}/app?q={$}',
+          description: 'ask Gemini'
+        }
+      },
+      bgColor: {
+        type: 'gradient',
+        gradientType: 'linear',
+        angle: 135,
+        colors: ['#4285f4', '#9b72cb', '#d96570'],
+        stops: [0, 50, 100]
+      },
+      textColor: '#ffffff',
+      pinned: true
+    },
+    {
+      category: 'Communication',
+      name: 'Messenger',
+      triggers: ['msg', 'messenger', 'fb'],
+      icon: 'messenger',
+      url: 'https://www.messenger.com',
+      normalisedURL: 'messenger.com',
+      bgColor: {
+        type: 'gradient',
+        gradientType: 'linear',
+        angle: 135,
+        colors: ['#00c6ff', '#7a5fff', '#ff6481'],
+        stops: [0, 50, 100]
+      },
+      textColor: '#ffffff',
+      pinned: true
+    },
+    {
+      category: 'Social',
+      name: 'Pinterest',
+      triggers: ['p', 'pin', 'pins', 'pinterest'],
+      icon: 'pinterest',
+      url: 'https://www.pinterest.com',
+      normalisedURL: 'pinterest.com',
+      commands: {
+        search: {
+          template: '{@}/search/pins/?q={$}',
+          description: 'search pins'
+        }
+      },
+      bgColor: {
+        type: 'solid',
+        color: '#e60023'
+      },
+      textColor: '#ffffff',
+      pinned: true
+    }
   ],
   commands: [
     {

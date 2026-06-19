@@ -70,37 +70,6 @@ export const CheckboxField = memo(function CheckboxField({ label, checked, onCha
 })
 
 /**
- * Native color picker plus a hex text input synced both ways. Tolerates
- * partial hex strings (`#1c`) without nuking the parent state.
- */
-export const ColorField = memo(function ColorField({ label, value, onChange }) {
-  const safe = isHex(value) ? value : '#000000'
-  return (
-    <div className={classes['field']}>
-      <label>{label}</label>
-      <div className={classes['colorPair']}>
-        <input
-          type="color"
-          value={safe}
-          onChange={(e) => onChange(e.target.value)}
-          aria-label={`${label} color picker`}
-        />
-        <input
-          type="text"
-          value={value ?? ''}
-          placeholder="#000000"
-          onChange={(e) => onChange(e.target.value)}
-        />
-      </div>
-    </div>
-  )
-})
-
-function isHex(v) {
-  return typeof v === 'string' && /^#[0-9a-fA-F]{3,8}$/.test(v.trim())
-}
-
-/**
  * Chip input: comma / Enter / Tab / blur add the current text as a chip.
  * Backspace on empty input removes the last chip. Click × to remove a
  * specific chip. Duplicates are silently dropped.

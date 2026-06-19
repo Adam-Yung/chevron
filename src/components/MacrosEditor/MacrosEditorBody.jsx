@@ -11,8 +11,7 @@ import EnginesTab from './EnginesTab'
 /**
  * Headless editing surface — toolbar + sub-tabs + scroll area + status.
  * No backdrop / dialog wrapper / outer close button. Designed to be
- * embedded inside a parent modal (the new Settings) but also reusable
- * standalone via MacrosEditor.jsx.
+ * embedded inside a parent modal (the Settings dialog).
  *
  * `revision` is an optional value the parent can bump to force a
  * reload from localStorage (e.g. when the embedding modal reopens).
@@ -29,6 +28,8 @@ const TABS = [
   { id: 'json', label: 'Raw JSON' }
 ]
 
+const AUTOSAVE_DELAY = 800
+
 function MacrosEditorBody({ revision = 0, onSaved }) {
   const fileInputRef = useRef(null)
 
@@ -37,6 +38,16 @@ function MacrosEditorBody({ revision = 0, onSaved }) {
   const [activeTab, setActiveTab] = useState('macros')
   const [status, setStatus] = useState({ kind: 'idle', message: '' })
 
+  const isFirstRender = useRef(true)
+  const debounceTimer = useRef(null)
+  const latestCfg = useRef(cfg)
+  const latestActiveTab = useRef(activeTab)
+  const latestRawText = useRef(rawText)
+
+  latestCfg.current = cfg
+  latestActiveTab.current = activeTab
+  latestRawText.current = rawText
+
   // Reload on revision bump.
   useEffect(() => {
     const fresh = loadConfig()
@@ -44,6 +55,7 @@ function MacrosEditorBody({ revision = 0, onSaved }) {
     setRawText(pretty(fresh))
     setStatus({ kind: 'idle', message: '' })
     setActiveTab('macros')
+    isFirstRender.current = true
   }, [revision])
 
   const validation = useMemo(() => {
@@ -60,6 +72,24 @@ function MacrosEditorBody({ revision = 0, onSaved }) {
     return { ok: bad.length === 0, value: cfg, bad, parseError: null }
   }, [activeTab, rawText, cfg])
 
+  const validationRef = useRef(validation)
+  validationRef.current = validation
+
+  const flushSave = useCallback(() => {
+    if (debounceTimer.current) {
+      clearTimeout(debounceTimer.current)
+      debounceTimer.current = null
+    }
+    const v = validationRef.current
+    if (!v.ok) return
+    const payload = latestActiveTab.current === 'json' ? v.value : latestCfg.current
+    const result = saveConfig(payload)
+    if (result.ok) {
+      setStatus({ kind: 'success', message: 'Auto-saved.' })
+      onSaved?.(payload)
+    }
+  }, [onSaved])
+
   const setSlice = useCallback((key) => (next) => {
     setCfg((prev) => {
       const out = { ...prev, [key]: next }
@@ -69,6 +99,10 @@ function MacrosEditorBody({ revision = 0, onSaved }) {
   }, [])
 
   const handleSave = useCallback(() => {
+    if (debounceTimer.current) {
+      clearTimeout(debounceTimer.current)
+      debounceTimer.current = null
+    }
     if (!validation.ok) return
     const payload = activeTab === 'json' ? validation.value : cfg
     const result = saveConfig(payload)
@@ -82,11 +116,56 @@ function MacrosEditorBody({ revision = 0, onSaved }) {
     }
   }, [validation, activeTab, cfg, onSaved])
 
+  // Debounced auto-save: triggers ~800ms after cfg changes.
+  useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false
+      return
+    }
+    if (!validationRef.current.ok) return
+
+    if (debounceTimer.current) clearTimeout(debounceTimer.current)
+    debounceTimer.current = setTimeout(() => {
+      debounceTimer.current = null
+      const v = validationRef.current
+      if (!v.ok) return
+      const payload = latestActiveTab.current === 'json' ? v.value : latestCfg.current
+      const result = saveConfig(payload)
+      if (result.ok) {
+        setStatus({ kind: 'success', message: 'Auto-saved.' })
+        onSaved?.(payload)
+      }
+    }, AUTOSAVE_DELAY)
+
+    return () => {
+      if (debounceTimer.current) {
+        clearTimeout(debounceTimer.current)
+        debounceTimer.current = null
+      }
+    }
+  }, [cfg, onSaved])
+
+  // Flush pending auto-save on page unload.
+  useEffect(() => {
+    const flush = () => flushSave()
+    window.addEventListener('beforeunload', flush)
+    window.addEventListener('pagehide', flush)
+    return () => {
+      window.removeEventListener('beforeunload', flush)
+      window.removeEventListener('pagehide', flush)
+    }
+  }, [flushSave])
+
   const handleReset = useCallback(() => {
+    if (debounceTimer.current) {
+      clearTimeout(debounceTimer.current)
+      debounceTimer.current = null
+    }
     const bundled = resetConfig()
     setCfg(bundled)
     setRawText(pretty(bundled))
     setStatus({ kind: 'success', message: 'Reverted to the bundled config.js.' })
+    isFirstRender.current = true
   }, [])
 
   const handleLoadBundled = useCallback(() => {
@@ -142,7 +221,7 @@ function MacrosEditorBody({ revision = 0, onSaved }) {
     e.target.value = ''
   }, [])
 
-  // Cmd/Ctrl+S to save when focus is inside the body.
+  // Cmd/Ctrl+S to save immediately (bypasses debounce).
   const wrapRef = useRef(null)
   useEffect(() => {
     const node = wrapRef.current
@@ -189,7 +268,7 @@ function MacrosEditorBody({ revision = 0, onSaved }) {
       <div className={classes['toolbar']}>
         <button type="button" className={`${classes['btn']} ${classes['primary']}`}
                 onClick={handleSave} disabled={!validation.ok}>
-          Save (⌘/Ctrl+S)
+          Save now
         </button>
         <button type="button" className={classes['btn']} onClick={handleExport} disabled={!validation.ok}>
           Export JSON

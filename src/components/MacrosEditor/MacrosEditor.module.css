@@ -276,27 +276,7 @@
   border-color: var(--accent, var(--primary, #4a86ff));
 }
 
-.colorPair {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-}
-.colorPair input[type="color"] {
-  width: 32px;
-  height: 32px;
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: 6px;
-  background: transparent;
-  padding: 0;
-  cursor: pointer;
-}
-.colorPair input[type="color"]::-webkit-color-swatch-wrapper { padding: 2px; }
-.colorPair input[type="color"]::-webkit-color-swatch { border: 0; border-radius: 4px; }
-.colorPair input[type="text"] {
-  width: 86px;
-  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-  font-size: 0.8em;
-}
+
 
 .checkboxField {
   display: inline-flex;

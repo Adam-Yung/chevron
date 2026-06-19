@@ -1,6 +1,7 @@
 import { memo, useCallback } from 'react'
 import classes from './MacrosEditor.module.css'
-import { ColorField, SelectField, NumberField } from './Fields'
+import { SelectField, NumberField } from './Fields'
+import ColorPicker from './ColorPicker/ColorPicker'
 import { bgPreviewCss, makeSolid, makeGradient } from './colorHelpers'
 
 /**
@@ -33,7 +34,7 @@ function BgColorEditor({ value, onChange }) {
             ]}
             onChange={setType}
           />
-          <ColorField
+          <ColorPicker
             label="Background color"
             value={safe.color}
             onChange={(color) => onChange({ ...safe, color })}
@@ -86,7 +87,7 @@ function BgColorEditor({ value, onChange }) {
       <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
         {colors.map((c, i) => (
           <div key={i} className={classes['cmdRow']} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 28px', gap: 6, alignItems: 'center' }}>
-            <ColorField
+            <ColorPicker
               label={`Color ${i + 1}`}
               value={c}
               onChange={(next) => {
