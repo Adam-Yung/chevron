@@ -115,30 +115,36 @@ function useSuggestions(query, autoCompleteEngine) {
   useEffect(() => {
     if (!query) return
 
+    const controller = new AbortController()
     const timerId = setTimeout(() => {
       /* autocomplete section */
       autoCompleteEngine(query, locale)
         .then(suggestions => {
-          if (query !== queryRef.current) return
+          if (controller.signal.aborted || query !== queryRef.current) return
           addSuggestions(suggestions.slice(0, autocompleteLimit), 'autocomplete')
         })
         .catch(err => {
+          if (err.name === 'AbortError') return
           if (import.meta.env.DEV) console.warn('[Chevron] autocomplete failed:', err)
         })
 
       /* currency section */
       if (currencyCommonRegex.test(query))
-        fetchCurrency(query)
+        fetchCurrency(query, controller.signal)
           .then(response => {
-            if (query !== queryRef.current) return
+            if (controller.signal.aborted || query !== queryRef.current) return
             response && addSuggestions([response], 'currency')
           })
           .catch(err => {
+            if (err.name === 'AbortError') return
             if (import.meta.env.DEV) console.warn('[Chevron] currency lookup failed:', err)
           })
     }, NETWORK_DEBOUNCE_MS)
 
-    return () => clearTimeout(timerId)
+    return () => {
+      clearTimeout(timerId)
+      controller.abort()
+    }
 
   }, [query, autoCompleteEngine, autocompleteLimit, addSuggestions, locale])
 
@@ -180,7 +186,7 @@ function normaliseCurrencyCode(raw) {
 const CURRENCY_CACHE_TTL_MS = 5 * 60 * 1000 // 5 minutes
 const currencyRateCache = new Map()
 
-async function fetchCurrency(query) {
+async function fetchCurrency(query, externalSignal) {
   const amount = query.match(currencyAmountRegex),
         codes = query.match(currencyCodeRegex),
         from = normaliseCurrencyCode(codes[0]),
@@ -202,6 +208,9 @@ async function fetchCurrency(query) {
 
   const controller = new AbortController()
   const timeoutId = setTimeout(() => controller.abort(), 5000)
+  if (externalSignal) {
+    externalSignal.addEventListener('abort', () => controller.abort(), { once: true })
+  }
 
   try {
     const response = await fetch(
@@ -218,6 +227,7 @@ async function fetchCurrency(query) {
       }
     }
   } catch (err) {
+    if (err.name === 'AbortError') throw err
     if (import.meta.env.DEV) console.warn('[Chevron] currency request failed:', err.message || err)
   } finally {
     clearTimeout(timeoutId)
