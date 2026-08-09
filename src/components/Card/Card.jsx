@@ -136,10 +136,13 @@ function Card({ active=false, visibility=true, icon, bgColor, textColor, macroNa
 
   return (
     <div
+      role='button'
+      tabIndex={0}
       className={gC('card', classes['card'], active && classes['active'], isHintActive && revealCount > 0 && classes['label-visible'])}
       style={{ '--macro-text': textColor, '--match-color': matchColor || textColor }}
       data-tab-focused={tabFocused || undefined}
-      onClick={onClick}>
+      onClick={onClick}
+      onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onClick?.() } }}>
       <div className={classes['logo-wrapper']}>
         { 
           isAnimated

@@ -322,7 +322,8 @@ function App() {
                     <LayoutButton
                       id='settings'
                       style={{ right: 0, top: 0 }}
-                      onClick={() => setShowSettings(state => !state)}>
+                      onClick={() => setShowSettings(state => !state)}
+                      aria-label='Open settings'>
                         <BsGearFill/>
                     </LayoutButton>
                     <LayoutButton
@@ -335,7 +336,8 @@ function App() {
                     <LayoutButton
                       id='macros-menu'
                       style={{ right: 0, bottom: 0 }}
-                      onClick={() => switchMacrosMenu(false)}>
+                      onClick={() => switchMacrosMenu(false)}
+                      aria-label='Toggle macros menu'>
                         {
                           mode === 'default' && <RiMenu5Fill/>
                         }
@@ -354,13 +356,15 @@ function App() {
           : <div className={classes['mobile-warning']}>
               <div>
                 Mobile devices are not supported :( <br />
-                <span className={classes['ignore-mobile-button']}
+                <button
+                type='button'
+                className={classes['ignore-mobile-button']}
                 onClick={() => {
                   localStorage.setItem('ignoreMobile', true)
                   location.reload()
                 }}>
                   ignore this warning
-                </span>
+                </button>
               </div>
             </div>
       }

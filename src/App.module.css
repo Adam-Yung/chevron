@@ -21,6 +21,11 @@
 .ignore-mobile-button {
   text-decoration: underline;
   cursor: pointer;
+  background: none;
+  border: none;
+  padding: 0;
+  color: inherit;
+  font: inherit;
 }
 
 .cancel-button {

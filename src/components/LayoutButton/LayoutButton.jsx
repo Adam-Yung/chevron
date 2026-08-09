@@ -9,26 +9,16 @@ function LayoutButton({ id, style, children, onClick, ...rest }) {
     localStorage.setItem(id + 'Visited', true)
     onClick()
   }
-  function handleKeyDown(e) {
-    // Native <button>-style: Enter / Space activates.
-    if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault()
-      handleClick()
-    }
-  }
 
   return (
-    <div
-      key='icon'
-      role='button'
-      tabIndex={0}
+    <button
+      type='button'
       style={style}
       onClick={handleClick}
-      onKeyDown={handleKeyDown}
       className={gC(classes['container'], isSettingsVisited && classes['visited'])}
       {...rest}>
       { children }
-    </div>
+    </button>
   )
 }
 

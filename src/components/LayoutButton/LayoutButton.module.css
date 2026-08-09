@@ -4,6 +4,11 @@
   cursor: pointer;
   z-index: 100;
   transition: opacity .3s;
+  background: none;
+  border: none;
+  padding: 0;
+  color: inherit;
+  font: inherit;
 }
 .container.visited {
   opacity: 0;
