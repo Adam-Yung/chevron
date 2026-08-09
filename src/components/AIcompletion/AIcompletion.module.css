@@ -34,3 +34,13 @@
   background: var(--accent);
   color: var(--secondary);
 }
+.thinking {
+  opacity: 0.5;
+  font-style: italic;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 0.2; }
+}

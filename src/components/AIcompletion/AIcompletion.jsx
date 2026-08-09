@@ -71,6 +71,7 @@ function AIcompletion({ query, className }) {
   const { config: providerConfig, missing } = resolveProviderConfig(aiSettings)
 
   const [completion, setCompletion] = useState('')
+  const [waiting, setWaiting] = useState(false)
   const chatLogRef = useRef([])
 
   useEffect(() => {
@@ -111,16 +112,23 @@ function AIcompletion({ query, className }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [query, temperature, providerConfig.baseURL, providerConfig.model, providerConfig.apiKey, enabled, language, missing])
 
-  if (!completion || !enabled)
+  if (!enabled || (!completion && !waiting))
     return null
 
   return <>
     <Icon className={classes['icon']} onClick={e => e.stopPropagation()}/>
-    <div className={className} onClick={e => e.stopPropagation()}>
-      <div className={classes['md-container']}>
-        {renderMarkdown(completion)}
+    {waiting && !completion && (
+      <div className={className} onClick={e => e.stopPropagation()}>
+        <div className={classes['thinking']}>thinking…</div>
       </div>
-    </div>
+    )}
+    {completion && (
+      <div className={className} onClick={e => e.stopPropagation()}>
+        <div className={classes['md-container']}>
+          {renderMarkdown(completion)}
+        </div>
+      </div>
+    )}
   </>
 }
 

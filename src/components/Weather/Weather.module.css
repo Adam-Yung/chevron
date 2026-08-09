@@ -52,3 +52,15 @@
   height: 1em;
   display: block;
 }
+
+.loading {
+  font-size: 0.38em;
+  opacity: 0.5;
+  margin-left: 0.6em;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 0.2; }
+}

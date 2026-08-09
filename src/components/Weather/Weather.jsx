@@ -32,6 +32,7 @@ function Weather() {
   const [current,   setCurrent]   = useState(() => getCachedCurrent())
   const [forecast,  setForecast]  = useState(() => getCachedForecast())
   const [showModal, setShowModal] = useState(false)
+  const [loading,   setLoading]   = useState(false)
 
   // Stable ref keeps latest params without recreating the fetch callback.
   const paramsRef = useRef({ apiKey, lat, lon, units })
@@ -45,18 +46,19 @@ function Weather() {
   const doFetch = useCallback(async (signal, generation) => {
     const { apiKey: key, lat: la, lon: lo, units: u } = paramsRef.current
     if (!key || !OWM_KEY_RE.test(key) || !la || !lo) return
+    setLoading(true)
     try {
       const [cur, fore] = await Promise.all([
         fetchCurrentWeather(la, lo, u, key, signal),
         fetchForecast(la, lo, u, key, signal)
       ])
-      // Discard if a newer fetch has already started.
       if (generation !== fetchGenRef.current) return
       setCachedCurrent(cur)
       setCachedForecast(fore)
       setCurrent({ stale: false, data: cur })
       setForecast({ stale: false, data: fore })
     } catch { /* stale cache stays visible */ }
+    finally { if (generation === fetchGenRef.current) setLoading(false) }
   }, [])
 
   // Re-fetch only when coordinates actually change, not on every keystroke.
@@ -71,7 +73,12 @@ function Weather() {
 
   // No weather data yet — render just the clock so the row is never empty.
   if (!current?.data) {
-    return <div className={classes['row-plain']}><Time /></div>
+    return (
+      <div className={classes['row-plain']}>
+        <Time />
+        {loading && <span className={classes['loading']}>loading weather…</span>}
+      </div>
+    )
   }
 
   const w          = current.data
