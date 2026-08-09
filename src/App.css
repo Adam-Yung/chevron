@@ -1,8 +1,21 @@
+
+:root {
+  --z-base: 1;
+  --z-content: 10;
+  --z-menu: 100;
+  --z-overlay: 150;
+  --z-modal: 200;
+  --z-toast: 1000;
+  --z-popover: 9000;
+  --z-top: 10000;
+}
+
 .app {
   background: var(--background);
   color: var(--primary);
   width: 100vw;
   height: 100vh;
+  height: 100dvh;
   overflow: hidden;
 }
 .app * {

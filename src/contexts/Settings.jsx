@@ -58,7 +58,7 @@ function loadSettings() {
 
 const assignedSettings = loadSettings()
 
-const SETTINGS_PERSIST_DEBOUNCE_MS = 150
+const SETTINGS_PERSIST_DEBOUNCE_MS = 300
 
 export const SettingsContext = createContext(null)
 export const SetSettingsContext = createContext(null)

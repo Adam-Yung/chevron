@@ -190,8 +190,12 @@ function getIcon(icon, color) {
   if (isValidElement(icon))
     return <div>{icon}</div>
 
-  else if (typeof icon === 'string' && Object.prototype.hasOwnProperty.call(window.ICONS, icon)) 
-    return <div dangerouslySetInnerHTML={{__html: window.ICONS?.[icon]}}/>
+  else if (typeof icon === 'string' && Object.prototype.hasOwnProperty.call(window.ICONS, icon)) {
+    const svg = window.ICONS[icon]
+    if (typeof svg === 'string' && svg.trimStart().startsWith('<svg'))
+      return <div dangerouslySetInnerHTML={{__html: svg}}/>
+    return <div><TbBan color={color}/></div>
+  }
 
   return <div><TbBan color={color}/></div>
 }
