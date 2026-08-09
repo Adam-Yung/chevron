@@ -86,12 +86,16 @@ function App() {
   // user is about to keyboard-navigate.
   function switchMacrosMenu(viaKeyboard = false) {
     const liveMode = modeRef.current
-    if (liveMode === 'default')
+    if (liveMode === 'default') {
+      modeRef.current = 'opened'
       updateStore({ mode: 'opened', macroHintsKeyboard: viaKeyboard })
-    else if (liveMode === 'opened')
+    } else if (liveMode === 'opened') {
+      modeRef.current = 'default'
       updateStore({ mode: 'default' })
-    else
+    } else {
+      modeRef.current = 'default'
       resetStore()
+    }
   }
 
   onKeyDownRef.current = e => {
