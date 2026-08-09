@@ -1,16 +1,11 @@
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 
-// Phase 8e: touch swipe gesture hook.
-// Recognises directional swipes on the window and calls the matching
-// callback. Left/right are exposed but not wired in App.jsx — Splide
-// handles in-menu horizontal swipes natively, so we don't double-fire.
-//
-// Thresholds (per spec § 3.7.1):
-//   - Max gesture duration: 600 ms  (too slow = scroll, not swipe)
-//   - Min displacement:      60 px  (too short = tap/jitter, not swipe)
-//
-// All listeners are passive so they never block scrolling.
 function useGestures({ onSwipeUp, onSwipeDown, onSwipeLeft, onSwipeRight }) {
+  const cbRef = useRef({ onSwipeUp, onSwipeDown, onSwipeLeft, onSwipeRight })
+  useEffect(() => {
+    cbRef.current = { onSwipeUp, onSwipeDown, onSwipeLeft, onSwipeRight }
+  })
+
   useEffect(() => {
     let startX, startY, startT
 
@@ -28,16 +23,16 @@ function useGestures({ onSwipeUp, onSwipeDown, onSwipeLeft, onSwipeRight }) {
       const dy  = t.clientY - startY
       const dt  = performance.now() - startT
 
-      if (dt > 600) return                                // too slow
+      if (dt > 600) return
       const absX = Math.abs(dx), absY = Math.abs(dy)
-      if (Math.max(absX, absY) < 60) return              // too short
+      if (Math.max(absX, absY) < 60) return
 
       if (absY > absX) {
-        if (dy < 0) onSwipeUp?.()
-        else        onSwipeDown?.()
+        if (dy < 0) cbRef.current.onSwipeUp?.()
+        else        cbRef.current.onSwipeDown?.()
       } else {
-        if (dx < 0) onSwipeLeft?.()
-        else        onSwipeRight?.()
+        if (dx < 0) cbRef.current.onSwipeLeft?.()
+        else        cbRef.current.onSwipeRight?.()
       }
     }
 
@@ -47,7 +42,7 @@ function useGestures({ onSwipeUp, onSwipeDown, onSwipeLeft, onSwipeRight }) {
       window.removeEventListener('touchstart', onTouchStart)
       window.removeEventListener('touchend',   onTouchEnd)
     }
-  }, [onSwipeUp, onSwipeDown, onSwipeLeft, onSwipeRight])
+  }, [])
 }
 
 export default useGestures
