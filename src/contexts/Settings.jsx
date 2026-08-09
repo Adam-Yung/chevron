@@ -78,10 +78,13 @@ export default function SettingsProvider({ children }) {
   // sync settings with localStorage (debounced to avoid write storms from
   // rapid changes like dragging a color picker)
   const persistTimerRef = useRef(null)
+  const settingsRef = useRef(settings)
+  useEffect(() => { settingsRef.current = settings })
+
   useEffect(() => {
     if (persistTimerRef.current) clearTimeout(persistTimerRef.current)
     persistTimerRef.current = setTimeout(() => {
-      localSettings.set(settings)
+      localSettings.set(settingsRef.current)
       persistTimerRef.current = null
     }, SETTINGS_PERSIST_DEBOUNCE_MS)
   }, [settings])
@@ -92,7 +95,7 @@ export default function SettingsProvider({ children }) {
       if (persistTimerRef.current) {
         clearTimeout(persistTimerRef.current)
         persistTimerRef.current = null
-        localSettings.set(settings)
+        localSettings.set(settingsRef.current)
       }
     }
     window.addEventListener('pagehide', flush)
@@ -102,7 +105,7 @@ export default function SettingsProvider({ children }) {
       window.removeEventListener('beforeunload', flush)
       flush()
     }
-  }, [settings])
+  }, [])
 
   return (
     <SettingsContext.Provider value={settings}>
