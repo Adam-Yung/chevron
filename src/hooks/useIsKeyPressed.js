@@ -1,17 +1,38 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
+
+const STUCK_KEY_TIMEOUT_MS = 5000
 
 function useIsKeyPressed(keyName) {
   const [isKeyPressed, setIsKeyPressed] = useState(false)
+  const stuckTimerRef = useRef(null)
 
   useEffect(() => {
+    const clearStuckTimer = () => {
+      if (stuckTimerRef.current) {
+        clearTimeout(stuckTimerRef.current)
+        stuckTimerRef.current = null
+      }
+    }
+
     const onKeyDown = e => {
-      if (e.key === keyName) setIsKeyPressed(true)
+      if (e.key === keyName) {
+        setIsKeyPressed(true)
+        clearStuckTimer()
+        stuckTimerRef.current = setTimeout(() => {
+          setIsKeyPressed(false)
+        }, STUCK_KEY_TIMEOUT_MS)
+      }
     }
     const onKeyUp = e => {
-      if (e.key === keyName) setIsKeyPressed(false)
+      if (e.key === keyName) {
+        setIsKeyPressed(false)
+        clearStuckTimer()
+      }
     }
-    // reset state if window loses focus while key is held (prevents stuck "pressed")
-    const onBlur = () => setIsKeyPressed(false)
+    const onBlur = () => {
+      setIsKeyPressed(false)
+      clearStuckTimer()
+    }
 
     document.addEventListener('keydown', onKeyDown)
     document.addEventListener('keyup', onKeyUp)
@@ -20,6 +41,7 @@ function useIsKeyPressed(keyName) {
       document.removeEventListener('keydown', onKeyDown)
       document.removeEventListener('keyup', onKeyUp)
       window.removeEventListener('blur', onBlur)
+      clearStuckTimer()
     }
   }, [keyName])
 
