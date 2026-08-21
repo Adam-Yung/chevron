@@ -57,6 +57,9 @@ function App() {
   /* handlers */
   const onContextMenuRef = useRef(null)
   const onKeyDownRef = useRef(null)
+  const onKeyUpRef = useRef(null)
+  const shiftDownAtRef = useRef(0)
+  const shiftAloneRef = useRef(false)
   // Live mirror of `mode` so handlers can read it synchronously without
   // recreating the listener on every transition.
   const modeRef = useRef(mode)
@@ -105,19 +108,16 @@ function App() {
     const ae = document.activeElement
     if (ae && ae.closest && ae.closest('[data-keep-focus]')) return
 
-    // Phase 8a: Shift = simple toggle. No tap-vs-hold distinction, no
-    // peek state to track. `e.repeat` is filtered so a held Shift can't
-    // re-fire the toggle while the OS is repeating the key.
+    // Shift tap-only: record the press, but don't toggle yet. The toggle
+    // fires on keyup only if no other key was pressed in between (see
+    // onKeyUpRef below). This prevents Shift-as-modifier (Ctrl+Shift+V,
+    // Shift+Tab, etc.) from accidentally toggling the macros menu.
     if (e.key === 'Shift' && !e.repeat) {
-      const liveMode = modeRef.current
-      // Only fire the toggle from modes Chevron knows about. Prevents
-      // Shift in `searching` mode from accidentally jumping into the
-      // macro menu mid-search.
-      if (allowedModes.get('Chevron').has(liveMode)) {
-        // viaKeyboard=true: Shift opening means the user is about to
-        // key-navigate, so reveal the per-card hints in MacrosMenu.
-        switchMacrosMenu(true)
-      }
+      shiftDownAtRef.current = Date.now()
+      shiftAloneRef.current = true
+    } else {
+      // Any non-Shift key invalidates the "tap alone" flag.
+      shiftAloneRef.current = false
     }
 
     // Esc in macro mode: pop a char if the filter has content, else
@@ -156,6 +156,24 @@ function App() {
       }
     }
   }
+  // Shift tap-only: fire the toggle on keyup only if Shift was the sole
+  // key pressed and released within 400ms. This is the pattern used by
+  // VS Code, Spotlight, etc. to distinguish tap from modifier use.
+  const SHIFT_TAP_MAX_MS = 400
+  onKeyUpRef.current = e => {
+    if (e.key !== 'Shift') return
+    const ae = document.activeElement
+    if (ae && ae.closest && ae.closest('[data-keep-focus]')) return
+
+    if (shiftAloneRef.current && (Date.now() - shiftDownAtRef.current < SHIFT_TAP_MAX_MS)) {
+      const liveMode = modeRef.current
+      if (allowedModes.get('Chevron').has(liveMode)) {
+        switchMacrosMenu(true)
+      }
+    }
+    shiftAloneRef.current = false
+  }
+
   // Phase 8a: right-click mirrors the Shift toggle so the keyboard and
   // mouse paths stay in sync (and the close animation plays correctly
   // when going opened → default).
@@ -187,11 +205,14 @@ function App() {
   useEffect(() => {
     const onContextMenu = e => onContextMenuRef.current(e)
     const onKeyDown = e => onKeyDownRef.current(e)
+    const onKeyUp = e => onKeyUpRef.current(e)
 
     document.addEventListener('keydown', onKeyDown)
+    document.addEventListener('keyup', onKeyUp)
     document.addEventListener('contextmenu', onContextMenu)
     return () => {
       document.removeEventListener('keydown', onKeyDown)
+      document.removeEventListener('keyup', onKeyUp)
       document.removeEventListener('contextmenu', onContextMenu)
     }
   }, [])
