@@ -1,4 +1,5 @@
 import { lazy, Suspense, useContext, useCallback, useEffect, memo, useRef } from 'react'
+import useAdaptiveFontSize from '../../hooks/useAdaptiveFontSize'
 import useSuggestions from '../../hooks/useSuggestions'
 import useParseQuery from '../../hooks/useParseQuery'
 import useRedirect from '../../hooks/useRedirect'
@@ -30,6 +31,7 @@ function QueryField () {
   const enableCarret = settings.query.field.caret
 
   const inputRef = useRef(null)
+  const containerRef = useRef(null)
   const escLastPressRef = useRef(-1)
 
   /* store */
@@ -50,6 +52,12 @@ function QueryField () {
 
   // query for AI
   const [aiQuery, setAiQuery] = useState('')
+
+  const adaptiveFontSize = useAdaptiveFontSize(
+    parsedQuery.value || query,
+    { maxFontSize: inputFontSize, containerRef }
+  )
+
   // "Copied!" toast for special-result clipboard actions
   const [copied, setCopied] = useState(false)
   const copiedTimerRef = useRef(null)
@@ -231,6 +239,23 @@ function QueryField () {
   // Cleanup the copied-toast timer on unmount
   useEffect(() => () => clearTimeout(copiedTimerRef.current), [])
 
+  const handleTextareaKeyDown = useCallback((e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault()
+    }
+  }, [])
+
+  // Auto-resize textarea height
+  useEffect(() => {
+    if (inputRef.current) {
+      inputRef.current.style.height = '0'
+      const scrollHeight = inputRef.current.scrollHeight
+      const lineHeight = parseFloat(getComputedStyle(inputRef.current).lineHeight) || (adaptiveFontSize * 16 * 1.2)
+      const maxHeight = lineHeight * 3
+      inputRef.current.style.height = Math.min(scrollHeight, maxHeight) + 'px'
+    }
+  }, [parsedQuery.value, adaptiveFontSize])
+
   // re-focusing the input inputField to focus on the caret
   // Phase 8e: skip on touch/coarse-pointer devices so the on-screen
   // keyboard doesn't pop up unbidden on page load.
@@ -242,7 +267,7 @@ function QueryField () {
   
   // css variables
   const variables = {
-    '--font-size': inputFontSize + 'em',
+    '--font-size': adaptiveFontSize + 'em',
     '--font-size-suggestions': suggestionsFontSize + 'em'
   }
 
@@ -250,11 +275,12 @@ function QueryField () {
   const activeOptionIndex = selectedSuggestion ? suggestions.indexOf(selectedSuggestion) : -1
   const activeDescendant = activeOptionIndex >= 0 ? suggestionOptionId(activeOptionIndex) : undefined
 
-  const input = <input
+  const input = <textarea
     ref={inputRef}
     value={parsedQuery.value}
     className={gC(classes['field'], !selectedSuggestion && classes['selected'])}
     onChange={e => handleQueryChange(e.target.value)}
+    onKeyDown={handleTextareaKeyDown}
     role="combobox"
     aria-label="Search"
     aria-autocomplete="list"
@@ -265,13 +291,16 @@ function QueryField () {
     autoCorrect="off"
     autoCapitalize="off"
     spellCheck={false}
+    rows={1}
     style={{
-      // hide when query is empty
       opacity: parsedQuery.value ? 1 : 0,
-      caretColor: enableCarret ? undefined : 'transparent'}}/>
+      caretColor: enableCarret ? undefined : 'transparent',
+      fontSize: adaptiveFontSize + 'em'
+    }}/>
 
   return (
     <div
+      ref={containerRef}
       className={classes['container']}
       style={variables}>
         {copied && <div className={classes['copied-toast']} aria-live="polite">Copied!</div>}

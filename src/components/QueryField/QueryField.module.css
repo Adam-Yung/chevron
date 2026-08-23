@@ -23,8 +23,6 @@
   padding: 0;
   width: 100%;
   margin: 0 auto;
-  overflow: hidden;
-  resize: none;
   border: none;
   color: var(--query);
   font-size: var(--font-size);
@@ -32,8 +30,20 @@
   text-transform: uppercase;
   font-family: inherit;
   cursor: default;
-  /* Subtle caret glow — the caret itself is the only "active" indicator */
   caret-color: color-mix(in srgb, var(--query) 80%, transparent);
+  transition: font-size 0.12s ease-out;
+  resize: none;
+  overflow: hidden;
+  line-height: 1.2;
+  white-space: pre-wrap;
+  word-break: break-word;
+  max-height: calc(var(--font-size) * 1.2 * 3);
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+
+.field::-webkit-scrollbar {
+  display: none;
 }
 
 /* No focus ring — input is already the dominant visual element */
