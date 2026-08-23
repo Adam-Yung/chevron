@@ -6,9 +6,12 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(0, 0, 0, 0.6);
+  background: rgba(0, 0, 0, 0.7);
+}
+body[data-glass-mode] .backdrop {
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
+  background: rgba(0, 0, 0, 0.5);
 }
 
 /* ── Modal shell ────────────────────────────────────────────────────── */

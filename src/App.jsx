@@ -262,14 +262,14 @@ function App() {
   }, [colorScheme]) 
   // ---
 
-  /* performance mode — disables backdrop-filter blurs on slow platforms */
+  /* glass mode — enables backdrop-filter blurs for capable/willing platforms */
   useEffect(() => {
-    if (settings.appearance.performanceMode) {
-      document.body.setAttribute('data-performance-mode', '')
+    if (settings.appearance.glassmorphism) {
+      document.body.setAttribute('data-glass-mode', '')
     } else {
-      document.body.removeAttribute('data-performance-mode')
+      document.body.removeAttribute('data-glass-mode')
     }
-  }, [settings.appearance.performanceMode])
+  }, [settings.appearance.glassmorphism])
   // ---
 
   /* return-to-blank after navigating away (back button, bfcache, tab refocus)

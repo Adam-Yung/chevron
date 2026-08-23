@@ -5,15 +5,22 @@
   user-select: text !important;
 }
 .md-container code {
-  backdrop-filter: contrast(0.8);
+  background: rgba(0, 0, 0, 0.12);
+  border-radius: 4px;
   padding-left: 6px;
   padding-right: 6px;
 }
 .md-container pre {
-  backdrop-filter: contrast(0.8);
+  background: rgba(0, 0, 0, 0.12);
+  border-radius: 4px;
   padding: 10px;
   border-radius: 10px;
   overflow-x: auto;
+}
+body[data-glass-mode] .md-container code,
+body[data-glass-mode] .md-container pre {
+  background: transparent;
+  backdrop-filter: contrast(0.8);
 }
 .md-container > *:first-child {
   margin-top: 0;
