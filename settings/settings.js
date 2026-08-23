@@ -67,10 +67,7 @@ const template = {
       }),
     },
     style: new types.List('default', ['default']),
-    performanceMode: new types.Switch(false, undefined, { description: 'Disable backdrop blur effects for smoother animations. Recommended on Windows or slow GPUs.' }),
-    macroMenu: {
-      glassmorphism: new types.Switch(false, undefined, { description: 'Frost the macros menu backdrop with a blur effect. Disable on slow GPUs.' })
-    },
+    glassmorphism: new types.Switch(false, undefined, { description: 'Enable frosted glass blur effects. Beautiful on macOS; may reduce smoothness on Windows.' }),
     gestures: {
       enableSwipe:    new types.Switch(true, undefined, { description: 'Swipe up to open the macros menu, swipe down to close.' }),
       enableTrackpad: new types.Switch(true, undefined, { description: 'Trackpad scroll paginates the macros menu horizontally.' })

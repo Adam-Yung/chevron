@@ -28,7 +28,6 @@ function MacrosMenu({ visibility, fullVisibility }) {
   const rows       = settings.menu.rows
   const cols       = settings.menu.columns
   const gap        = settings.menu.gap
-  const glassmorphism  = settings.appearance?.macroMenu?.glassmorphism  ?? false
   const enableTrackpad = settings.appearance?.gestures?.enableTrackpad ?? true
 
   const mode             = useStateSelector(store => store.mode)
@@ -189,8 +188,7 @@ function MacrosMenu({ visibility, fullVisibility }) {
       <div
       ref={containerRef}
       className={classes['container']}
-      style={{ '--grid-rows': activeRows }}
-      data-glassmorphism={glassmorphism || undefined}>
+      style={{ '--grid-rows': activeRows }}>
       {isEmpty ? (
         <div className={classes['empty']}>
           <span className={classes['empty-icon']}>🔍</span>

@@ -14,7 +14,7 @@
 // increment SETTINGS_VERSION. The migration will detect the mismatch and
 // run the appropriate fixer.
 
-export const SETTINGS_VERSION = 2
+export const SETTINGS_VERSION = 3
 
 const BACKUP_KEY_PREFIX = 'chevron.settings.bak'
 const VERSION_KEY = 'chevron.settings.version'
@@ -111,6 +111,29 @@ export function migrateSettings(stored, fromVersion) {
   // transparently. If an incompatible legacy OBF1: value was stored,
   // deobfuscate() returns '' so the user re-enters the key once.
   // No explicit data transform needed here — just bump the version.
+
+  // v2 → v3: performanceMode (opt-out blur) replaced by glassmorphism (opt-in blur).
+  // Also merges macroMenu.glassmorphism into the top-level toggle.
+  if (fromVersion === undefined || fromVersion < 3) {
+    const appearance = stored?.appearance
+    if (appearance) {
+      // Invert: performanceMode=false meant blur was ON → glassmorphism=true
+      if ('performanceMode' in appearance) {
+        appearance.glassmorphism = !appearance.performanceMode
+        delete appearance.performanceMode
+      }
+      // Merge macroMenu.glassmorphism into top-level
+      if (appearance.macroMenu?.glassmorphism !== undefined) {
+        if (appearance.glassmorphism === undefined) {
+          appearance.glassmorphism = appearance.macroMenu.glassmorphism
+        }
+        delete appearance.macroMenu.glassmorphism
+        if (Object.keys(appearance.macroMenu).length === 0) {
+          delete appearance.macroMenu
+        }
+      }
+    }
+  }
 
   return stored
 }
