@@ -263,6 +263,7 @@ The pre-React inline script sets the body background from persisted settings so 
 - **Framer Motion** — page transitions and modals (`AnimatePresence`, `motion.div`)
 - **CSS modules** — hover/state transitions. Use explicit `transition: opacity 200ms` (not `transition: all`). Add `will-change: transform, opacity` on per-frame animated elements.
 - **`prefers-reduced-motion`** — respected globally in `App.css` and per-component
+- **Glassmorphism** — `backdrop-filter` effects are opt-in via `settings.appearance.glassmorphism`. When enabled, `body[data-glass-mode]` is set and CSS selectors apply blur. The default (off) uses higher-opacity backgrounds for a polished look without GPU-expensive blur.
 
 The chevron SVG morph animates the `d` attribute directly. It's cheap enough for the simple bezier paths involved.
 
@@ -343,10 +344,18 @@ The `backend/` directory has a Node script + `node-mac/linux/windows` wrappers t
 - `@mui/joy` + `@emotion` (~150 KB) — only Settings + MacrosEditor
 - `@splidejs` (~25 KB) — only MacrosMenu
 
+**Glassmorphism is opt-in:**
+- `backdrop-filter` is expensive on Windows (Chrome emulates it via texture readback per element per frame). On macOS it maps to hardware-accelerated Core Animation blur.
+- By default, no `backdrop-filter` is applied. Polished translucent backgrounds provide visual depth without blur.
+- Users opt-in via `settings.appearance.glassmorphism` which sets `body[data-glass-mode]` — CSS selectors under this attribute add blur.
+
 **Compositor discipline:**
 - Use `transform` + `opacity`, not `width`/`height`/`top`/`left`
 - Use `will-change: transform, opacity` on per-frame elements
+- Card transitions are scoped to specific selectors (`.card`, `.plate`, `.plate::before`) — never wildcard `*`
 - Don't animate SVG `d` attributes when cross-fading would work (though it doesn't here — see Phase 7)
+
+**Adaptive text sizing:** The search field (`QueryField`) dynamically shrinks font-size as the query grows (logarithmic decay from the configured max to ~0.9rem floor). At the floor it wraps to up to 3 lines, then scrolls. Uses canvas `measureText()` for measurement without layout thrashing.
 
 **Settings persistence:** Goes through `SetSettingsContext` with 150 ms debounce. Never write `localStorage.setItem` directly on keystroke.
 

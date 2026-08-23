@@ -8,7 +8,14 @@
     "type": "git",
     "url": "https://github.com/Adam-Yung/chevron.git"
   },
-  "keywords": ["startpage", "new-tab", "browser", "search", "macros", "keyboard"],
+  "keywords": [
+    "startpage",
+    "new-tab",
+    "browser",
+    "search",
+    "macros",
+    "keyboard"
+  ],
   "version": "2.3.0",
   "type": "module",
   "scripts": {
@@ -30,7 +37,6 @@
     "@meteocons/svg": "^0.1.0",
     "@splidejs/react-splide": "^0.7.12",
     "@splidejs/splide-extension-grid": "^0.4.1",
-    "autosize": "^5.0.2",
     "framer-motion": "^11.18.2",
     "minisearch": "^6.0.1",
     "react": "^18.2.0",
@@ -46,7 +52,6 @@
     }
   ],
   "devDependencies": {
-    "size-limit": "^11.0.0",
     "@size-limit/file": "^11.0.0",
     "@types/react": "^18.0.24",
     "@types/react-dom": "^18.0.8",
@@ -55,6 +60,7 @@
     "eslint-plugin-react": "^7.31.11",
     "eslint-plugin-react-hooks": "^4.6.0",
     "gh-pages": "^5.0.0",
+    "size-limit": "^11.0.0",
     "vite": "^5.4.21",
     "vite-plugin-singlefile": "^2.3.3"
   }
