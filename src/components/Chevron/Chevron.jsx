@@ -96,7 +96,7 @@ function Chevron({ visibility, onAnimationEnd }) {
               }
             })
             controls.svg.start({
-              left: '50%',
+              x: '50vw',
               transition: {
                 ease: easeOutQuad,
                 duration: duration * timings.smashToSide[0]
@@ -149,7 +149,7 @@ function Chevron({ visibility, onAnimationEnd }) {
         searching: {
           async default() {
             controls.svg.start({
-              left: 0,
+              x: 0,
               transition: {
                 ease: easeInQuad,
                 duration: duration * timings.smashToSide[0]
@@ -177,7 +177,7 @@ function Chevron({ visibility, onAnimationEnd }) {
         opened: {
           async default() {
             controls.svg.start({
-              left: '50%',
+              x: '50vw',
               transition: {
                 ease: easeInOutQuad,
                 duration: duration * timings.menu[0]
@@ -238,7 +238,7 @@ function Chevron({ visibility, onAnimationEnd }) {
         </motion.div>
       </div>
       <motion.svg
-        initial={{ left: '50%' }}
+        initial={{ x: '50vw' }}
         animate={controls.svg}
         className={classes['svg']}
         viewBox='0 0 0.5 1'>

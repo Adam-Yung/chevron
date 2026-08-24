@@ -44,9 +44,11 @@
 
 .svg {
   top: 0;
+  left: 0;
   position: absolute;
   height: 100vh;
   overflow: visible;
   pointer-events: none;
   z-index: 2;
+  will-change: transform;
 }
