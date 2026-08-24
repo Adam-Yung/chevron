@@ -2,6 +2,7 @@ import { lazy, Suspense, useMemo, useContext, useRef, useEffect, useState } from
 import { SettingsContext, ThemeContext } from '../../contexts/Settings'
 import { useStateSelector } from '../../contexts/Store'
 import useTransitions from '../../hooks/useTransitions'
+import usePathMorph from '../../hooks/usePathMorph'
 import ChevronTop from '../ChevronTop/ChevronTop'
 const MacrosMenu = lazy(() => import('../MacrosMenu/MacrosMenu'))
 import { motion, useAnimationControls } from 'framer-motion'
@@ -82,18 +83,28 @@ function Chevron({ visibility, onAnimationEnd }) {
     })
   }, [svgControls, pathControls, topMenuControls, bottomMenuControls])
 
+  const pathRef = useRef(null)
+  const { morph, setInitialD } = usePathMorph(pathRef, pathControls)
+
+  useEffect(() => {
+    setInitialD(stages[0])
+  }, [stages, setInitialD])
+
   const animations = useMemo(() => {
     return ({
       transitions: {
         default: {
           async searching() {
-            await controls.path.start({
+            controls.path.start({
               translateX: pivotOffset.x,
-              d: stages[1],
               transition: {
                 ease: 'easeIn',
                 duration: duration * timings.smashToSide[1]
               }
+            })
+            await morph(stages[1], {
+              ease: 'ease-in',
+              duration: duration * timings.smashToSide[1]
             })
             controls.svg.start({
               x: '50vw',
@@ -102,18 +113,16 @@ function Chevron({ visibility, onAnimationEnd }) {
                 duration: duration * timings.smashToSide[0]
               }
             })
-            return await controls.path.start({
-              d: stages[0],
-              transition: {
-                ease: 'linear',
-                duration: duration * (timings.smashToSide[0] - timings.smashToSide[1])
-              }
+            return await morph(stages[0], {
+              ease: 'linear',
+              duration: duration * (timings.smashToSide[0] - timings.smashToSide[1])
             })
           },
           async opened() {
             setIsMacrosMenuRendered(false)
             controls.topMenu.start({
-              clipPath: 'inset(100% 0 0 0)',
+              opacity: 0,
+              y: 16,
               transition: {
                 ease: easeInOutQuad,
                 duration: duration * timings.menu[2]
@@ -127,22 +136,22 @@ function Chevron({ visibility, onAnimationEnd }) {
               }
             })
             if (mode !== modeRef.current) return 
-            await controls.path.start({
+            controls.path.start({
               translateX: pivotOffset.x,
-              d: stages[3],
               transition: {
                 ease: easeInOutQuad,
                 duration: duration * timings.menu[1]
               }
             })
+            await morph(stages[3], {
+              ease: easeInOutQuad,
+              duration: duration * timings.menu[1]
+            })
             if (mode !== modeRef.current) return
-            return await controls.path.start({
-              d: stages[0],
-              transition: {
-                ease: easeInOutQuad,
-                delay: .1,
-                duration: duration * timings.menu[0]
-              }
+            return await morph(stages[0], {
+              ease: easeInOutQuad,
+              duration: duration * timings.menu[0],
+              delay: .1
             })
           }
         },
@@ -155,21 +164,27 @@ function Chevron({ visibility, onAnimationEnd }) {
                 duration: duration * timings.smashToSide[0]
               }
             })
-            await controls.path.start({
+            controls.path.start({
               translateX: 0,
-              d: stages[1],
               transition: {
                 ease: 'linear',
                 duration: duration * timings.smashToSide[0]
               }
             })
-            await controls.path.start({
+            await morph(stages[1], {
+              ease: 'linear',
+              duration: duration * timings.smashToSide[0]
+            })
+            controls.path.start({
               translateY: 0,
-              d: stages[2],
               transition: {
                 ease: easeOutCubic,
                 duration: duration * timings.smashToSide[1]
               }
+            })
+            await morph(stages[2], {
+              ease: easeOutCubic,
+              duration: duration * timings.smashToSide[1]
             })
             return onAnimationEnd()
           }
@@ -183,24 +198,26 @@ function Chevron({ visibility, onAnimationEnd }) {
                 duration: duration * timings.menu[0]
               }
             })
-            await controls.path.start({
-              d: stages[3],
-              transition: {
-                ease: easeInOutQuad,
-                duration: duration * timings.menu[0]
-              }
+            await morph(stages[3], {
+              ease: easeInOutQuad,
+              duration: duration * timings.menu[0]
             })
-            await controls.path.start({
+            controls.path.start({
               translateX: 0,
-              d: stages[4],
               transition: {
                 ease: easeInOutQuad,
                 delay: .1,
                 duration: duration * timings.menu[1]
               }
             })
+            await morph(stages[4], {
+              ease: easeInOutQuad,
+              duration: duration * timings.menu[1],
+              delay: .1
+            })
             controls.topMenu.start({
-              clipPath: 'inset(0% 0 0 0)',
+              opacity: 1,
+              y: 0,
               transition: {
                 ease: easeInOutQuad,
                 duration: duration * timings.menu[2]
@@ -219,7 +236,7 @@ function Chevron({ visibility, onAnimationEnd }) {
       }
     })
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [controls, duration, stages, pivotOffset, onAnimationEnd])
+  }, [controls, morph, duration, stages, pivotOffset, onAnimationEnd])
 
   useTransitions(mode, animations, visibility)
 
@@ -232,7 +249,7 @@ function Chevron({ visibility, onAnimationEnd }) {
       }}>
       <div className={classes['wrapper']}>
         <motion.div
-          initial={{ clipPath: 'inset(100% 0 0 0)' }}
+          initial={{ opacity: 0, y: 16 }}
           animate={controls.topMenu}>
           <ChevronTop/>
         </motion.div>
@@ -243,10 +260,9 @@ function Chevron({ visibility, onAnimationEnd }) {
         className={classes['svg']}
         viewBox='0 0 0.5 1'>
         <motion.path
-          initial={{
-            translateX: pivotOffset.x,
-            d: stages[0]
-          }}
+          ref={pathRef}
+          d={stages[0]}
+          initial={{ translateX: pivotOffset.x }}
           animate={controls.path}
           stroke={color} 
           strokeWidth={thickness}
