@@ -70,6 +70,11 @@ function stripModuleMarkers() {
 export default defineConfig(({ mode }) => {
   const target = resolveTarget(mode)
   const isHosted = target === 'hosted'
+  // GitHub Pages serves from /chevron/ subpath. CI sets VITE_BASE to ensure
+  // asset URLs resolve correctly (Vite's IIFE new URL() fallback uses
+  // document.baseURI when document.currentScript is unavailable).
+  // Local/file:// builds keep '' (relative paths) so they work anywhere.
+  const base = process.env.VITE_BASE || ''
   return {
     plugins: [
       react(),
@@ -78,7 +83,7 @@ export default defineConfig(({ mode }) => {
       // build stays as an ES module inlined by vite-plugin-singlefile.
       ...(isHosted ? [stripModuleMarkers()] : [viteSingleFile()])
     ],
-    base: '',
+    base,
     preview: {
       host: '::'
     },

@@ -31,6 +31,8 @@ jobs:
       - run: npm ci
 
       - run: npm run build:hosted
+        env:
+          VITE_BASE: /chevron/
 
       - uses: actions/upload-pages-artifact@v3
         with:

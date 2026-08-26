@@ -1,6 +1,7 @@
 import { useRef, useEffect, useMemo, useCallback } from 'react'
 import parseStages from './parseStages'
 import CanvasRenderer from './canvasRenderer'
+import ChevronWorker from './chevron.worker.js?worker'
 
 const INTERNAL_WIDTH = 1920
 const INTERNAL_HEIGHT = 1920
@@ -27,10 +28,7 @@ export default function useChevronCanvas(canvasRef, { size, color, thickness }) 
     if (typeof OffscreenCanvas !== 'undefined' && canvas.transferControlToOffscreen) {
       try {
         const offscreen = canvas.transferControlToOffscreen()
-        const worker = new Worker(
-          new URL('./chevron.worker.js', import.meta.url),
-          { type: 'module' }
-        )
+        const worker = new ChevronWorker()
         worker.postMessage({
           type: 'init',
           canvas: offscreen,
