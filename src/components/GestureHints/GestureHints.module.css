@@ -1,0 +1,77 @@
+.overlay {
+  position: absolute;
+  inset: 0;
+  z-index: var(--z-overlay, 150);
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* fade the whole overlay out when dismissing */
+  opacity: 1;
+  transition: opacity 0.4s ease;
+}
+.overlay.leaving {
+  opacity: 0;
+}
+
+/* A directional hint = arrow + label, anchored to a viewport edge. */
+.hint {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--primary);
+  opacity: 0.75;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+.arrow {
+  display: inline-flex;
+  font-size: 1.8rem;
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.35));
+}
+.label {
+  white-space: nowrap;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.4);
+}
+
+/* ── Up = macros (top centre) ─────────────────────────────────────────── */
+.up {
+  top: max(env(safe-area-inset-top), 18px);
+  left: 50%;
+  transform: translateX(-50%);
+  flex-direction: column;
+}
+.up .arrow {
+  animation: nudge-up 1.6s ease-in-out infinite;
+}
+
+/* ── Left = search (left centre) ──────────────────────────────────────── */
+.left {
+  left: max(env(safe-area-inset-left), 18px);
+  top: 50%;
+  transform: translateY(-50%);
+  flex-direction: row;
+}
+.left .arrow {
+  animation: nudge-left 1.6s ease-in-out infinite;
+}
+
+@keyframes nudge-up {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-8px); }
+}
+@keyframes nudge-left {
+  0%, 100% { transform: translateX(0); }
+  50%      { transform: translateX(-8px); }
+}
+
+/* Phase 12: respect reduced-motion — no nudging, static hint only. */
+@media (prefers-reduced-motion: reduce) {
+  .up .arrow,
+  .left .arrow {
+    animation: none;
+  }
+}

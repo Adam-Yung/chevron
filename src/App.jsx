@@ -22,6 +22,7 @@ if (typeof requestIdleCallback !== 'undefined') {
   setTimeout(() => import('./components/MacrosMenu/MacrosMenu'), 200)
 }
 import OfflineIndicator from './components/OfflineIndicator/OfflineIndicator'
+import GestureHints from './components/GestureHints/GestureHints'
 import { BsGearFill, BsChevronRight, BsQuestionLg } from 'react-icons/bs'
 import { RiMenu5Fill } from 'react-icons/ri'
 import { allowedModes } from './rules'
@@ -380,6 +381,7 @@ function App() {
         <Cheatsheet open={showCheatsheet} onClose={() => setShowCheatsheet(false)} />
       </Suspense>
       <OfflineIndicator />
+      <GestureHints />
     </div>
   )
 }
