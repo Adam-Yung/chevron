@@ -25,11 +25,9 @@ import OfflineIndicator from './components/OfflineIndicator/OfflineIndicator'
 import { BsGearFill, BsChevronRight, BsQuestionLg } from 'react-icons/bs'
 import { RiMenu5Fill } from 'react-icons/ri'
 import { allowedModes } from './rules'
-import { isMobile } from './functions/webUtils/isMobile'
+import { isTouch } from './functions/webUtils/isMobile'
 import classes from './App.module.css'
 import './App.css'
-
-const ignoreMobile = localStorage.getItem('ignoreMobile')
 
 function App() {
   // settings
@@ -302,68 +300,49 @@ function App() {
   // ---
 
   return (
-    <div className='app'>
-      {
-        !isMobile || ignoreMobile
-          ? <>
-              <AnimatePresence>
-                <motion.div
-                  key={timestamp}
-                  className={classes['container']}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={redirected || { opacity: 0 }}>
-                    <ActiveElements/>
-                    <QueryField/>
-                    <LayoutButton
-                      id='settings'
-                      style={{ right: 0, top: 0 }}
-                      onClick={() => setShowSettings(state => !state)}
-                      aria-label='Open settings'>
-                        <BsGearFill/>
-                    </LayoutButton>
-                    <LayoutButton
-                      id='cheatsheet'
-                      style={{ left: 0, top: 0 }}
-                      onClick={() => setShowCheatsheet(true)}
-                      aria-label='Keyboard shortcuts'>
-                        <BsQuestionLg/>
-                    </LayoutButton>
-                    <LayoutButton
-                      id='macros-menu'
-                      style={{ right: 0, bottom: 0 }}
-                      onClick={() => switchMacrosMenu(false)}
-                      aria-label='Toggle macros menu'>
-                        {
-                          mode === 'default' && <RiMenu5Fill/>
-                        }
-                        {
-                          mode === 'opened' && <BsChevronRight/>
-                        }
-                    </LayoutButton>
-                </motion.div>
-              </AnimatePresence>
-              {showSettings && (
-                <Suspense fallback={null}>
-                  <Settings onClose={() => setShowSettings(false)} />
-                </Suspense>
-              )}
-            </>
-          : <div className={classes['mobile-warning']}>
-              <div>
-                Mobile devices are not supported :( <br />
-                <button
-                type='button'
-                className={classes['ignore-mobile-button']}
-                onClick={() => {
-                  localStorage.setItem('ignoreMobile', true)
-                  location.reload()
-                }}>
-                  ignore this warning
-                </button>
-              </div>
-            </div>
-      }
+    <div className={isTouch ? 'app is-touch' : 'app'}>
+      <AnimatePresence>
+        <motion.div
+          key={timestamp}
+          className={classes['container']}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={redirected || { opacity: 0 }}>
+            <ActiveElements/>
+            <QueryField/>
+            <LayoutButton
+              id='settings'
+              style={{ right: 0, top: 0 }}
+              onClick={() => setShowSettings(state => !state)}
+              aria-label='Open settings'>
+                <BsGearFill/>
+            </LayoutButton>
+            <LayoutButton
+              id='cheatsheet'
+              style={{ left: 0, top: 0 }}
+              onClick={() => setShowCheatsheet(true)}
+              aria-label='Keyboard shortcuts'>
+                <BsQuestionLg/>
+            </LayoutButton>
+            <LayoutButton
+              id='macros-menu'
+              style={{ right: 0, bottom: 0 }}
+              onClick={() => switchMacrosMenu(false)}
+              aria-label='Toggle macros menu'>
+                {
+                  mode === 'default' && <RiMenu5Fill/>
+                }
+                {
+                  mode === 'opened' && <BsChevronRight/>
+                }
+            </LayoutButton>
+        </motion.div>
+      </AnimatePresence>
+      {showSettings && (
+        <Suspense fallback={null}>
+          <Settings onClose={() => setShowSettings(false)} />
+        </Suspense>
+      )}
       <Suspense fallback={null}>
         <Cheatsheet open={showCheatsheet} onClose={() => setShowCheatsheet(false)} />
       </Suspense>
