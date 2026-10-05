@@ -2,6 +2,12 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <!-- Phase 9: double-tap zoom is prevented via CSS touch-action
+         (touch-action: none on .app + manipulation on controls, see App.css),
+         NOT via user-scalable=no / maximum-scale. Blocking user scaling is an
+         accessibility anti-pattern (defeats pinch-zoom for low-vision users)
+         and is ignored by modern Safari anyway. Do not add user-scalable=no.
+         width=device-width also removes the legacy 300ms tap delay. -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, interactive-widget=resizes-content" />
     <meta name="description" content="Chevron — a keyboard-driven browser start page with search, macros, AI, and weather.">
     <meta name="theme-color" content="#1a1a2e">
