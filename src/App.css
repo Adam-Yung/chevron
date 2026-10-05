@@ -17,6 +17,9 @@
   height: 100vh;
   height: 100dvh;
   overflow: hidden;
+  /* Phase 7: block the browser's native pull-to-refresh / overscroll glow so
+     a swipe-down (close macro menu) can't trigger a page reload. */
+  overscroll-behavior: none;
 }
 .app * {
   user-select: none;
@@ -45,6 +48,12 @@ body, html, #root {
   margin: 0;
   padding: 0;
   overflow: hidden;
+  /* Phase 7: pull-to-refresh is only suppressed when overscroll-behavior is
+     set on the element that actually owns the document scroll, so apply it to
+     the whole root chain. `none` stops the scroll chaining AND the refresh/
+     bounce; `-y: contain` is the explicit vertical belt-and-suspenders. */
+  overscroll-behavior: none;
+  overscroll-behavior-y: contain;
 }
 
 body {
@@ -68,4 +77,12 @@ code {
     transition-duration: 0.001ms !important;
     scroll-behavior: auto !important;
   }
+}
+
+/* Phase 7: scrollable panels (Settings, Cheatsheet, MacrosEditor, …) still
+   need real vertical scrolling, but their scroll must not chain up to the
+   document and trigger pull-to-refresh. `contain` keeps scroll local. */
+.app [data-keep-focus],
+.app [data-scrollable] {
+  overscroll-behavior: contain;
 }
