@@ -1,6 +1,7 @@
 .svg {
   position: absolute;
   height: 100vh;
+  height: 100dvh;
   overflow: visible;
   margin-left: calc((var(--thickness) / -2) - 1px);
   padding-right: calc(var(--thickness) / 2);
@@ -9,6 +10,7 @@
 .clip-container {
   clip-path: url(#quick-look-clip-path);
   height: 100vh; 
+  height: 100dvh; 
   width: 100vw;
   overflow: visible;
   position: absolute;
@@ -18,7 +20,9 @@
 .label-container {
   position: absolute;
   height: 100vh;
+  height: 100dvh;
   width: calc(50vh - var(--thickness));
+  width: calc(50dvh - var(--thickness));
   top: 0;
   display: flex;
   align-items: center;

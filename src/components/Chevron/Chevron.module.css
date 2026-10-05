@@ -5,12 +5,14 @@
   flex-wrap: wrap;
   width: 100vw;
   height: 100vh;
+  height: 100dvh;
 }
 .wrapper {
   display: flex;
   justify-content: center;
   width: 100%;
   height: calc(50vh - var(--menu-offset));
+  height: calc(50dvh - var(--menu-offset));
   font-size: 5em;
   padding: 0 15%;
   overflow: hidden;
@@ -44,9 +46,12 @@
 .svg {
   top: 0;
   left: -50vh;
+  left: -50dvh;
   position: absolute;
   width: 100vh;
+  width: 100dvh;
   height: 100vh;
+  height: 100dvh;
   overflow: visible;
   pointer-events: none;
   z-index: 2;

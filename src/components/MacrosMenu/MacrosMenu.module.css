@@ -1,6 +1,7 @@
 /* ── Splide overrides ────────────────────────────────────────────────── */
 :global(.splide__track) {
   height: calc(50vh - var(--menu-offset) - 44px);
+  height: calc(50dvh - var(--menu-offset) - 44px);
   overflow: hidden !important;
 }
 :global(.splide__slide__row) {
@@ -19,6 +20,8 @@
   min-height: 56px;
   max-width:  calc((50vh - var(--menu-offset) - 44px - 20px) / var(--grid-rows, 2));
   max-height: calc((50vh - var(--menu-offset) - 44px - 20px) / var(--grid-rows, 2));
+  max-width:  calc((50dvh - var(--menu-offset) - 44px - 20px) / var(--grid-rows, 2));
+  max-height: calc((50dvh - var(--menu-offset) - 44px - 20px) / var(--grid-rows, 2));
   padding: 5px;
 }
 :global(.splide__slide--col:last-child) {
@@ -62,6 +65,7 @@ body[data-glass-mode] :global(.splide__arrow) {
 .container {
   width: auto;
   height: calc(50vh - var(--menu-offset) - 44px);
+  height: calc(50dvh - var(--menu-offset) - 44px);
   margin: 10px 0 14px;
   overflow: hidden;
   border-radius: 18px;

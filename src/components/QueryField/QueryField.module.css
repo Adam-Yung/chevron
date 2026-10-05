@@ -2,6 +2,7 @@
   width: 100%;
   position: relative;
   margin-left: calc(50vh + 5vw);   
+  margin-left: calc(50dvh + 5vw);   
   margin-right: 5vw;
 }
 
@@ -10,6 +11,7 @@
   position: absolute;
   width: 100%;
   height: calc(50vh - 50% - 20px - 20px);
+  height: calc(50dvh - 50% - 20px - 20px);
   font-size: 1.3em;
   font-family: var(--font), Arial, Helvetica, sans-serif;
   margin-bottom: 20px;
