@@ -1,6 +1,13 @@
 .container {
   position: absolute;
-  margin: 1.5em;
+  /* Phase 11: keep buttons clear of notches / rounded corners by growing the
+     corner margin to at least the relevant safe-area insets. Falls back to the
+     plain 1.5em on devices without env() support. */
+  margin:
+    max(1.5em, env(safe-area-inset-top))
+    max(1.5em, env(safe-area-inset-right))
+    max(1.5em, env(safe-area-inset-bottom))
+    max(1.5em, env(safe-area-inset-left));
   cursor: pointer;
   z-index: 100;
   transition: opacity .3s;
@@ -24,7 +31,9 @@
 }
 
 /* Phase 6: guarantee a comfortable tap target on touch devices. The icon
-   stays visually the same size; the button grows to >=44px and centers it. */
+   stays visually the same size; the button grows to >=44px and centers it.
+   Phase 11: the corner margin still honours the safe-area insets (minus the
+   10px padding added here) so the enlarged button clears notches. */
 @media (pointer: coarse) {
   .container {
     display: inline-flex;
@@ -32,8 +41,11 @@
     justify-content: center;
     min-width: 44px;
     min-height: 44px;
-    /* Pull back the padding so the visual icon position is unchanged. */
     padding: 10px;
-    margin: calc(1.5em - 10px);
+    margin:
+      max(calc(1.5em - 10px), calc(env(safe-area-inset-top) - 10px))
+      max(calc(1.5em - 10px), calc(env(safe-area-inset-right) - 10px))
+      max(calc(1.5em - 10px), calc(env(safe-area-inset-bottom) - 10px))
+      max(calc(1.5em - 10px), calc(env(safe-area-inset-left) - 10px));
   }
 }
