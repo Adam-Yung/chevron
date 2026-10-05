@@ -118,12 +118,12 @@ function AIcompletion({ query, className }) {
   return <>
     <Icon className={classes['icon']} onClick={e => e.stopPropagation()}/>
     {waiting && !completion && (
-      <div className={className} onClick={e => e.stopPropagation()}>
+      <div className={className} data-scrollable onClick={e => e.stopPropagation()}>
         <div className={classes['thinking']}>thinking…</div>
       </div>
     )}
     {completion && (
-      <div className={className} onClick={e => e.stopPropagation()}>
+      <div className={className} data-scrollable onClick={e => e.stopPropagation()}>
         <div className={classes['md-container']}>
           {renderMarkdown(completion)}
         </div>

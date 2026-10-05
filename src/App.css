@@ -86,3 +86,28 @@ code {
 .app [data-scrollable] {
   overscroll-behavior: contain;
 }
+
+/* ── Phase 8: touch-action authority ───────────────────────────────────
+   Give our gesture engine (useGestures) sole authority over raw touch on the
+   root so the browser never pre-empts a swipe with its own scroll/zoom/nav.
+   touch-action: none also reinforces pull-to-refresh avoidance (Phase 7) and
+   double-tap zoom prevention (Phase 9). */
+.app {
+  touch-action: none;
+}
+/* Exceptions: genuinely scrollable content keeps vertical panning. */
+.app [data-keep-focus],
+.app [data-scrollable] {
+  touch-action: pan-y;
+}
+/* Interactive controls: instant taps, no 300ms delay, no double-tap zoom,
+   while still allowing scroll where the control sits inside a scroller. */
+.app button,
+.app .card,
+.app [role="button"],
+.app textarea,
+.app input,
+.app a[href],
+.app summary {
+  touch-action: manipulation;
+}

@@ -24,6 +24,7 @@ function Suggestions({ suggestions, selectedSuggestion, queryMode, buttonMode, o
       id={SUGGESTIONS_LISTBOX_ID}
       role="listbox"
       aria-label="Search suggestions"
+      data-scrollable
       className={gC(classes['container'], classes[queryMode])}>
       { suggestions.map((suggestion, index) =>
         <Suggestion
