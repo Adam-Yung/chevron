@@ -45,13 +45,14 @@
 
 .svg {
   top: 0;
-  left: -50vh;
-  left: -50dvh;
+  /* Phase 10: derive the chevron's horizontal geometry from --chev so it
+     stays proportional in portrait (where raw vh would overflow). The SVG is
+     a square of side 2*--chev, pulled left by --chev so its point lands at the
+     horizontal centre of the viewport. */
+  left: calc(var(--chev) * -1);
   position: absolute;
-  width: 100vh;
-  width: 100dvh;
-  height: 100vh;
-  height: 100dvh;
+  width: calc(var(--chev) * 2);
+  height: calc(var(--chev) * 2);
   overflow: visible;
   pointer-events: none;
   z-index: 2;

@@ -20,6 +20,18 @@
   /* Phase 7: block the browser's native pull-to-refresh / overscroll glow so
      a swipe-down (close macro menu) can't trigger a page reload. */
   overscroll-behavior: none;
+  /* Phase 10: single source of truth for the chevron's half-size. Horizontal
+     measures in Chevron / QueryField derive from --chev so the chevron stays
+     proportional in both orientations. Landscape scales off height (vh);
+     portrait scales off width (vw) because vh >> vw there and vh-based
+     horizontal measures would overflow the screen. */
+  --chev: 50vh;
+  --chev: 50dvh;
+}
+@media (orientation: portrait) {
+  .app {
+    --chev: 40vw;
+  }
 }
 .app * {
   user-select: none;

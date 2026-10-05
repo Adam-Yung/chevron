@@ -1,8 +1,9 @@
 .container {
   width: 100%;
   position: relative;
-  margin-left: calc(50vh + 5vw);   
-  margin-left: calc(50dvh + 5vw);   
+  /* Phase 10: offset the field to the right of the side-docked chevron using
+     the shared --chev variable so it tracks orientation. */
+  margin-left: calc(var(--chev) + 5vw);
   margin-right: 5vw;
 }
 

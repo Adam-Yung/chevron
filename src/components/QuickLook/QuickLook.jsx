@@ -245,8 +245,13 @@ function useViewportSize() {
       })
     }
     window.addEventListener('resize', onResize)
+    // Phase 10: some Android browsers fire `resize` late (or not at all) on
+    // rotation, so also listen to orientationchange to re-measure the chevron
+    // snapshot promptly after the viewport flips.
+    window.addEventListener('orientationchange', onResize)
     return () => {
       window.removeEventListener('resize', onResize)
+      window.removeEventListener('orientationchange', onResize)
       if (frame !== null) cancelAnimationFrame(frame)
     }
   }

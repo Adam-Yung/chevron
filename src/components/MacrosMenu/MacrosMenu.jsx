@@ -52,6 +52,27 @@ function MacrosMenu({ visibility, fullVisibility }) {
     typeof window.matchMedia === 'function' &&
     window.matchMedia('(pointer: coarse)').matches
   )
+
+  // Phase 10: track portrait orientation so the macro grid can re-flow. In
+  // portrait there is less width but more height, so a wide landscape grid
+  // (e.g. 4x2) looks cramped — we transpose toward more rows / fewer columns.
+  const [isPortrait, setIsPortrait] = useState(() =>
+    typeof window !== 'undefined' &&
+    typeof window.matchMedia === 'function' &&
+    window.matchMedia('(orientation: portrait)').matches
+  )
+  useEffect(() => {
+    if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return
+    const mql = window.matchMedia('(orientation: portrait)')
+    const onChange = (e) => setIsPortrait(e.matches)
+    // Safari <14 only supports addListener; guard for both.
+    if (mql.addEventListener) mql.addEventListener('change', onChange)
+    else mql.addListener(onChange)
+    return () => {
+      if (mql.removeEventListener) mql.removeEventListener('change', onChange)
+      else mql.removeListener(onChange)
+    }
+  }, [])
   const hintsActive = !isPointerCoarse && (macroHintsKeyboard || macroFilter.length > 0)
   const [isCardInFocus, setIsCardInFocus] = useState(false)
   // Tab-cycling cursor: index into visibleMacros, or null for no selection.
@@ -65,6 +86,14 @@ function MacrosMenu({ visibility, fullVisibility }) {
   const activeRows     = rows
   const slideCapacity  = cols * activeRows
   const isVisibleSliderHasMultipleSlides = visibleMacros.length > slideCapacity
+
+  // Phase 10: in portrait, transpose the grid so it is taller than it is wide
+  // (more rows, fewer columns) to suit the narrower width. Capacity per page
+  // is preserved, so pagination behaviour is unchanged. Only applies on
+  // portrait touch screens; landscape and desktop keep the configured dims.
+  const usePortraitGrid = isPortrait && isPointerCoarse && cols !== activeRows
+  const effectiveCols = usePortraitGrid ? Math.min(cols, activeRows) : cols
+  const effectiveRows = usePortraitGrid ? Math.max(cols, activeRows) : activeRows
 
   const updateValue = useUpdate()
   const redirect    = useRedirect()
@@ -141,8 +170,8 @@ function MacrosMenu({ visibility, fullVisibility }) {
       wheel: false,
       keyboard: allowedModes.get('Slider').has(mode) ? 'global' : false,
       grid: {
-        cols,
-        rows: activeRows,
+        cols: effectiveCols,
+        rows: effectiveRows,
         gap: { col: gap + 'px', row: gap + 'px' }
       }
     }
@@ -206,7 +235,7 @@ function MacrosMenu({ visibility, fullVisibility }) {
       <div
       ref={containerRef}
       className={classes['container']}
-      style={{ '--grid-rows': activeRows }}>
+      style={{ '--grid-rows': effectiveRows }}>
       {isEmpty ? (
         <div className={classes['empty']}>
           <span className={classes['empty-icon']}>🔍</span>
@@ -217,7 +246,7 @@ function MacrosMenu({ visibility, fullVisibility }) {
         // Key on macroFilter so Splide remounts on filter change (8a behavior,
         // retained per Option A in § 3.5.3). The stagger re-fires on remount,
         // which is the desired effect — new card set slides in fresh.
-        <Splide {...splideOptions} key={macroFilter || '__all__'}>
+        <Splide {...splideOptions} key={`${macroFilter || '__all__'}:${effectiveCols}x${effectiveRows}`}>
           {visibleMacros.map((pm, idx) => {
             const needle     = macroFilter.trim().toLowerCase()
             const nameLower  = pm.name.toLowerCase()
