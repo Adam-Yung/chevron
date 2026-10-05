@@ -48,6 +48,23 @@
   display: none;
 }
 
+/* Phase 5 / Phase 10: touch search layout.
+   When the app enters searching mode on a touch device (.touch-searching set
+   on .app), the virtual keyboard shrinks the visible viewport. Pull the query
+   field up toward the top so it isn't hidden behind the keyboard, drop the
+   landscape side-dock margin that assumes a chevron on the left, and center it.
+   The suggestions list flows naturally below. */
+:global(.touch-searching) .container {
+  margin-left: auto;
+  margin-right: auto;
+  padding: 0 5vw;
+  position: absolute;
+  top: max(env(safe-area-inset-top), 16px);
+  left: 0;
+  right: 0;
+  z-index: var(--z-content, 10);
+}
+
 /* No focus ring — input is already the dominant visual element */
 .field:focus-visible {
   outline: none;

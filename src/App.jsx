@@ -327,7 +327,13 @@ function App() {
   // ---
 
   return (
-    <div className={isTouch ? 'app is-touch' : 'app'}>
+    <div className={
+      [
+        'app',
+        isTouch && 'is-touch',
+        isTouch && mode === 'searching' && 'touch-searching',
+      ].filter(Boolean).join(' ')
+    }>
       <AnimatePresence>
         <motion.div
           key={timestamp}

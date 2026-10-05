@@ -15,6 +15,7 @@ const AIcompletion = lazy(() => import('../AIcompletion/AIcompletion'))
 import googleAutocomplete from '../../autocomplete/googleAutocomplete'
 import History from '../../classes/localStorage/history'
 import gC from '../../functions/generationUtils/getClasses'
+import { GESTURE_FOCUS_SEARCH, GESTURE_BLUR_SEARCH } from '../../functions/webUtils/gestureEvents'
 import classes from './QueryField.module.css'
 import { useState } from 'react'
 
@@ -263,6 +264,25 @@ function QueryField () {
     if (window.matchMedia('(pointer: coarse)').matches) return
     inputRef.current.blur()
     inputRef.current.focus()
+  }, [])
+
+  // Phase 5: respond to intentional touch gestures. The page-load guard
+  // above still suppresses auto-focus on coarse pointers, but when the user
+  // deliberately swipes left into search, App emits GESTURE_FOCUS_SEARCH and
+  // we focus the field here — synchronously within the gesture call stack so
+  // the mobile browser is allowed to raise the virtual keyboard. Swipe-right
+  // out of search emits GESTURE_BLUR_SEARCH, which dismisses the keyboard.
+  useEffect(() => {
+    const onFocusSearch = () => inputRef.current?.focus()
+    const onBlurSearch  = () => {
+      if (document.activeElement === inputRef.current) inputRef.current.blur()
+    }
+    window.addEventListener(GESTURE_FOCUS_SEARCH, onFocusSearch)
+    window.addEventListener(GESTURE_BLUR_SEARCH, onBlurSearch)
+    return () => {
+      window.removeEventListener(GESTURE_FOCUS_SEARCH, onFocusSearch)
+      window.removeEventListener(GESTURE_BLUR_SEARCH, onBlurSearch)
+    }
   }, [])
   
   // css variables
