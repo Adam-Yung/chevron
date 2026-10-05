@@ -60,7 +60,9 @@
   opacity: 0.65;
   transition: opacity 120ms ease, border-color 120ms ease;
 }
-.tab:hover { opacity: 0.9; }
+@media (hover: hover) {
+  .tab:hover { opacity: 0.9; }
+}
 .tab.active {
   opacity: 1;
   border-bottom-color: var(--accent, var(--primary, #4a86ff));
@@ -82,8 +84,10 @@
   cursor: pointer;
   transition: background 120ms ease, border-color 120ms ease;
 }
-.btn:hover {
-  background: rgba(255, 255, 255, 0.14);
+@media (hover: hover) {
+  .btn:hover {
+    background: rgba(255, 255, 255, 0.14);
+  }
 }
 .btn:focus-visible {
   outline: 2px solid var(--accent, var(--primary));
@@ -116,7 +120,9 @@
   cursor: pointer;
   padding: 0;
 }
-.iconBtn:hover { background: rgba(255, 255, 255, 0.12); }
+@media (hover: hover) {
+  .iconBtn:hover { background: rgba(255, 255, 255, 0.12); }
+}
 .iconBtn:focus-visible {
   outline: 2px solid var(--accent, var(--primary));
   outline-offset: 2px;
@@ -187,7 +193,9 @@
   opacity: 0.7;
   transition: background 0.15s ease, opacity 0.15s ease;
 }
-.closeBtn:hover { opacity: 1; background: rgba(255,255,255,0.08); }
+@media (hover: hover) {
+  .closeBtn:hover { opacity: 1; background: rgba(255,255,255,0.08); }
+}
 .closeBtn:focus-visible { outline: 2px solid var(--accent, var(--primary)); outline-offset: 2px; }
 
 /* Embedded body (no backdrop / dialog chrome) — used inside Settings. */
@@ -316,7 +324,9 @@
   padding: 0 4px;
   opacity: 0.6;
 }
-.chip button:hover { opacity: 1; }
+@media (hover: hover) {
+  .chip button:hover { opacity: 1; }
+}
 .chips input {
   background: transparent;
   border: 0;
@@ -348,7 +358,9 @@
   font-size: 0.85em;
   font-family: inherit;
 }
-.gradientNote button:hover { background: rgba(255, 200, 100, 0.1); }
+@media (hover: hover) {
+  .gradientNote button:hover { background: rgba(255, 200, 100, 0.1); }
+}
 
 .commandsList {
   display: flex;
@@ -373,7 +385,9 @@
   font-size: 0.85em;
   cursor: pointer;
 }
-.addBtn:hover { background: rgba(255, 255, 255, 0.12); }
+@media (hover: hover) {
+  .addBtn:hover { background: rgba(255, 255, 255, 0.12); }
+}
 .addBtn:focus-visible {
   outline: 2px solid var(--accent, var(--primary));
   outline-offset: 2px;

@@ -22,8 +22,10 @@
   min-height: 36px;
   transition: opacity 0.15s, border-color 0.15s;
 }
-.trigger:hover {
-  border-color: rgba(255, 255, 255, 0.25);
+@media (hover: hover) {
+  .trigger:hover {
+    border-color: rgba(255, 255, 255, 0.25);
+  }
 }
 .trigger:focus-visible {
   border-color: var(--accent, var(--primary, #4a86ff));

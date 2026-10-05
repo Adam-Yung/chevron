@@ -43,8 +43,10 @@ body[data-glass-mode] :global(.splide__arrow) {
   fill: var(--primary) !important;
   opacity: 0.75;
 }
-:global(.splide__arrow:hover) {
-  background: color-mix(in srgb, var(--primary) 20%, transparent) !important;
+@media (hover: hover) {
+  :global(.splide__arrow:hover) {
+    background: color-mix(in srgb, var(--primary) 20%, transparent) !important;
+  }
 }
 
 /* Pagination dots */

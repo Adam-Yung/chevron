@@ -12,7 +12,9 @@
   cursor: pointer;
   transition: filter 0.12s ease;
 }
-.btn:hover { filter: brightness(1.15); }
+@media (hover: hover) {
+  .btn:hover { filter: brightness(1.15); }
+}
 .btn:active { filter: brightness(0.9); }
 
 .primary {

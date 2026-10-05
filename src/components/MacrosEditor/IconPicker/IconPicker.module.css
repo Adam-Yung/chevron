@@ -23,8 +23,10 @@
   min-height: 36px;
   transition: opacity 0.15s, border-color 0.15s;
 }
-.trigger:hover {
-  border-color: rgba(255, 255, 255, 0.25);
+@media (hover: hover) {
+  .trigger:hover {
+    border-color: rgba(255, 255, 255, 0.25);
+  }
 }
 .trigger:focus-visible {
   border-color: var(--accent, var(--primary, #4a86ff));
@@ -124,8 +126,10 @@
   color: inherit;
   transition: background 0.1s, border-color 0.1s;
 }
-.swatch:hover {
-  background: rgba(128, 128, 128, 0.2);
+@media (hover: hover) {
+  .swatch:hover {
+    background: rgba(128, 128, 128, 0.2);
+  }
 }
 .swatch.selected {
   border-color: rgba(128, 128, 128, 0.6);

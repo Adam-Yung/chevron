@@ -42,10 +42,12 @@ body[data-glass-mode] .suggestion > div {
   -webkit-backdrop-filter: blur(10px);
   background: color-mix(in srgb, var(--primary) 4%, transparent);
 }
-.suggestion > div:hover {
-  background: color-mix(in srgb, var(--primary) 12%, transparent);
-  border-color: rgba(255, 255, 255, 0.14);
-  transform: translateY(-1px);
+@media (hover: hover) {
+  .suggestion > div:hover {
+    background: color-mix(in srgb, var(--primary) 12%, transparent);
+    border-color: rgba(255, 255, 255, 0.14);
+    transform: translateY(-1px);
+  }
 }
 
 /* Sources */
@@ -114,13 +116,15 @@ body[data-glass-mode][data-color-scheme=light] .suggestion > div {
   -webkit-backdrop-filter: blur(14px) saturate(1.6);
   background: rgba(255, 255, 255, 0.42);
 }
-body[data-color-scheme=light] .suggestion > div:hover {
-  background: rgba(255, 255, 255, 0.72);
-  border-color: rgba(0, 0, 0, 0.12);
-  box-shadow:
-    0 4px 16px rgba(0, 0, 0, 0.10),
-    0 1px 0 rgba(255, 255, 255, 1) inset;
-  transform: translateY(-1px);
+@media (hover: hover) {
+  body[data-color-scheme=light] .suggestion > div:hover {
+    background: rgba(255, 255, 255, 0.72);
+    border-color: rgba(0, 0, 0, 0.12);
+    box-shadow:
+      0 4px 16px rgba(0, 0, 0, 0.10),
+      0 1px 0 rgba(255, 255, 255, 1) inset;
+    transform: translateY(-1px);
+  }
 }
 body[data-color-scheme=light] .suggestion.selected > div {
   background: rgba(255, 255, 255, 0.82);

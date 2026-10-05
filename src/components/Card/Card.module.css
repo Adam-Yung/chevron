@@ -60,13 +60,24 @@ body[data-glass-mode] .card {
 .plate::before {
   transition: opacity .2s;
 }
-.card:hover,
 .card[data-tab-focused] {
   transform: scale(1.05);
   box-shadow:
     0 8px 32px rgba(0, 0, 0, 0.35),
     0 1px 0 rgba(255, 255, 255, 0.12) inset;
   border-color: rgba(255, 255, 255, 0.18);
+}
+/* Phase 13: hover scale only on true hover pointers — on touch it latches on
+   tap-down and sticks until another element is tapped (a stuck-scaled card).
+   The :active press feedback below stays unguarded (desirable on touch). */
+@media (hover: hover) {
+  .card:hover {
+    transform: scale(1.05);
+    box-shadow:
+      0 8px 32px rgba(0, 0, 0, 0.35),
+      0 1px 0 rgba(255, 255, 255, 0.12) inset;
+    border-color: rgba(255, 255, 255, 0.18);
+  }
 }
 .card:active {
   transform: scale(0.96);
@@ -181,8 +192,13 @@ body[data-color-scheme=light] .label-char-match {
   will-change: transform, opacity;
   box-shadow: 0 2px 0 rgba(255, 255, 255, 0.15) inset, 0 4px 16px rgba(0,0,0,0.25);
 }
-.card:hover .plate, .card:active .plate, .card[data-tab-focused] .plate, .plate.detached {
+.card:active .plate, .card[data-tab-focused] .plate, .plate.detached {
   background-size: 100% 100%;
+}
+@media (hover: hover) {
+  .card:hover .plate {
+    background-size: 100% 100%;
+  }
 }
 .plate::before {
   content: '';
@@ -194,12 +210,17 @@ body[data-color-scheme=light] .label-char-match {
   transition: opacity .5s;
 }
 .plate::before { opacity: .22; }
-.card:hover .plate::before, .card:active .plate::before, .card[data-tab-focused] .plate::before, .plate.detached::before { opacity: .08; }
+.card:active .plate::before, .card[data-tab-focused] .plate::before, .plate.detached::before { opacity: .08; }
+@media (hover: hover) {
+  .card:hover .plate::before { opacity: .08; }
+}
 body[data-color-scheme=light] .plate::before { opacity: .15; }
-body[data-color-scheme=light] .card:hover .plate::before,
 body[data-color-scheme=light] .card:active .plate::before,
 body[data-color-scheme=light] .card[data-tab-focused] .plate::before,
 body[data-color-scheme=light] .plate.detached::before { opacity: 0; }
+@media (hover: hover) {
+  body[data-color-scheme=light] .card:hover .plate::before { opacity: 0; }
+}
 
 /* ── Logo / icon ─────────────────────────────────────────────────────── */
 .logo-wrapper {

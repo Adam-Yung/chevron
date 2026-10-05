@@ -12,7 +12,9 @@
   transition: opacity 0.15s;
   opacity: 0.92;
 }
-.row:hover { opacity: 1; }
+@media (hover: hover) {
+  .row:hover { opacity: 1; }
+}
 
 /* When weather data hasn't loaded yet — just the clock */
 .row-plain {

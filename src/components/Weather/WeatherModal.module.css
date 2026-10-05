@@ -81,7 +81,9 @@ body[data-glass-mode] .backdrop {
   transition: background 0.15s;
   z-index: 2;
 }
-.close:hover { background: rgba(255,255,255,0.22); }
+@media (hover: hover) {
+  .close:hover { background: rgba(255,255,255,0.22); }
+}
 
 /* ── Hero meta (city + stale) ───────────────────────────────────────── */
 .hero-meta {
@@ -194,8 +196,10 @@ body[data-glass-mode] .backdrop {
   min-width: 60px;
   transition: background 0.15s;
 }
-.day-card:hover {
-  background: color-mix(in srgb, var(--primary) 12%, transparent);
+@media (hover: hover) {
+  .day-card:hover {
+    background: color-mix(in srgb, var(--primary) 12%, transparent);
+  }
 }
 
 .day-label { font-size: 0.78em; font-weight: 700; opacity: 0.9; }

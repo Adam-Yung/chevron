@@ -18,7 +18,9 @@
   cursor: pointer;
   transition: filter 0.12s ease;
 }
-.trigger-btn:hover { filter: brightness(1.1); }
+@media (hover: hover) {
+  .trigger-btn:hover { filter: brightness(1.1); }
+}
 .trigger-btn:active { filter: brightness(0.9); }
 
 .popover {
@@ -96,7 +98,9 @@
   cursor: help;
   opacity: 0.7;
 }
-.tooltip-trigger:hover { opacity: 1; }
+@media (hover: hover) {
+  .tooltip-trigger:hover { opacity: 1; }
+}
 
 .tooltip-trigger::after {
   content: attr(data-tip);
@@ -118,6 +122,8 @@
   z-index: 10001;
   box-shadow: 0 4px 12px rgba(0,0,0,0.4);
 }
-.tooltip-trigger:hover::after {
-  opacity: 1;
+@media (hover: hover) {
+  .tooltip-trigger:hover::after {
+    opacity: 1;
+  }
 }
