@@ -7,6 +7,7 @@ import { Grid } from '@splidejs/splide-extension-grid'
 import { motion } from 'framer-motion'
 import Card from '../Card/Card'
 import { allowedModes } from '../../rules'
+import { GESTURE_MACRO_PAGE } from '../../functions/webUtils/gestureEvents'
 import { pinnedMacros, score } from './macroData'
 import { readableMatchColor } from '../MacrosEditor/colorHelpers'
 import classes from './MacrosMenu.module.css'
@@ -131,7 +132,10 @@ function MacrosMenu({ visibility, fullVisibility }) {
     options: {
       pagination,
       arrows: arrows && isVisibleSliderHasMultipleSlides,
-      drag:   drag   && isVisibleSliderHasMultipleSlides,
+      // Phase 4: on touch devices our global gesture engine owns horizontal
+      // swipes (and drives pagination via splide.go), so disable Splide's
+      // built-in drag to avoid two handlers competing for the same gesture.
+      drag:   !isPointerCoarse && drag && isVisibleSliderHasMultipleSlides,
       perPage: 1,
       // Disable Splide's built-in wheel so we can implement weighted snap.
       wheel: false,
@@ -180,6 +184,20 @@ function MacrosMenu({ visibility, fullVisibility }) {
       clearTimeout(decayTimer)
     }
   }, [enableTrackpad]) // containerRef and sliderRef are stable refs
+
+  // Phase 4: paginate macro pages in response to global left/right swipes.
+  // App dispatches GESTURE_MACRO_PAGE (detail.dir '+' | '-') from the touch
+  // handler; we forward it to Splide. Guarded on `opened` mode so stray
+  // events in other states are ignored.
+  useEffect(() => {
+    const onMacroPage = (e) => {
+      if (mode !== 'opened') return
+      const dir = e.detail?.dir
+      if (dir === '+' || dir === '-') sliderRef.current?.splide?.go(dir)
+    }
+    window.addEventListener(GESTURE_MACRO_PAGE, onMacroPage)
+    return () => window.removeEventListener(GESTURE_MACRO_PAGE, onMacroPage)
+  }, [mode]) // sliderRef is a stable ref
 
   // Phase 8c: empty state when filter matches nothing.
   const isEmpty = macroFilter.length > 0 && visibleMacros.length === 0

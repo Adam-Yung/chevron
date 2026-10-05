@@ -26,6 +26,7 @@ import { BsGearFill, BsChevronRight, BsQuestionLg } from 'react-icons/bs'
 import { RiMenu5Fill } from 'react-icons/ri'
 import { allowedModes } from './rules'
 import { isTouch } from './functions/webUtils/isMobile'
+import { emitFocusSearch, emitBlurSearch, emitMacroPage } from './functions/webUtils/gestureEvents'
 import classes from './App.module.css'
 import './App.css'
 
@@ -165,16 +166,42 @@ function App() {
   // (matters during the open transition).
   useMacroFilter()
 
-  // Phase 8e: touch swipe gestures.
-  // Left/right are intentionally omitted — Splide handles in-menu
-  // horizontal swipes natively and we don't want to double-fire.
+  // Phase 8e / Phase 4: touch swipe gestures.
+  //  - default: swipe-up opens macros; swipe-left enters search (focuses the
+  //    field inside the gesture call stack so the virtual keyboard opens).
+  //  - opened:  swipe-down closes; swipe-left/right paginate macro pages via
+  //    Splide (driven through a window event so App stays decoupled from the
+  //    lazy-loaded MacrosMenu's slider ref).
+  //  - searching: swipe-right dismisses the keyboard, clears the query, and
+  //    returns to default.
   useGestures({
-    onSwipeUp:   enableSwipe
-      ? () => { if (modeRef.current === 'default') switchMacrosMenuRef.current(false) }
-      : undefined,
-    onSwipeDown: enableSwipe
-      ? () => { if (modeRef.current !== 'default') updateStore({ mode: 'default' }) }
-      : undefined,
+    enabled: enableSwipe,
+    onSwipeUp: () => {
+      if (modeRef.current === 'default') switchMacrosMenuRef.current(false)
+    },
+    onSwipeDown: () => {
+      if (modeRef.current !== 'default') updateStore({ mode: 'default' })
+    },
+    onSwipeLeft: () => {
+      const liveMode = modeRef.current
+      if (liveMode === 'default') {
+        modeRef.current = 'searching'
+        updateStore({ mode: 'searching' })
+        emitFocusSearch()
+      } else if (liveMode === 'opened') {
+        emitMacroPage('+')
+      }
+    },
+    onSwipeRight: () => {
+      const liveMode = modeRef.current
+      if (liveMode === 'searching') {
+        emitBlurSearch()
+        modeRef.current = 'default'
+        updateStore({ query: '', selectedSuggestion: null, mode: 'default' })
+      } else if (liveMode === 'opened') {
+        emitMacroPage('-')
+      }
+    },
   })
 
   // adding event listeners

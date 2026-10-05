@@ -12,11 +12,13 @@ const TRANSITIONS = {
     QUERY_TYPED:  { target: 'searching' },
     CONTEXT_MENU: { target: 'opened' },
     SWIPE_UP:     { target: 'opened' },
+    SWIPE_LEFT:   { target: 'searching' },
     SCROLL_UP:    { target: 'opened' },
   },
   searching: {
     QUERY_CLEARED: { target: 'default' },
     SHIFT_PRESS:   { target: 'default' },
+    SWIPE_RIGHT:   { target: 'default' },
     REDIRECT:      { target: 'redirected' },
   },
   opened: {
@@ -24,6 +26,8 @@ const TRANSITIONS = {
     ESC_PRESS:    { target: 'default' },
     SCROLL_DOWN:  { target: 'default' },
     SWIPE_DOWN:   { target: 'default' },
+    SWIPE_LEFT:   { target: 'opened' },
+    SWIPE_RIGHT:  { target: 'opened' },
     CONTEXT_MENU: { target: 'default' },
   },
   redirected: {
