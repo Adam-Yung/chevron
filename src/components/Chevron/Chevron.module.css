@@ -43,6 +43,22 @@
   width: auto;
 }
 
+/* The two framer-motion wrappers (ChevronTop + MacrosMenu) animate their
+   transform during the open/close transition. Promote them to their own
+   compositor layer so the heavy card subtree (box-shadows, gradients,
+   optional backdrop-filter) is rasterised once and merely translated by the
+   GPU, instead of repainting on the main thread every frame. Mirrors the
+   will-change hint already on .svg. */
+.menu-layer {
+  will-change: transform;
+  backface-visibility: hidden;
+}
+@media (prefers-reduced-motion: reduce) {
+  .menu-layer {
+    will-change: auto;
+  }
+}
+
 .svg {
   top: 0;
   /* Phase 10: derive the chevron's horizontal geometry from --chev so it

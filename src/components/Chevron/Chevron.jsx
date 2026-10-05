@@ -146,6 +146,7 @@ function Chevron({ visibility, onAnimationEnd }) {
       }}>
       <div className={classes['wrapper']}>
         <motion.div
+          className={classes['menu-layer']}
           initial={{ opacity: 0, y: 16 }}
           animate={controls.topMenu}>
           <ChevronTop/>
@@ -164,6 +165,7 @@ function Chevron({ visibility, onAnimationEnd }) {
       </motion.div>
       <div className={classes['wrapper']}>
         <motion.div
+          className={classes['menu-layer']}
           initial={{ translateY: '-100%'}}
           animate={controls.bottomMenu}>
           <Suspense fallback={null}>
