@@ -58,6 +58,20 @@ body[data-glass-mode] :global(.splide__arrow) {
   transform: scale(1.3) !important;
 }
 
+/* Phase 6: enlarge Splide controls for touch — bigger pagination dots with
+   generous spacing and larger arrow hit targets. */
+@media (pointer: coarse) {
+  :global(.splide__pagination__page) {
+    width: 14px !important;
+    height: 14px !important;
+    margin: 6px !important;
+  }
+  :global(.splide__arrow) {
+    width: 44px !important;
+    height: 44px !important;
+  }
+}
+
 /* ── Container ────────────────────────────────────────────────────────── */
 /* No outer glass — the individual card surfaces provide all the depth
    needed. A backdrop-filter on the whole container fought with the cards

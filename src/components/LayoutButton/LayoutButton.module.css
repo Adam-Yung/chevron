@@ -22,3 +22,18 @@
   width: 1.75em;
   height: 1.75em;
 }
+
+/* Phase 6: guarantee a comfortable tap target on touch devices. The icon
+   stays visually the same size; the button grows to >=44px and centers it. */
+@media (pointer: coarse) {
+  .container {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 44px;
+    min-height: 44px;
+    /* Pull back the padding so the visual icon position is unchanged. */
+    padding: 10px;
+    margin: calc(1.5em - 10px);
+  }
+}

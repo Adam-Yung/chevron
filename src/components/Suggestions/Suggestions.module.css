@@ -138,3 +138,16 @@ body[data-color-scheme=light] :global(.forwarding) .suggestion.selected > div {
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
   transform: scale(0.97);
 }
+
+/* Phase 6: taller, roomier suggestion pills on touch for easy tapping
+   (>=44px row height via increased vertical padding). */
+@media (pointer: coarse) {
+  .suggestion > div {
+    padding: 12px 20px;
+    min-height: 44px;
+    align-items: center;
+  }
+  .container.default {
+    gap: 10px;
+  }
+}

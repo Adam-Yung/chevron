@@ -109,6 +109,14 @@
   outline: 2px solid var(--accent, var(--primary));
   outline-offset: 2px;
 }
+
+/* Phase 6: comfortable tap target for settings navigation tabs on touch. */
+@media (pointer: coarse) {
+  .tab {
+    padding: 12px 14px;
+    min-height: 44px;
+  }
+}
 .tabIcon {
   display: inline-flex;
   font-size: 1.1em;
