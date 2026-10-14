@@ -12,19 +12,21 @@ const __dirname = dirname(fileURLToPath(import.meta.url))
 const pkg = JSON.parse(readFileSync(resolve(__dirname, 'package.json'), 'utf8'))
 const APP_VERSION = pkg.version || '0.0.0'
 
-/* Two build profiles, both produced by `vite build` (Phase 6):
+/* Two build profiles, both produced by `vite build`:
  *
- *   build:static  – inlines every JS / CSS chunk into a single HTML file
- *                   via `vite-plugin-singlefile`. This is the artifact
- *                   shipped in the GitHub release zip and the one used by
+ *   build:static  – inlines every JS / CSS chunk into a single IIFE HTML
+ *                   file via `vite-plugin-singlefile` (then stripModuleMarkers
+ *                   removes type=module/crossorigin for file:// use). This is
+ *                   the artifact shipped in the GitHub release zip and used by
  *                   the local Express bundle.
  *
- *   build:hosted  – default multi-chunk Vite output. Each chunk is named
- *                   with a content hash so the browser can cache forever.
- *                   When the version in package.json bumps, the helper
- *                   scripts in /public are also versioned via `?v=<ver>`
- *                   so they are re-fetched even though their filename
- *                   never changes.
+ *   build:hosted  – real ES-module output with code splitting. React.lazy
+ *                   boundaries (Settings, Weather, Cheatsheet, AIcompletion,
+ *                   MacrosMenu) and big vendors (react, framer-motion, splide,
+ *                   minisearch) emit as separate content-hashed chunks that
+ *                   load on demand and cache forever. VitePWA precaches them
+ *                   all. GitHub Pages serves over HTTP so modules load fine.
+ *                   Helper scripts in /public are versioned via `?v=<ver>`.
  *
  * Pick the profile via `VITE_BUILD_TARGET=static|hosted vite build` (the
  * `build:*` package.json scripts wire that up).
@@ -77,30 +79,33 @@ export default defineConfig(({ mode }) => {
     plugins: [
       react(),
       publicCacheBust(),
-      // Hosted (GitHub Pages) build only:
-      //   1. VitePWA — Workbox generates sw.js + a versioned precache of the
-      //      app shell so repeat/offline visits are served from local cache
-      //      with no network round-trip. Must run BEFORE stripModuleMarkers so
-      //      the post-pass can normalise anything VitePWA injects into the HTML.
-      //   2. stripModuleMarkers — drops type="module"/crossorigin so the IIFE
-      //      bundle also works from file://.
-      // The static build stays an ES module inlined by vite-plugin-singlefile.
+      // Build-profile-specific plugins:
+      //
+      //   Hosted (GitHub Pages, HTTP): real ES-module output with code
+      //   splitting (see rollupOptions below). VitePWA/Workbox generates
+      //   sw.js + a versioned precache of every emitted chunk so repeat and
+      //   offline visits are served from local cache. No stripModuleMarkers
+      //   here — we WANT type="module"/crossorigin so lazy chunks load.
+      //
+      //   Static (portable, file://): single IIFE inlined into one HTML file
+      //   by vite-plugin-singlefile, then stripModuleMarkers drops
+      //   type="module"/crossorigin so it also runs from the local
+      //   filesystem (browsers CORS-gate module loads over file://).
       ...(isHosted ? [
         VitePWA({
           // Auto-update: a new deploy silently installs its fresh precache and
           // takes over on the next navigation. No in-app prompt needed.
           registerType: 'autoUpdate',
           // 'inline' injects a tiny classic (non-module) registration snippet
-          // directly into index.html. This avoids emitting an extra
-          // type="module" registerSW.js that would clash with Chevron's
-          // IIFE / file:// strategy and the stripModuleMarkers post-pass.
+          // directly into index.html, avoiding an extra registerSW.js file.
           injectRegister: 'inline',
           // Chevron already ships public/manifest.json and links it from
           // index.html; don't let the plugin emit a second manifest.
           manifest: false,
           workbox: {
-            // Precache the full app shell. The web worker, fonts and public
-            // helper scripts are all emitted into dist, so cover them too.
+            // Precache the full app shell + all code-split chunks. The web
+            // worker, fonts and public helper scripts are emitted into dist,
+            // so cover them too.
             globPatterns: ['**/*.{html,js,css,svg,png,ico,woff,woff2,json}'],
             // Drop precaches from previous deploys to avoid unbounded growth.
             cleanupOutdatedCaches: true,
@@ -108,9 +113,8 @@ export default defineConfig(({ mode }) => {
             // /chevron/, so the fallback document is /chevron/index.html.
             navigateFallback: `${base}index.html`
           }
-        }),
-        stripModuleMarkers()
-      ] : [viteSingleFile()])
+        })
+      ] : [viteSingleFile(), stripModuleMarkers()])
     ],
     base,
     preview: {
@@ -128,21 +132,45 @@ export default defineConfig(({ mode }) => {
       include: ['src/**/*.{test,spec}.{js,jsx}', 'test/**/*.{test,spec}.{js,jsx}']
     },
     build: {
-      // The hosted IIFE bundle is ~580 KB which exceeds Vite's default
-      // 500 KB warning. This is acceptable for a start page that loads
-      // once and caches forever.
+      // Raise the warning limit; the static single-file bundle is ~580 KB.
       chunkSizeWarningLimit: 700,
-      // Hosted build uses IIFE format so the browser doesn't apply module
-      // CORS rules — critical for file:// usage. inlineDynamicImports
-      // collapses lazy chunks into one file (IIFE can't do code-splitting).
-      rollupOptions: isHosted ? {
-        output: {
-          format: 'iife',
-          inlineDynamicImports: true,
-          entryFileNames: 'assets/[name].[hash].js',
-          assetFileNames: 'assets/[name].[hash][extname]'
-        }
-      } : undefined
+      rollupOptions: isHosted
+        ? {
+            // Hosted (HTTP): real ES-module output so React.lazy boundaries
+            // (Settings/MUI-Joy, Weather, Cheatsheet, AIcompletion,
+            // MacrosMenu) split into separate chunks that load on demand
+            // instead of being inlined into the entry. Vendors are grouped
+            // so the big, rarely-changing libraries cache independently of
+            // app code. Content-hashed names → cache-forever + SW precache.
+            output: {
+              format: 'es',
+              entryFileNames: 'assets/[name].[hash].js',
+              chunkFileNames: 'assets/[name].[hash].js',
+              assetFileNames: 'assets/[name].[hash][extname]',
+              manualChunks(id) {
+                if (!id.includes('node_modules')) return undefined
+                if (id.includes('react-dom') || /node_modules\/(react|scheduler)\//.test(id)) {
+                  return 'react-vendor'
+                }
+                if (id.includes('framer-motion')) return 'framer-motion'
+                if (id.includes('@splidejs')) return 'splide'
+                if (id.includes('minisearch')) return 'minisearch'
+                return 'vendor'
+              }
+            }
+          }
+        : {
+            // Static (file://): single IIFE so the browser doesn't apply
+            // module CORS rules. inlineDynamicImports collapses lazy chunks
+            // into one file (IIFE can't code-split); singlefile then inlines
+            // it into index.html.
+            output: {
+              format: 'iife',
+              inlineDynamicImports: true,
+              entryFileNames: 'assets/[name].[hash].js',
+              assetFileNames: 'assets/[name].[hash][extname]'
+            }
+          }
     }
   }
 })
