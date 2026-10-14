@@ -18,7 +18,13 @@
     <meta name="twitter:card" content="summary_large_image">
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
     <link rel="manifest" href="manifest.json">
-    <link rel="stylesheet" href="/public/font.css">
+    <!-- Preload the single UI font so text paints without a swap flash.
+         Must be crossorigin (fonts are always fetched in CORS mode). -->
+    <link rel="preload" href="fonts/Onest/Onest.woff2" as="font" type="font/woff2" crossorigin>
+    <!-- Relative path so it resolves under both '/' (file://, local server)
+         and the '/chevron/' GitHub Pages base. An absolute '/public/...'
+         path 404s in production. font-display:swap keeps this non-blocking. -->
+    <link rel="stylesheet" href="font.css">
     <title>Chevron</title>
 
     <!-- coloration -->

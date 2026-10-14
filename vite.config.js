@@ -6,6 +6,7 @@ import { VitePWA } from 'vite-plugin-pwa'
 import { readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { dirname, resolve } from 'node:path'
+import { stripModuleMarkersFromHtml } from './build/htmlTransforms.js'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const pkg = JSON.parse(readFileSync(resolve(__dirname, 'package.json'), 'utf8'))
@@ -60,12 +61,7 @@ function stripModuleMarkers() {
   return {
     name: 'chevron-strip-module-markers',
     enforce: 'post',
-    transformIndexHtml(html) {
-      return html
-        .replace(/\s+crossorigin/g, '')
-        .replace(/<script\s+type="module"\s+/g, '<script defer ')
-        .replace(/<link\s+rel="modulepreload"[^>]*>\s*/g, '')
-    }
+    transformIndexHtml: stripModuleMarkersFromHtml
   }
 }
 
