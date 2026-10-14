@@ -36,6 +36,10 @@
   background: color-mix(in srgb, var(--primary) 8%, transparent);
   border: 1px solid rgba(255, 255, 255, 0.08);
   transition: background 0.15s, border-color 0.15s, transform 0.15s;
+  /* Isolate each pill's paint/layout so a backdrop-filter repaint (the
+     list re-renders on every keystroke) can't invalidate sibling pills.
+     Bounds the blur's recompute region to this element. */
+  contain: layout paint style;
 }
 body[data-glass-mode] .suggestion > div {
   backdrop-filter: blur(10px);
