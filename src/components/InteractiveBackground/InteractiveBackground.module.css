@@ -62,6 +62,10 @@
 
 @media (prefers-reduced-motion: reduce) {
   .marquee-track { animation: none; }
+  /* Also stop the background pan under reduced-motion. Pausing (not
+     removing) keeps the pseudo-element at its first keyframe without a
+     layout jump. */
+  .viewport::before { animation: none; }
 }
 
 .row {
