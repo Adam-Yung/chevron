@@ -1,6 +1,7 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { viteSingleFile } from 'vite-plugin-singlefile'
+import { VitePWA } from 'vite-plugin-pwa'
 import { readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { dirname, resolve } from 'node:path'
@@ -79,9 +80,40 @@ export default defineConfig(({ mode }) => {
     plugins: [
       react(),
       publicCacheBust(),
-      // Only strip module markers for hosted (IIFE) builds. The static
-      // build stays as an ES module inlined by vite-plugin-singlefile.
-      ...(isHosted ? [stripModuleMarkers()] : [viteSingleFile()])
+      // Hosted (GitHub Pages) build only:
+      //   1. VitePWA — Workbox generates sw.js + a versioned precache of the
+      //      app shell so repeat/offline visits are served from local cache
+      //      with no network round-trip. Must run BEFORE stripModuleMarkers so
+      //      the post-pass can normalise anything VitePWA injects into the HTML.
+      //   2. stripModuleMarkers — drops type="module"/crossorigin so the IIFE
+      //      bundle also works from file://.
+      // The static build stays an ES module inlined by vite-plugin-singlefile.
+      ...(isHosted ? [
+        VitePWA({
+          // Auto-update: a new deploy silently installs its fresh precache and
+          // takes over on the next navigation. No in-app prompt needed.
+          registerType: 'autoUpdate',
+          // 'inline' injects a tiny classic (non-module) registration snippet
+          // directly into index.html. This avoids emitting an extra
+          // type="module" registerSW.js that would clash with Chevron's
+          // IIFE / file:// strategy and the stripModuleMarkers post-pass.
+          injectRegister: 'inline',
+          // Chevron already ships public/manifest.json and links it from
+          // index.html; don't let the plugin emit a second manifest.
+          manifest: false,
+          workbox: {
+            // Precache the full app shell. The web worker, fonts and public
+            // helper scripts are all emitted into dist, so cover them too.
+            globPatterns: ['**/*.{html,js,css,svg,png,ico,woff,woff2,json}'],
+            // Drop precaches from previous deploys to avoid unbounded growth.
+            cleanupOutdatedCaches: true,
+            // SPA fallback must be base-aware: GitHub Pages serves from
+            // /chevron/, so the fallback document is /chevron/index.html.
+            navigateFallback: `${base}index.html`
+          }
+        }),
+        stripModuleMarkers()
+      ] : [viteSingleFile()])
     ],
     base,
     preview: {
