@@ -6,7 +6,8 @@ import { useState, useCallback, useRef, useEffect } from 'react'
  */
 export default function useAdaptiveFontSize(text, {
   maxFontSize = 5,
-  minFontSize = 0.9,
+  minFontSize = 0.5,
+  maxLines = 3,
   containerRef = null,
   fontFamily = 'inherit'
 } = {}) {
@@ -34,9 +35,16 @@ export default function useAdaptiveFontSize(text, {
     const textWidth = ctx.measureText(text.toUpperCase()).width
 
     const availableWidth = containerWidth * 0.95
-    if (textWidth <= availableWidth) return maxFontSize
 
-    const ratio = availableWidth / textWidth
+    // The text can wrap across up to `maxLines` lines, so the total horizontal
+    // budget before we need to shrink is `maxLines * availableWidth`. This keeps
+    // short queries at full size while shrinking long multi-line queries far
+    // more aggressively than a single-line fit would.
+    const lineBudget = Math.max(1, maxLines)
+    const availableTotalWidth = availableWidth * lineBudget
+    if (textWidth <= availableTotalWidth) return maxFontSize
+
+    const ratio = availableTotalWidth / textWidth
     const scaledPx = maxPx * ratio
 
     if (scaledPx <= minPx) {
@@ -44,7 +52,7 @@ export default function useAdaptiveFontSize(text, {
     }
 
     return scaledPx / parentFontSize
-  }, [text, maxFontSize, minFontSize, containerRef, fontFamily])
+  }, [text, maxFontSize, minFontSize, maxLines, containerRef, fontFamily])
 
   useEffect(() => {
     setFontSize(measure())

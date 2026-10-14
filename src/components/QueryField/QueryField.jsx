@@ -14,7 +14,6 @@ import ParsedQuery from '../../classes/parsedQuery'
 const AIcompletion = lazy(() => import('../AIcompletion/AIcompletion'))
 import googleAutocomplete from '../../autocomplete/googleAutocomplete'
 import History from '../../classes/localStorage/history'
-import gC from '../../functions/generationUtils/getClasses'
 import { GESTURE_FOCUS_SEARCH, GESTURE_BLUR_SEARCH } from '../../functions/webUtils/gestureEvents'
 import classes from './QueryField.module.css'
 import { useState } from 'react'
@@ -44,19 +43,27 @@ function QueryField () {
   
   // suggestions
   const suggestions = useSuggestions(query, googleAutocomplete)
-  
-  // parse query
-  const [parsedQuery] = useParseQuery(
+
+  // Parse the typed query for display. The visible field always reflects what
+  // the user typed — selecting a suggestion must NOT overwrite it (that caused
+  // resize/font glitches and was confusing). Suggestion highlighting lives in
+  // the dropdown instead.
+  const [displayParsedQuery] = useParseQuery(query, undefined, query)
+
+  // Parse the committed query for navigation. When a suggestion is selected,
+  // Enter/click should navigate to / copy that suggestion, so this derives
+  // from the selected suggestion when present.
+  const [redirectParsedQuery] = useParseQuery(
     selectedSuggestion ? selectedSuggestion.suggestion : query,
-    selectedSuggestion ? selectedSuggestion.type : undefined, 
+    selectedSuggestion ? selectedSuggestion.type : undefined,
     query)
 
   // query for AI
   const [aiQuery, setAiQuery] = useState('')
 
   const adaptiveFontSize = useAdaptiveFontSize(
-    parsedQuery.value || query,
-    { maxFontSize: inputFontSize, containerRef }
+    displayParsedQuery.value || query,
+    { maxFontSize: inputFontSize, maxLines: 3, containerRef }
   )
 
   // "Copied!" toast for special-result clipboard actions
@@ -74,8 +81,8 @@ function QueryField () {
   const handleRedirect = useCallback(() => {
     // Special results (calculator, currency, weight, time) → copy to clipboard
     // instead of opening a search page.
-    if (ParsedQuery.specialTypes.includes(parsedQuery.type)) {
-      const text = selectedSuggestion ? selectedSuggestion.suggestion : parsedQuery.value
+    if (ParsedQuery.specialTypes.includes(redirectParsedQuery.type)) {
+      const text = selectedSuggestion ? selectedSuggestion.suggestion : redirectParsedQuery.value
       navigator.clipboard?.writeText(text).then(() => showCopiedToast()).catch(() => {
         // Fallback for browsers without clipboard API
         try {
@@ -95,11 +102,11 @@ function QueryField () {
 
     if (searchHistory)
       // memorise only non generated queries
-      if (parsedQuery._type === 'query')
-        History.add({ id: parsedQuery.value, type: parsedQuery._type })
+      if (redirectParsedQuery._type === 'query')
+        History.add({ id: redirectParsedQuery.value, type: redirectParsedQuery._type })
   
-    redirect(parsedQuery.url, 'main')
-  }, [parsedQuery, searchHistory, redirect, selectedSuggestion, showCopiedToast])
+    redirect(redirectParsedQuery.url, 'main')
+  }, [redirectParsedQuery, searchHistory, redirect, selectedSuggestion, showCopiedToast])
 
   const handleQueryChange = useCallback(value => {
     if (allowedModes.get('QueryField').has(mode)) {
@@ -255,7 +262,7 @@ function QueryField () {
       const maxHeight = lineHeight * 3
       inputRef.current.style.height = Math.min(scrollHeight, maxHeight) + 'px'
     }
-  }, [parsedQuery.value, adaptiveFontSize])
+  }, [displayParsedQuery.value, adaptiveFontSize])
 
   // re-focusing the input inputField to focus on the caret
   // Phase 8e: skip on touch/coarse-pointer devices so the on-screen
@@ -291,14 +298,14 @@ function QueryField () {
     '--font-size-suggestions': suggestionsFontSize + 'em'
   }
 
-  const expanded = Boolean(parsedQuery.value) && suggestions.length > 0
+  const expanded = Boolean(displayParsedQuery.value) && suggestions.length > 0
   const activeOptionIndex = selectedSuggestion ? suggestions.indexOf(selectedSuggestion) : -1
   const activeDescendant = activeOptionIndex >= 0 ? suggestionOptionId(activeOptionIndex) : undefined
 
   const input = <textarea
     ref={inputRef}
-    value={parsedQuery.value}
-    className={gC(classes['field'], !selectedSuggestion && classes['selected'])}
+    value={displayParsedQuery.value}
+    className={classes['field']}
     onChange={e => handleQueryChange(e.target.value)}
     onKeyDown={handleTextareaKeyDown}
     role="combobox"
@@ -313,7 +320,7 @@ function QueryField () {
     spellCheck={false}
     rows={1}
     style={{
-      opacity: parsedQuery.value ? 1 : 0,
+      opacity: displayParsedQuery.value ? 1 : 0,
       caretColor: enableCarret ? undefined : 'transparent',
       fontSize: adaptiveFontSize + 'em'
     }}/>
@@ -330,7 +337,7 @@ function QueryField () {
           </Suspense>
         )}
         { input }
-        { parsedQuery.value && <Suggestions
+        { displayParsedQuery.value && <Suggestions
             queryMode={settings.appearance.style}
             buttonMode={settings.appearance.style}
             suggestions={suggestions}
