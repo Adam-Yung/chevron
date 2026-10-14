@@ -25,14 +25,27 @@ export default class History extends LocalStorageObject {
   }
 
   #miniSearch
+  // Lazy index: the (potentially large, up to History.limit entries)
+  // MiniSearch index is NOT built in the constructor. Building it eagerly
+  // ran a synchronous addAll over every stored entry on the critical path
+  // (module-eval of useSuggestions), delaying first-input readiness even
+  // though suggestions aren't needed until the user types. We build it on
+  // the first suggest() call instead.
+  #indexed = false
 
   constructor() {
     super(History.objectName, History.initialState)
+  }
+
+  #ensureIndex() {
+    if (this.#indexed) return
     this.#miniSearch = new MiniSearch({ fields: ['id'] })
-    this.#syncMiniSearch()
+    this.#miniSearch.addAll(this.object)
+    this.#indexed = true
   }
 
   suggest(query) {
+    this.#ensureIndex()
     const result = this.#miniSearch.search(query, {
       prefix: term => term.length > 3, 
       fizzy: 0.2,
@@ -52,6 +65,9 @@ export default class History extends LocalStorageObject {
   }
 
   #syncMiniSearch() {
+    // If the index was never built (user never typed), there's nothing to
+    // resync — it will be built lazily on the next suggest().
+    if (!this.#indexed) return
     this.#miniSearch.removeAll()
     this.#miniSearch.addAll(this.object)
   }
