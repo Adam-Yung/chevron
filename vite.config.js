@@ -1,4 +1,5 @@
-import { defineConfig } from 'vite'
+/// <reference types="vitest" />
+import { defineConfig } from 'vitest/config'
 import react from '@vitejs/plugin-react'
 import { viteSingleFile } from 'vite-plugin-singlefile'
 import { VitePWA } from 'vite-plugin-pwa'
@@ -121,6 +122,14 @@ export default defineConfig(({ mode }) => {
     },
     define: {
       __APP_VERSION__: JSON.stringify(APP_VERSION)
+    },
+    test: {
+      // Unit tests run under jsdom so hooks/classes that touch the DOM and
+      // localStorage work without a real browser. See src/**/*.test.{js,jsx}.
+      environment: 'jsdom',
+      globals: true,
+      setupFiles: ['./test/setup.js'],
+      include: ['src/**/*.{test,spec}.{js,jsx}', 'test/**/*.{test,spec}.{js,jsx}']
     },
     build: {
       // The hosted IIFE bundle is ~580 KB which exceeds Vite's default

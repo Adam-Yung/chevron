@@ -23,6 +23,8 @@
     "build": "vite build",
     "build:static": "vite build --mode static",
     "build:hosted": "vite build --mode hosted",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "preview": "vite preview",
     "predeploy": "npm run build:hosted",
     "deploy": "gh-pages -d dist",
@@ -53,6 +55,8 @@
   ],
   "devDependencies": {
     "@size-limit/file": "^11.0.0",
+    "@testing-library/jest-dom": "^7.0.1",
+    "@testing-library/react": "^16.3.3",
     "@types/react": "^18.0.24",
     "@types/react-dom": "^18.0.8",
     "@vitejs/plugin-react": "^4.7.0",
@@ -60,9 +64,11 @@
     "eslint-plugin-react": "^7.31.11",
     "eslint-plugin-react-hooks": "^4.6.0",
     "gh-pages": "^5.0.0",
+    "jsdom": "^30.1.2",
     "size-limit": "^11.0.0",
     "vite": "^5.4.21",
     "vite-plugin-pwa": "^2.0.0",
-    "vite-plugin-singlefile": "^2.3.3"
+    "vite-plugin-singlefile": "^2.3.3",
+    "vitest": "^2.1.9"
   }
 }
