@@ -63,7 +63,7 @@ function QueryField () {
 
   const adaptiveFontSize = useAdaptiveFontSize(
     displayParsedQuery.value || query,
-    { maxFontSize: inputFontSize, maxLines: 3, containerRef }
+    { maxFontSize: inputFontSize, containerRef }
   )
 
   // "Copied!" toast for special-result clipboard actions
