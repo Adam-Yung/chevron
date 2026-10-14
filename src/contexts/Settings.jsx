@@ -2,58 +2,27 @@ import { createContext, useEffect, useRef, useState } from 'react'
 import useColorSchemeDetector from '../hooks/useColorSchemeDetector'
 import settings from '../../settings/settings'
 import LocalSettings from '../classes/localStorage/settings'
-import {
-  validateSettings, backupSettings,
-  getStoredVersion, writeVersion, migrateSettings,
-  SETTINGS_VERSION
-} from './settingsMigration'
-
-function deepMerge(target, source) {
-  const result = { ...target }
-  for (const key of Object.keys(source)) {
-    if (
-      source[key] != null &&
-      typeof source[key] === 'object' &&
-      !Array.isArray(source[key]) &&
-      typeof target[key] === 'object' &&
-      !Array.isArray(target[key]) &&
-      target[key] != null
-    ) {
-      result[key] = deepMerge(target[key], source[key])
-    } else {
-      result[key] = source[key]
-    }
-  }
-  return result
-}
+import { getStoredVersion, writeVersion, SETTINGS_VERSION } from './settingsMigration'
+import { resolveSettings } from './resolveSettings'
 
 const localSettings = new LocalSettings()
 
 // Phase 8.5: run migration + validation before merging with defaults.
 // This runs once at module evaluation time (before the first render),
 // so any fixes are in place before the React tree is built.
+//
+// Perf: resolveSettings skips the migration walk + full-tree validation
+// entirely when the stored version already matches SETTINGS_VERSION (the
+// common case on every normal load) — only the cheap deepMerge runs then.
 function loadSettings() {
   const raw = localSettings.object ?? {}
   const storedVersion = getStoredVersion()
-
-  // Run version-specific migrations (idempotent; mutates a clone)
-  const migrated = migrateSettings({ ...raw }, storedVersion)
-
-  // Structural validation — warn and back up on mismatch, then continue
-  // with fresh defaults so the app always starts cleanly.
-  const issues = validateSettings(migrated)
-  if (issues.length > 0) {
-    console.warn('[chevron] Settings validation issues:', issues)
-    backupSettings(raw)
-    // Fall through — assignDeep with defaults handles the gaps
-  }
-
-  // Stamp / update the version
-  if (storedVersion !== SETTINGS_VERSION) {
+  const { settings: resolved, needsVersionWrite } =
+    resolveSettings(raw, storedVersion, settings.defaults)
+  if (needsVersionWrite) {
     writeVersion(SETTINGS_VERSION)
   }
-
-  return deepMerge(settings.defaults, migrated)
+  return resolved
 }
 
 const assignedSettings = loadSettings()
