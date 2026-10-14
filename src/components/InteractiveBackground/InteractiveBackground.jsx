@@ -15,6 +15,7 @@ function InteractiveBackground({
   textColor='#d2d2d2',
   textSize='5vmin',
   textOpacity=.2,
+  paused=false,
   style={}
 }) {
   // settings
@@ -88,7 +89,7 @@ function InteractiveBackground({
 
   return (
     <div 
-      className={classes['viewport']} 
+      className={paused ? `${classes['viewport']} ${classes['paused']}` : classes['viewport']} 
       style={{...variables, ...style}}>
       <div className={classes['container']}>
         { marquee }

@@ -202,6 +202,7 @@ function QuickLook ({ visibility, onAnimationEnd }) {
           height={height}
           color={parsedQuery.bgColor}
           textColor={parsedQuery.textColor}
+          paused={!visibility}
           marqueeText={parsedQuery.marquee}/>
       </div>
       <svg

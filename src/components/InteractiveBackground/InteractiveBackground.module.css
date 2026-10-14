@@ -68,6 +68,15 @@
   .viewport::before { animation: none; }
 }
 
+/* When the QuickLook view is not the active element it stays mounted but
+   hidden. Pause both infinite animations so the compositor stops animating
+   an off-screen layer (idle GPU/CPU savings). visibility:hidden alone does
+   NOT pause CSS animations. */
+.paused::before,
+.paused .marquee-track {
+  animation-play-state: paused;
+}
+
 .row {
   height: var(--diagonal);
   width: min-content;

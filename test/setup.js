@@ -23,6 +23,17 @@ if (!window.sessionStorage) {
   Object.defineProperty(window, 'sessionStorage', { value: createMemoryStorage(), configurable: true })
 }
 
+// public/config.js normally defines window.CONFIG before the app bundle
+// runs. settings/settings.js reads window.CONFIG.engines at module-eval, so
+// tests that import anything from the Settings context need this stub.
+if (!window.CONFIG) {
+  window.CONFIG = {
+    engines: { google: { name: 'Google', url: 'https://www.google.com/search?q=' } },
+    macros: [],
+    commands: {}
+  }
+}
+
 // jsdom lacks matchMedia; several components query it (reduced-motion,
 // pointer:coarse). Provide a minimal stub that defaults to "no match".
 if (!window.matchMedia) {
