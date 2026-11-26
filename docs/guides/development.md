@@ -1,6 +1,6 @@
 # Development
 
-> Verified: 2026-11-26 10:07 · Sources: `package.json`, `vite.config.js`, `scripts/verify.sh`, `scripts/e2e/run.mjs`, `tools/vite/htmlTransforms.js`, `scripts/owner/install-deps.sh`
+> Verified: 2026-11-26 10:10 · Sources: `package.json`, `vite.config.js`, `scripts/verify.sh`, `scripts/e2e/run.mjs`, `tools/vite/htmlTransforms.js`, `scripts/owner/install-deps.sh`, `scripts/perf/load.mjs`
 
 ## Run
 - `npm run dev`: dev server with hot reload.
@@ -13,6 +13,9 @@
   build folder, `E2E_HEADED=1` shows the browser. Every outside request is stubbed; nothing leaves the machine.
 - `scripts/verify.sh`: the full gate (tests, lint, structure limits on touched files, both builds, e2e, doc checks). Run it through
   `~/.claude-personal/framework/bin/gate` before committing.
+
+- `node scripts/perf/load.mjs <url | build dir> [--runs N] [--out report.json]`: cold and warm load timings at three network
+  speeds, plus an offline reload, in Chromium. Not part of the gate. Baseline numbers are in `docs/decisions/load-speed.md`.
 
 The e2e runner uses the project's `playwright-core`; the `PLAYWRIGHT_CORE` variable (or a path in an untracked
 `playwright-path.local` next to the runner) points it at another copy.

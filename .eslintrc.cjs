@@ -15,7 +15,7 @@ module.exports = {
       env: { node: true, browser: false }
     },
     {
-      files: ['scripts/e2e/**'],
+      files: ['scripts/e2e/**', 'scripts/perf/**'],
       // page.evaluate callbacks run in the browser
       env: { node: true, browser: true }
     },
