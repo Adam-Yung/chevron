@@ -2,6 +2,7 @@
 // End-to-end suite: loads the built static page (dist/index.html) in Playwright Chromium and runs every spec in scripts/e2e/specs.
 //   node scripts/e2e/run.mjs [filter]      run specs whose name contains `filter`
 //   E2E_HEADED=1 node scripts/e2e/run.mjs  watch it run
+//   E2E_DIST=/some/dir node scripts/e2e/run.mjs   test a static build written somewhere other than dist/
 // playwright-core is resolved from, in order: $PLAYWRIGHT_CORE, the path in scripts/e2e/playwright-path.local (untracked), the
 // project's node_modules (after scripts/owner/install-deps.sh --run). Nothing is downloaded: all outside requests are stubbed.
 import { readdir } from 'node:fs/promises'
@@ -14,6 +15,7 @@ import { openApp } from './lib/app.mjs'
 const here = dirname(fileURLToPath(import.meta.url))
 const root = join(here, '..', '..')
 const filter = process.argv[2] || ''
+const dist = process.env.E2E_DIST || join(root, 'dist')
 
 async function loadSpecs() {
   const dir = join(here, 'specs')
@@ -28,13 +30,13 @@ async function loadSpecs() {
 
 async function runSpec(browser, server, spec) {
   const started = Date.now()
-  const app = await openApp(browser, server.url)
+  const app = await openApp(browser, server.url, { dist })
   try {
     await spec.fn(app)
     if (app.errors.length) throw new Error('page errors: ' + app.errors.join(' | '))
     return { ok: true, ms: Date.now() - started }
   } catch (error) {
-    await app.page.screenshot({ path: join(root, 'dist', `e2e-failure-${spec.name.replace(/\W+/g, '_')}.png`) }).catch(() => {})
+    await app.page.screenshot({ path: join(dist, `e2e-failure-${spec.name.replace(/\W+/g, '_')}.png`) }).catch(() => {})
     return { ok: false, ms: Date.now() - started, error }
   } finally {
     await app.close()
@@ -47,7 +49,7 @@ async function main() {
     console.error('e2e: playwright-core not found. Run scripts/owner/install-deps.sh --run, or set PLAYWRIGHT_CORE.')
     process.exit(1)
   }
-  const server = await startStaticServer(join(root, 'dist'))
+  const server = await startStaticServer(dist)
   const browser = await chromium.launch({ headless: !process.env.E2E_HEADED })
   const specs = await loadSpecs()
   let failed = 0

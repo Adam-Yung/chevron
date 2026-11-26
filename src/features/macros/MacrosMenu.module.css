@@ -1,0 +1,110 @@
+/* ── Splide overrides ────────────────────────────────────────────────── */
+:global(.splide__track) {
+  height: calc(50vh - var(--menu-offset) - 44px);
+  height: calc(50dvh - var(--menu-offset) - 44px);
+  overflow: hidden !important;
+}
+:global(.splide__slide__row) {
+  justify-content: center;
+}
+:global(.splide__slide--col) {
+  width: unset !important;
+  aspect-ratio: 1;
+  /* Square cells bounded by both the track height (rows) and the row width (columns): bounding by height alone let cards
+     overflow onto their neighbours and the next page on small screens. */
+  max-width: min(calc((50dvh - var(--menu-offset) - 44px - 20px) / var(--grid-rows, 2)), calc(100% / var(--grid-cols, 4) - 4px));
+  max-height: calc((50dvh - var(--menu-offset) - 44px - 20px) / var(--grid-rows, 2));
+  padding: 5px;
+  box-sizing: border-box;
+}
+:global(.splide__slide--col:last-child) {
+  margin-right: 0 !important;
+}
+
+/* Glass arrows that match the new card aesthetic */
+:global(.splide__arrow) {
+  background: color-mix(in srgb, var(--primary) 20%, transparent) !important;
+  border: 1px solid rgba(255,255,255,0.1) !important;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.2) !important;
+}
+body[data-glass-mode] :global(.splide__arrow) {
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+  background: color-mix(in srgb, var(--primary) 10%, transparent) !important;
+}
+:global(.splide__arrow svg) {
+  fill: var(--primary) !important;
+  opacity: 0.75;
+}
+@media (hover: hover) {
+  :global(.splide__arrow:hover) {
+    background: color-mix(in srgb, var(--primary) 20%, transparent) !important;
+  }
+}
+
+/* Pagination dots */
+:global(.splide__pagination__page) {
+  background: var(--primary) !important;
+  opacity: 0.25;
+  transition: opacity 0.2s, transform 0.2s !important;
+}
+:global(.splide__pagination__page.is-active) {
+  opacity: 0.85 !important;
+  transform: scale(1.3) !important;
+}
+
+/* Bigger dots and arrows for fingers. */
+@media (pointer: coarse) {
+  :global(.splide__pagination__page) {
+    width: 14px !important;
+    height: 14px !important;
+    margin: 6px !important;
+  }
+  :global(.splide__arrow) {
+    width: 44px !important;
+    height: 44px !important;
+  }
+}
+
+/* ── Container ────────────────────────────────────────────────────────── */
+/* No backdrop-filter here: it fought with the cards' own and boxed in the arrows. */
+.container {
+  width: auto;
+  height: calc(50vh - var(--menu-offset) - 44px);
+  height: calc(50dvh - var(--menu-offset) - 44px);
+  margin: 10px 0 14px;
+  overflow: hidden;
+  border-radius: 18px;
+  position: relative;
+}
+
+/* Cards rise in one after another each time the grid is (re)built: on first open and on every filter change. */
+.slide-inner {
+  width: 100%;
+  height: 100%;
+  animation: card-in 0.18s ease-out both;
+  animation-delay: calc(var(--i, 0) * 18ms);
+}
+@keyframes card-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: none; }
+}
+
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: calc(50vh - var(--menu-offset) - 44px);
+  gap: 8px;
+  color: var(--primary);
+}
+.empty-text {
+  font-size: 1rem;
+  opacity: 0.5;
+}
+.empty-filter {
+  font-size: 1.6rem;
+  font-weight: 700;
+  opacity: 0.8;
+}

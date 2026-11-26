@@ -1,0 +1,89 @@
+.container {
+  width: 100%;
+  position: relative;
+  /* Clear of the search blob on the left, whose width is --chev. */
+  margin-left: calc(var(--chev) + 5vw);
+  margin-right: 5vw;
+}
+
+.ai-completion {
+  bottom: 100%;
+  position: absolute;
+  width: 100%;
+  height: calc(50vh - 50% - 20px - 20px);
+  height: calc(50dvh - 50% - 20px - 20px);
+  font-size: 1.3em;
+  font-family: var(--font), Arial, Helvetica, sans-serif;
+  margin-bottom: 20px;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.field {
+  outline: none;
+  background: transparent;
+  padding: 0;
+  width: 100%;
+  margin: 0 auto;
+  border: none;
+  color: var(--query);
+  font-size: var(--font-size);
+  text-align: center;
+  text-transform: uppercase;
+  font-family: inherit;
+  cursor: default;
+  caret-color: color-mix(in srgb, var(--query) 80%, transparent);
+  resize: none;
+  overflow: hidden;
+  line-height: 1.2;
+  white-space: pre-wrap;
+  word-break: break-word;
+  max-height: calc(var(--font-size) * 1.2 * 3);
+  field-sizing: content;
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+
+.field::-webkit-scrollbar {
+  display: none;
+}
+
+/* On touch the on-screen keyboard covers the lower half: while the field has focus or text, move it to the top, centred. */
+:global(.is-touch) .container:focus-within,
+:global(.is-touch[data-view='search']) .container {
+  box-sizing: border-box;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 0 5vw;
+  position: absolute;
+  /* Below the corner buttons. */
+  top: calc(max(env(safe-area-inset-top), 16px) + 56px);
+  left: 0;
+  right: 0;
+  z-index: var(--z-content, 10);
+}
+
+/* No focus ring — input is already the dominant visual element */
+.field:focus-visible {
+  outline: none;
+}
+
+/* Empty: invisible but still focused, so the first keystroke lands here. */
+.field:placeholder-shown {
+  opacity: 0;
+}
+
+/* Narrow portrait screens without touch (a slim window) get the same top layout: the blob is hidden there, so keeping room for it
+   would push the text off-centre. */
+@media (orientation: portrait) and (max-width: 600px) {
+  .container {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0 5vw;
+    position: absolute;
+    top: calc(max(env(safe-area-inset-top), 16px) + 56px);
+    left: 0;
+    right: 0;
+    z-index: var(--z-content, 10);
+  }
+}

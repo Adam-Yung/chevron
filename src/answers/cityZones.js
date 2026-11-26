@@ -1,0 +1,107 @@
+// Place name -> IANA zone. Only places that sit in a single zone are listed: a country that
+// spans several (usa, russia, brazil, australia, canada) is ambiguous, and no answer beats a wrong one.
+// Each row is [display name, IANA zone, ...extra spellings].
+const ROWS = [
+  ['New York', 'America/New_York', 'nyc', 'new york city'],
+  ['Los Angeles', 'America/Los_Angeles', 'la', 'l.a.'],
+  ['San Francisco', 'America/Los_Angeles', 'sf', 'san fran'],
+  ['Seattle', 'America/Los_Angeles'],
+  ['Las Vegas', 'America/Los_Angeles'],
+  ['Denver', 'America/Denver'],
+  ['Phoenix', 'America/Phoenix'],
+  ['Chicago', 'America/Chicago'],
+  ['Houston', 'America/Chicago'],
+  ['Dallas', 'America/Chicago'],
+  ['Boston', 'America/New_York'],
+  ['Washington', 'America/New_York', 'washington dc', 'dc', 'washington d.c.'],
+  ['Miami', 'America/New_York'],
+  ['Atlanta', 'America/New_York'],
+  ['Toronto', 'America/Toronto'],
+  ['Vancouver', 'America/Vancouver'],
+  ['Montreal', 'America/Toronto'],
+  ['Mexico City', 'America/Mexico_City'],
+  ['Sao Paulo', 'America/Sao_Paulo', 'são paulo'],
+  ['Buenos Aires', 'America/Argentina/Buenos_Aires'],
+  ['Bogota', 'America/Bogota', 'bogotá'],
+  ['Lima', 'America/Lima'],
+  ['Santiago', 'America/Santiago'],
+  ['Honolulu', 'Pacific/Honolulu', 'hawaii'],
+  ['Anchorage', 'America/Anchorage', 'alaska'],
+  ['London', 'Europe/London', 'uk', 'england', 'united kingdom', 'great britain'],
+  ['Dublin', 'Europe/Dublin', 'ireland'],
+  ['Lisbon', 'Europe/Lisbon', 'portugal'],
+  ['Paris', 'Europe/Paris', 'france'],
+  ['Berlin', 'Europe/Berlin', 'germany'],
+  ['Madrid', 'Europe/Madrid', 'spain'],
+  ['Rome', 'Europe/Rome', 'italy'],
+  ['Amsterdam', 'Europe/Amsterdam', 'netherlands'],
+  ['Brussels', 'Europe/Brussels', 'belgium'],
+  ['Zurich', 'Europe/Zurich', 'zürich', 'switzerland'],
+  ['Vienna', 'Europe/Vienna', 'austria'],
+  ['Stockholm', 'Europe/Stockholm', 'sweden'],
+  ['Oslo', 'Europe/Oslo', 'norway'],
+  ['Copenhagen', 'Europe/Copenhagen', 'denmark'],
+  ['Helsinki', 'Europe/Helsinki', 'finland'],
+  ['Warsaw', 'Europe/Warsaw', 'poland'],
+  ['Prague', 'Europe/Prague'],
+  ['Budapest', 'Europe/Budapest'],
+  ['Athens', 'Europe/Athens', 'greece'],
+  ['Istanbul', 'Europe/Istanbul', 'turkey'],
+  ['Moscow', 'Europe/Moscow'],
+  ['Kyiv', 'Europe/Kyiv', 'kiev'],
+  ['Cairo', 'Africa/Cairo', 'egypt'],
+  ['Johannesburg', 'Africa/Johannesburg', 'south africa'],
+  ['Cape Town', 'Africa/Johannesburg'],
+  ['Nairobi', 'Africa/Nairobi', 'kenya'],
+  ['Lagos', 'Africa/Lagos', 'nigeria'],
+  ['Casablanca', 'Africa/Casablanca', 'morocco'],
+  ['Dubai', 'Asia/Dubai', 'uae', 'abu dhabi'],
+  ['Riyadh', 'Asia/Riyadh', 'saudi arabia'],
+  ['Tehran', 'Asia/Tehran', 'iran'],
+  ['Karachi', 'Asia/Karachi', 'pakistan'],
+  ['Delhi', 'Asia/Kolkata', 'new delhi', 'india', 'mumbai', 'bombay', 'kolkata', 'calcutta', 'bangalore', 'bengaluru'],
+  ['Dhaka', 'Asia/Dhaka', 'bangladesh'],
+  ['Bangkok', 'Asia/Bangkok', 'thailand'],
+  ['Jakarta', 'Asia/Jakarta'],
+  ['Ho Chi Minh City', 'Asia/Ho_Chi_Minh', 'saigon', 'vietnam', 'hanoi'],
+  ['Singapore', 'Asia/Singapore'],
+  ['Kuala Lumpur', 'Asia/Kuala_Lumpur', 'malaysia'],
+  ['Hong Kong', 'Asia/Hong_Kong', 'hk'],
+  ['Shanghai', 'Asia/Shanghai', 'beijing', 'china'],
+  ['Taipei', 'Asia/Taipei', 'taiwan'],
+  ['Manila', 'Asia/Manila', 'philippines'],
+  ['Seoul', 'Asia/Seoul', 'south korea', 'korea'],
+  ['Tokyo', 'Asia/Tokyo', 'japan', 'osaka', 'kyoto'],
+  ['Sydney', 'Australia/Sydney'],
+  ['Melbourne', 'Australia/Melbourne'],
+  ['Brisbane', 'Australia/Brisbane'],
+  ['Perth', 'Australia/Perth'],
+  ['Adelaide', 'Australia/Adelaide'],
+  ['Auckland', 'Pacific/Auckland', 'new zealand', 'wellington'],
+]
+
+// Abbreviations map to the region's civil zone, so `pst` in July shows daylight time.
+// CST, BST-as-Bangladesh, IST-as-Israel/Ireland and the like are left out as ambiguous;
+// IST is read as India because that is how it is overwhelmingly typed.
+const ABBREVIATIONS = {
+  utc: 'UTC', gmt: 'UTC', z: null,
+  pst: 'America/Los_Angeles', pdt: 'America/Los_Angeles', pt: 'America/Los_Angeles',
+  mst: 'America/Denver', mdt: 'America/Denver', mt: 'America/Denver',
+  est: 'America/New_York', edt: 'America/New_York', et: 'America/New_York',
+  cdt: 'America/Chicago', ct: 'America/Chicago',
+  akst: 'America/Anchorage', akdt: 'America/Anchorage', hst: 'Pacific/Honolulu',
+  bst: 'Europe/London', wet: 'Europe/Lisbon', cet: 'Europe/Paris', cest: 'Europe/Paris',
+  eet: 'Europe/Athens', eest: 'Europe/Athens', msk: 'Europe/Moscow', sast: 'Africa/Johannesburg',
+  ist: 'Asia/Kolkata', hkt: 'Asia/Hong_Kong', sgt: 'Asia/Singapore', jst: 'Asia/Tokyo', kst: 'Asia/Seoul',
+  awst: 'Australia/Perth', aest: 'Australia/Sydney', aedt: 'Australia/Sydney',
+  nzst: 'Pacific/Auckland', nzdt: 'Pacific/Auckland',
+}
+
+/** @type {Map<string, { name: string, zone: string }>} lower-case spelling -> place */
+export const PLACES = new Map()
+for (const [name, zone, ...extra] of ROWS) {
+  for (const spelling of [name, ...extra]) PLACES.set(spelling.toLowerCase(), { name, zone })
+}
+for (const [abbr, zone] of Object.entries(ABBREVIATIONS)) {
+  if (zone) PLACES.set(abbr, { name: abbr.toUpperCase(), zone })
+}

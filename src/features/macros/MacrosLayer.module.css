@@ -1,0 +1,50 @@
+/* Two halves meeting at the bar the chevron becomes. The sites slide down out from behind the bar; the clock fades up. */
+.layer {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  --menu-offset: 8px;
+  z-index: 1;
+}
+.layer[data-open] {
+  pointer-events: auto;
+}
+.top, .bottom {
+  height: 50%;
+  display: flex;
+  justify-content: center;
+  padding: 0 15%;
+}
+.top {
+  align-items: flex-end;
+  padding-bottom: 0.18em;
+  font-size: 5.6em;
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity calc(var(--t) * 0.6) ease-out, transform calc(var(--t) * 0.6) var(--ease-move);
+}
+.bottom {
+  align-items: flex-start;
+  overflow: hidden;
+  padding-top: var(--menu-offset);
+}
+.slide {
+  width: 100%;
+  transform: translateY(-105%);
+  transition: transform calc(var(--t) * 0.6) var(--ease-move);
+  will-change: transform;
+}
+.layer[data-open] .top {
+  opacity: 1;
+  transform: none;
+  transition-delay: calc(var(--t) * 0.5);
+}
+.layer[data-open] .slide {
+  transform: none;
+  transition-delay: calc(var(--t) * 0.4);
+}
+.top > * {
+  width: 100%;
+  text-align: center;
+}

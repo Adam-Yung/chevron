@@ -11,7 +11,7 @@ BIN=./node_modules/.bin
 "$BIN/vitest" run --reporter=dot
 
 # 2. Lint, warnings as errors. LINT_DIRS grows as the re-architecture rewrites each area (docs/todo.md); the end state is the whole repo.
-LINT_DIRS=(tools scripts test vite.config.js .eslintrc.cjs)
+LINT_DIRS=(src tools scripts test vite.config.js .eslintrc.cjs)
 "$BIN/eslint" --max-warnings 0 --ext .js,.jsx,.mjs,.cjs "${LINT_DIRS[@]}"
 
 # 3. Structure ratchet: strict nesting and complexity on touched files only.

@@ -2,12 +2,8 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <!-- Phase 9: double-tap zoom is prevented via CSS touch-action
-         (touch-action: none on .app + manipulation on controls, see App.css),
-         NOT via user-scalable=no / maximum-scale. Blocking user scaling is an
-         accessibility anti-pattern (defeats pinch-zoom for low-vision users)
-         and is ignored by modern Safari anyway. Do not add user-scalable=no.
-         width=device-width also removes the legacy 300ms tap delay. -->
+    <!-- Double-tap zoom is stopped with CSS touch-action (src/app/global.css), never user-scalable=no: blocking pinch-zoom
+         fails low-vision users. -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, interactive-widget=resizes-content, viewport-fit=cover" />
     <meta name="description" content="Chevron — a keyboard-driven browser start page with search, macros, AI, and weather.">
     <meta name="theme-color" content="#1a1a2e">
@@ -18,29 +14,23 @@
     <meta name="twitter:card" content="summary_large_image">
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
     <link rel="manifest" href="manifest.json">
-    <!-- Preload the single UI font so text paints without a swap flash.
-         Must be crossorigin (fonts are always fetched in CORS mode). -->
+    <!-- crossorigin: fonts are fetched in CORS mode; a preload without it is not reused and the font downloads twice. -->
     <link rel="preload" href="fonts/Onest/Onest.woff2" as="font" type="font/woff2" crossorigin>
-    <!-- Relative path so it resolves under both '/' (file://, local server)
-         and the '/chevron/' GitHub Pages base. An absolute '/public/...'
-         path 404s in production. font-display:swap keeps this non-blocking. -->
     <link rel="stylesheet" href="font.css">
     <title>Chevron</title>
 
-    <!-- coloration -->
+    <!-- Paint the saved theme's background before the bundle loads, so a dark theme never flashes white. Any problem with the
+         stored settings just skips this; the app applies the theme itself a moment later. -->
     <script>
-      const settings = JSON.parse(localStorage.getItem('settings'))
-      if (settings) {
-        const colorScheme = settings.appearance.colorScheme === 'auto'
-          ? window.matchMedia("(prefers-color-scheme: dark)").matches
-            ? 'dark'
-            : 'light'
-          : settings.appearance.colorScheme
-  
-        document.documentElement.style.backgroundColor = settings.appearance.themes[settings.appearance.activeTheme][colorScheme].background
-      }
+      try {
+        const appearance = JSON.parse(localStorage.getItem('settings'))?.appearance
+        const scheme = appearance?.colorScheme === 'auto' || !appearance?.colorScheme
+          ? (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+          : appearance.colorScheme
+        const background = appearance?.themes?.[appearance.activeTheme]?.[scheme]?.background
+        if (background) document.documentElement.style.backgroundColor = background
+      } catch {}
     </script>
-    <!-- -->
 
   </head>
   <body>

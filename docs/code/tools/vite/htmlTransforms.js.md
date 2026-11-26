@@ -13,3 +13,6 @@ HTML rewrites for the static profile, applied by the `chevron-static-html` plugi
   never booted.
 
 Tests: `tools/vite/htmlTransforms.test.js`.
+- **Why inline the font (`inlineFonts`):** a `file://` page may not fetch font files (CORS), so the release zip showed a fallback
+  font. The static build now carries Onest as a data URL (about 35 KB); comments in `public/font.css` are stripped first so the
+  commented-out CJK example is never read as a real font.

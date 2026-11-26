@@ -1,0 +1,25 @@
+.notice {
+  position: fixed;
+  left: 50%;
+  top: max(1.5em, env(safe-area-inset-top));
+  transform: translateX(-50%);
+  z-index: var(--z-toast);
+  pointer-events: none;
+}
+.pill {
+  display: inline-block;
+  padding: 6px 16px;
+  border-radius: 999px;
+  background: var(--primary);
+  color: var(--secondary);
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  animation: notice-in 0.15s ease-out both;
+}
+@keyframes notice-in {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: none; }
+}

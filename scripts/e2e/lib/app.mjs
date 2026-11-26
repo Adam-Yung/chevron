@@ -26,7 +26,7 @@ async function stubOutside(context, navigations) {
   })
 }
 
-export async function openApp(browser, baseUrl, { viewport = { width: 1280, height: 800 }, settings, path = '' } = {}) {
+export async function openApp(browser, baseUrl, { viewport = { width: 1280, height: 800 }, settings, path = '', dist } = {}) {
   const context = await browser.newContext({ viewport })
   const navigations = []
   await stubOutside(context, navigations)
@@ -36,10 +36,10 @@ export async function openApp(browser, baseUrl, { viewport = { width: 1280, heig
   page.on('pageerror', e => errors.push(e.message))
   page.on('console', m => { if (m.type() === 'error' && !/Failed to load resource/.test(m.text())) errors.push('console: ' + m.text()) })
   const app = {
-    page, context, errors, navigations, baseUrl,
+    page, context, errors, navigations, baseUrl, dist,
     async goto(extra = path) {
       await page.goto(baseUrl + extra)
-      await page.waitForSelector('textarea[role="combobox"]')
+      await page.waitForSelector('textarea[role="combobox"]', { state: 'attached' })
     },
     view: () => page.getAttribute('[data-view]', 'data-view'),
     query: () => page.$eval('textarea[role="combobox"]', e => e.value),

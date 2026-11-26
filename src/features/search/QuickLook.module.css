@@ -1,0 +1,60 @@
+/* Hidden off the left edge; slides in once the chevron has reached the edge, slightly overshooting like a bulge popping out.
+   Leaving is quicker and starts at once. Only transform animates. */
+.quicklook {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: calc(var(--reach) + var(--thickness));
+  transform: translateX(calc(-100% - var(--thickness)));
+  transition: transform calc(var(--t) * 0.6) var(--ease-move);
+  will-change: transform;
+  z-index: 1;
+}
+.quicklook[data-active] {
+  transform: none;
+  transition: transform calc(var(--t) * 1.2) var(--ease-pop) calc(var(--t) * 0.5);
+}
+.fill {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+.fill > :first-child {
+  width: 100%;
+  height: 100%;
+}
+.label {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: calc(var(--reach) * 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 0.5em;
+  box-sizing: border-box;
+  color: var(--text);
+  font-size: 5vmin;
+  font-weight: 700;
+  text-transform: uppercase;
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.outline {
+  position: absolute;
+  top: 0;
+  left: 0;
+  overflow: visible;
+}
+@media (prefers-reduced-motion: reduce) {
+  .quicklook, .quicklook[data-active] {
+    transition-delay: 0s;
+  }
+}
+
+/* On a phone in portrait the field moves to the top and the blob would sit under the suggestions: the field alone is clearer. */
+@media (orientation: portrait) and (max-width: 600px) {
+  .quicklook {
+    display: none;
+  }
+}

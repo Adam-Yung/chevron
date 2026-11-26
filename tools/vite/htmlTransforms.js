@@ -30,6 +30,24 @@ export function moveAppScriptToBodyEnd(html) {
   return html.replace(match[0], '').replace('</body>', `${tag}\n</body>`)
 }
 
+const FONT_LINKS = /<link\s+rel="(?:stylesheet|preload)"\s+href="font\.css"[^>]*>\s*|<link\s+rel="preload"\s+href="fonts\/[^"]+"[^>]*>\s*/g
+
+/**
+ * Replace the font stylesheet and preload with an inline @font-face whose font is a data URL: a page opened from file:// is not
+ * allowed to fetch font files, so the static build must carry its font inside the HTML.
+ * @param {string} html
+ * @param {string} fontCss  public/font.css
+ * @param {Record<string, string>} fontsBase64  url as written in font.css -> base64 of the file
+ */
+export function inlineFonts(html, fontCss, fontsBase64) {
+  const css = Object.entries(fontsBase64).reduce(
+    (text, [url, b64]) => text.split(url).join(`data:font/woff2;base64,${b64}`),
+    fontCss.replace(/\/\*[\s\S]*?\*\//g, '').trim()
+  )
+  if (!html.includes('href="font.css"')) return html
+  return html.replace(FONT_LINKS, '').replace('</head>', `<style>${css}</style>\n</head>`)
+}
+
 /**
  * Both static-profile transforms in the order the build needs them.
  * @param {string} html

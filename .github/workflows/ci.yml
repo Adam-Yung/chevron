@@ -15,7 +15,9 @@ jobs:
 
       - run: npm ci
 
-      - run: npx eslint src/
+      - run: npm test
+
+      - run: ./node_modules/.bin/eslint --max-warnings 0 --ext .js,.jsx,.mjs,.cjs src tools scripts test vite.config.js
 
       - run: npm run build:static
 

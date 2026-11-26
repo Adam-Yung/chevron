@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { stripModuleMarkersFromHtml, moveAppScriptToBodyEnd, prepareStaticHtml } from './htmlTransforms.js'
+import { stripModuleMarkersFromHtml, moveAppScriptToBodyEnd, prepareStaticHtml, inlineFonts } from './htmlTransforms.js'
 
 describe('stripModuleMarkersFromHtml', () => {
   it('drops crossorigin from <script> tags (file:// / IIFE compat)', () => {
@@ -79,5 +79,22 @@ describe('moveAppScriptToBodyEnd', () => {
     const out = prepareStaticHtml(vitePage)
     expect(out).not.toContain('type="module"')
     expect(out.indexOf('icons.js')).toBeLessThan(out.indexOf('assets/index.abc.js'))
+  })
+})
+
+describe('inlineFonts', () => {
+  const head = '<head><link rel="preload" href="fonts/Onest/Onest.woff2" as="font" type="font/woff2" crossorigin>\n<link rel="stylesheet" href="font.css">\n</head>'
+  const css = "/* note */ @font-face { font-family: 'Onest'; src: url('./fonts/Onest/Onest.woff2') format('woff2'); }"
+
+  it('swaps the font links for an inline @font-face carrying the font as a data URL', () => {
+    const out = inlineFonts(head, css, { './fonts/Onest/Onest.woff2': 'AAAA' })
+    expect(out).not.toContain('href="font.css"')
+    expect(out).not.toContain('rel="preload"')
+    expect(out).toContain("url('data:font/woff2;base64,AAAA')")
+    expect(out).not.toContain('note')
+  })
+
+  it('leaves a page without the font stylesheet alone', () => {
+    expect(inlineFonts('<head></head>', css, {})).toBe('<head></head>')
   })
 })

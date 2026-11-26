@@ -1,4 +1,6 @@
 // The page boots clean and typing reaches the search field from the first keystroke.
+import { pathToFileURL } from 'node:url'
+import { join } from 'node:path'
 import { assert, assertEqual } from '../lib/app.mjs'
 
 export default {
@@ -16,8 +18,19 @@ export default {
     const page = await app.context.newPage()
     const errors = []
     page.on('pageerror', e => errors.push(e.message))
-    await page.goto(new URL('../../../dist/index.html', import.meta.url).href)
+    await page.goto(pathToFileURL(join(app.dist, 'index.html')).href)
     await page.waitForSelector('textarea[role="combobox"]')
     assert(errors.length === 0, 'file:// page errors: ' + errors.join(' | '))
+    const fontLoaded = await page.evaluate(async () => { await document.fonts.ready; return document.fonts.check('16px Onest') })
+    assert(fontLoaded, 'the Onest font did not load from file://')
+  },
+
+  async 'boots cleanly over an empty or partial settings blob'(app) {
+    for (const blob of ['{}', '{"appearance":{}}', '{"general":{"redirectTarget":"_blank"}}']) {
+      await app.context.addInitScript(b => localStorage.setItem('settings', b), blob)
+      await app.goto()
+      await app.page.keyboard.type('x')
+      assertEqual(await app.query(), 'x', 'typing after boot with ' + blob)
+    }
   }
 }

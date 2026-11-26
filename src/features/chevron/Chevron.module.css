@@ -1,0 +1,27 @@
+/* A square of side 2 x --chev whose centre is the chevron's anchor. It sits centred on the screen, or on the left edge while
+   searching, where its vertical-line shape becomes the edge of the search blob. Only transform animates. */
+.chevron {
+  position: absolute;
+  top: calc(50% - var(--chev));
+  left: calc(var(--chev) * -1);
+  width: calc(var(--chev) * 2);
+  height: calc(var(--chev) * 2);
+  transform: translateX(50vw);
+  transition: transform var(--t) var(--ease-move);
+  will-change: transform;
+  z-index: 2;
+}
+.chevron[data-view='search'] {
+  transform: translateX(0);
+}
+.chevron > canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+@media (orientation: portrait) and (max-width: 600px) {
+  .chevron[data-view='search'] {
+    opacity: 0;
+    transition: transform var(--t) var(--ease-move), opacity var(--t);
+  }
+}

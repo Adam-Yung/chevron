@@ -1,4 +1,7 @@
 /// <reference types="vitest" />
+// Two build profiles; docs/code/vite.config.js.md explains each choice.
+//   static (default): one self-contained index.html that runs from file://, a local server or Termux.
+//   hosted (`--mode hosted`): ES modules split into cacheable chunks, plus a service worker for repeat and offline visits.
 import { defineConfig } from 'vitest/config'
 import react from '@vitejs/plugin-react'
 import { viteSingleFile } from 'vite-plugin-singlefile'
@@ -6,169 +9,91 @@ import { VitePWA } from 'vite-plugin-pwa'
 import { readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { dirname, resolve } from 'node:path'
-import { prepareStaticHtml } from './tools/vite/htmlTransforms.js'
+import { inlineFonts, prepareStaticHtml } from './tools/vite/htmlTransforms.js'
 
-const __dirname = dirname(fileURLToPath(import.meta.url))
-const pkg = JSON.parse(readFileSync(resolve(__dirname, 'package.json'), 'utf8'))
-const APP_VERSION = pkg.version || '0.0.0'
+const root = dirname(fileURLToPath(import.meta.url))
+const APP_VERSION = JSON.parse(readFileSync(resolve(root, 'package.json'), 'utf8')).version || '0.0.0'
 
-/* Two build profiles, both produced by `vite build`:
- *
- *   build:static  – inlines every JS / CSS chunk into a single IIFE HTML
- *                   file via `vite-plugin-singlefile` (then stripModuleMarkers
- *                   removes type=module/crossorigin for file:// use). This is
- *                   the artifact shipped in the GitHub release zip and used by
- *                   the local Express bundle.
- *
- *   build:hosted  – real ES-module output with code splitting. React.lazy
- *                   boundaries (Settings, Weather, Cheatsheet, AIcompletion,
- *                   MacrosMenu) and big vendors (react, framer-motion, splide,
- *                   minisearch) emit as separate content-hashed chunks that
- *                   load on demand and cache forever. VitePWA precaches them
- *                   all. GitHub Pages serves over HTTP so modules load fine.
- *                   Helper scripts in /public are versioned via `?v=<ver>`.
- *
- * Pick the profile via `VITE_BUILD_TARGET=static|hosted vite build` (the
- * `build:*` package.json scripts wire that up).
- */
-// `vite build --mode hosted` selects the hosted profile; everything else
-// (default mode, dev server) keeps the historical single-file output.
-function resolveTarget(mode) {
-  if (mode === 'hosted' || process.env.VITE_BUILD_TARGET === 'hosted') return 'hosted'
-  return 'static'
-}
-
-// Append `?v=<package version>` to the two `<script src="…">` tags that
-// reference helper files served from /public. They have stable filenames
-// (so userland config.js / icons.js paths don't change), but we still
-// want the browser to drop its cached copy when the app version bumps.
+// config.js and icons.js keep stable names (users edit them), so a version query is what makes browsers drop stale copies.
 function publicCacheBust() {
-  const tagRe = /<script\s+src="(config\.js|icons\.js)"><\/script>/g
+  const tag = /<script\s+src="(config\.js|icons\.js)"><\/script>/g
   return {
     name: 'chevron-public-cache-bust',
-    transformIndexHtml(html) {
-      return html.replace(tagRe, (_, file) => {
-        return `<script src="${file}?v=${APP_VERSION}"></script>`
-      })
-    }
+    transformIndexHtml: html => html.replace(tag, (_, file) => `<script src="${file}?v=${APP_VERSION}"></script>`)
   }
 }
 
-// Static profile only: make the single-file output run from file:// (see tools/vite/htmlTransforms.js). `apply: 'build'` keeps
-// the dev server's module scripts intact; stripping them there stopped the dev page from booting.
+function readFonts() {
+  const css = readFileSync(resolve(root, 'public/font.css'), 'utf8').replace(/\/\*[\s\S]*?\*\//g, '')
+  const urls = [...css.matchAll(/url\('([^']+\.woff2)'\)/g)].map(m => m[1])
+  return { css, files: Object.fromEntries(urls.map(u => [u, readFileSync(resolve(root, 'public', u)).toString('base64')])) }
+}
+
 function staticHtml() {
   return {
     name: 'chevron-static-html',
     apply: 'build',
     enforce: 'post',
-    transformIndexHtml: prepareStaticHtml
+    transformIndexHtml(html) {
+      const fonts = readFonts()
+      return inlineFonts(prepareStaticHtml(html), fonts.css, fonts.files)
+    }
   }
 }
 
+function hostedPlugins(base) {
+  return [VitePWA({
+    registerType: 'autoUpdate',
+    injectRegister: 'inline',
+    manifest: false,
+    workbox: {
+      globPatterns: ['**/*.{html,js,css,svg,png,ico,woff,woff2,json}'],
+      cleanupOutdatedCaches: true,
+      navigateFallback: `${base}index.html`
+    }
+  })]
+}
+
+function vendorChunk(id) {
+  if (!id.includes('node_modules')) return undefined
+  if (/node_modules\/(react|react-dom|scheduler)\//.test(id)) return 'react-vendor'
+  if (id.includes('@splidejs')) return 'splide'
+  return 'vendor'
+}
+
+const hostedOutput = {
+  format: 'es',
+  entryFileNames: 'assets/[name].[hash].js',
+  chunkFileNames: 'assets/[name].[hash].js',
+  assetFileNames: 'assets/[name].[hash][extname]',
+  manualChunks: vendorChunk
+}
+
+const staticOutput = {
+  format: 'iife',
+  inlineDynamicImports: true,
+  entryFileNames: 'assets/[name].[hash].js',
+  assetFileNames: 'assets/[name].[hash][extname]'
+}
+
 export default defineConfig(({ mode }) => {
-  const target = resolveTarget(mode)
-  const isHosted = target === 'hosted'
-  // GitHub Pages serves from /chevron/ subpath. CI sets VITE_BASE to ensure
-  // asset URLs resolve correctly (Vite's IIFE new URL() fallback uses
-  // document.baseURI when document.currentScript is unavailable).
-  // Local/file:// builds keep '' (relative paths) so they work anywhere.
+  const hosted = mode === 'hosted' || process.env.VITE_BUILD_TARGET === 'hosted'
+  // GitHub Pages serves from /chevron/ and CI sets VITE_BASE; local and file:// builds use relative paths.
   const base = process.env.VITE_BASE || ''
   return {
-    plugins: [
-      react(),
-      publicCacheBust(),
-      // Build-profile-specific plugins:
-      //
-      //   Hosted (GitHub Pages, HTTP): real ES-module output with code
-      //   splitting (see rollupOptions below). VitePWA/Workbox generates
-      //   sw.js + a versioned precache of every emitted chunk so repeat and
-      //   offline visits are served from local cache. No stripModuleMarkers
-      //   here — we WANT type="module"/crossorigin so lazy chunks load.
-      //
-      //   Static (portable, file://): single IIFE inlined into one HTML file
-      //   by vite-plugin-singlefile, then stripModuleMarkers drops
-      //   type="module"/crossorigin so it also runs from the local
-      //   filesystem (browsers CORS-gate module loads over file://).
-      ...(isHosted ? [
-        VitePWA({
-          // Auto-update: a new deploy silently installs its fresh precache and
-          // takes over on the next navigation. No in-app prompt needed.
-          registerType: 'autoUpdate',
-          // 'inline' injects a tiny classic (non-module) registration snippet
-          // directly into index.html, avoiding an extra registerSW.js file.
-          injectRegister: 'inline',
-          // Chevron already ships public/manifest.json and links it from
-          // index.html; don't let the plugin emit a second manifest.
-          manifest: false,
-          workbox: {
-            // Precache the full app shell + all code-split chunks. The web
-            // worker, fonts and public helper scripts are emitted into dist,
-            // so cover them too.
-            globPatterns: ['**/*.{html,js,css,svg,png,ico,woff,woff2,json}'],
-            // Drop precaches from previous deploys to avoid unbounded growth.
-            cleanupOutdatedCaches: true,
-            // SPA fallback must be base-aware: GitHub Pages serves from
-            // /chevron/, so the fallback document is /chevron/index.html.
-            navigateFallback: `${base}index.html`
-          }
-        })
-      ] : [viteSingleFile(), staticHtml()])
-    ],
+    plugins: [react(), publicCacheBust(), ...(hosted ? hostedPlugins(base) : [viteSingleFile(), staticHtml()])],
     base,
-    preview: {
-      host: '::'
-    },
-    define: {
-      __APP_VERSION__: JSON.stringify(APP_VERSION)
-    },
+    preview: { host: '::' },
+    define: { __APP_VERSION__: JSON.stringify(APP_VERSION) },
     test: {
-      // Unit tests run under jsdom so hooks/classes that touch the DOM and
-      // localStorage work without a real browser. See src/**/*.test.{js,jsx}.
       environment: 'jsdom',
       globals: true,
       setupFiles: ['./test/setup.js'],
       include: ['src/**/*.{test,spec}.{js,jsx}', 'test/**/*.{test,spec}.{js,jsx}', 'tools/**/*.{test,spec}.{js,jsx}']
     },
     build: {
-      // Raise the warning limit; the static single-file bundle is ~580 KB.
       chunkSizeWarningLimit: 700,
-      rollupOptions: isHosted
-        ? {
-            // Hosted (HTTP): real ES-module output so React.lazy boundaries
-            // (Settings/MUI-Joy, Weather, Cheatsheet, AIcompletion,
-            // MacrosMenu) split into separate chunks that load on demand
-            // instead of being inlined into the entry. Vendors are grouped
-            // so the big, rarely-changing libraries cache independently of
-            // app code. Content-hashed names → cache-forever + SW precache.
-            output: {
-              format: 'es',
-              entryFileNames: 'assets/[name].[hash].js',
-              chunkFileNames: 'assets/[name].[hash].js',
-              assetFileNames: 'assets/[name].[hash][extname]',
-              manualChunks(id) {
-                if (!id.includes('node_modules')) return undefined
-                if (id.includes('react-dom') || /node_modules\/(react|scheduler)\//.test(id)) {
-                  return 'react-vendor'
-                }
-                if (id.includes('framer-motion')) return 'framer-motion'
-                if (id.includes('@splidejs')) return 'splide'
-                if (id.includes('minisearch')) return 'minisearch'
-                return 'vendor'
-              }
-            }
-          }
-        : {
-            // Static (file://): single IIFE so the browser doesn't apply
-            // module CORS rules. inlineDynamicImports collapses lazy chunks
-            // into one file (IIFE can't code-split); singlefile then inlines
-            // it into index.html.
-            output: {
-              format: 'iife',
-              inlineDynamicImports: true,
-              entryFileNames: 'assets/[name].[hash].js',
-              assetFileNames: 'assets/[name].[hash][extname]'
-            }
-          }
+      rollupOptions: { output: hosted ? hostedOutput : staticOutput }
     }
   }
 })

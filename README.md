@@ -41,10 +41,15 @@ No need to open a calculator app or Google a conversion:
 
 | You type | You get |
 |---|---|
-| `2 * (3 + 4)` | `14` — copied to clipboard on Enter |
+| `2 * (3 + 4)`, `sqrt(2)`, `5!` | `14`, `1.414213562`, `120` — copied to clipboard on Enter |
+| `15% of 80`, `80 - 20%` | `12`, `64` |
 | `100 EUR to USD` | Live exchange rate, no API key needed |
-| `5kg in lb` | `11.023 lb` |
-| `90min in hours` | `1.5 hours` |
+| `5kg in lb`, `10 km in mi`, `72 f to c` | Weight, length, temperature, volume, area, speed, data size, duration |
+| `255 in hex` | `0xff` |
+| `time in tokyo`, `3pm london to new york` | Time zones, offline |
+
+Type a web address (`github.com/you`, `localhost:3000`) and Enter goes straight there. Alt+Enter or Cmd+Enter opens any result in a
+new tab.
 
 ### Ask AI inline
 Double-tap Space to stream an answer from ChatGPT, Ollama, LM Studio, or any OpenAI-compatible endpoint. The response appears right above the search bar — no context switching.
@@ -53,7 +58,8 @@ Double-tap Space to stream an answer from ChatGPT, Ollama, LM Studio, or any Ope
 A minimal weather chip shows current conditions. Hover for a 5-day forecast. Powered by OpenWeatherMap (free tier).
 
 ### Browse your macros visually
-Press Shift or right-click to open a glassmorphic card carousel of your pinned sites. Type to filter. Use keyboard shortcuts to jump directly.
+Your pinned sites sit in a dock at the bottom of the start screen. Tap Shift (or right-click, or scroll up) to open the full card
+grid with the clock: type to filter, arrows and Enter to open, or Shift plus a card's letter to jump directly.
 
 ### Stay in control
 Press `?` to see every keyboard shortcut. Open Settings to configure everything from search engines to animation behavior. Export your config as JSON and carry it between machines.
@@ -216,6 +222,18 @@ Chevron never probes localhost unless you explicitly configure a local provider 
 | Key | Action |
 |---|---|
 | Just start typing | Search — the input always has focus |
+| `Enter` | Open the highlighted result, or copy an instant answer |
+| `Alt+Enter` / `Cmd+Enter` | Open in a new tab |
+| `Ctrl` + `Enter` | Force the search engine (skip macros and addresses) |
+| `Tab` / `Shift+Tab`, `↑` / `↓` | Move through suggestions |
+| `Shift+Delete` | Remove the highlighted history entry |
+| `Esc` | Step back: close a panel, the AI answer, the menu filter, the menu, then clear the query |
+| Tap `Shift` | Toggle the sites menu |
+| `Space Space` | Ask AI |
+| `?` | Show all keyboard shortcuts |
+
+---|---|
+| Just start typing | Search — the input always has focus |
 | `Enter` | Search or copy instant answer |
 | `Esc` | Clear query (double-tap: full reset) |
 | `Tab` / `Shift+Tab` | Cycle suggestions |
@@ -254,8 +272,8 @@ MIT — use it however you want. See [LICENSE.md](./LICENSE.md).
 
 ## Contributing
 
-- [Roadmap.md](./Roadmap.md) — what's planned, what's shipped, and what's up for grabs
-- [Maintainer.md](./Maintainer.md) — architecture overview and development conventions
+- [docs/README.md](./docs/README.md) — feature pages, decisions, and a note for every source file
+- [docs/guides/development.md](./docs/guides/development.md) — building, testing and where code lives
 
 ---
 
