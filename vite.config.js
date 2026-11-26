@@ -71,7 +71,6 @@ const hostedOutput = {
 
 const staticOutput = {
   format: 'iife',
-  inlineDynamicImports: true,
   entryFileNames: 'assets/[name].[hash].js',
   assetFileNames: 'assets/[name].[hash][extname]'
 }
@@ -93,7 +92,7 @@ export default defineConfig(({ mode }) => {
     },
     build: {
       chunkSizeWarningLimit: 700,
-      rollupOptions: { output: hosted ? hostedOutput : staticOutput }
+      rolldownOptions: { output: hosted ? hostedOutput : staticOutput }
     }
   }
 })

@@ -28,10 +28,10 @@ describe('config change event', () => {
 
   it('does not fire when storage rejects the write', () => {
     const { spy, stop } = countEvents()
-    const original = localStorage.setItem
-    localStorage.setItem = () => { throw new Error('quota') }
+    // Spy on the prototype: assigning localStorage.setItem does not shadow the method in every jsdom/Vitest storage shim.
+    const write = vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => { throw new Error('quota') })
     const result = saveConfig(good)
-    localStorage.setItem = original
+    write.mockRestore()
     stop()
     expect(result.ok).toBe(false)
     expect(spy).not.toHaveBeenCalled()

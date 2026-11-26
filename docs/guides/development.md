@@ -1,6 +1,6 @@
 # Development
 
-> Verified: 2026-11-26 00:24 · Sources: `package.json`, `vite.config.js`, `scripts/verify.sh`, `scripts/e2e/run.mjs`, `tools/vite/htmlTransforms.js`, `scripts/owner/install-deps.sh`
+> Verified: 2026-11-26 08:11 · Sources: `package.json`, `vite.config.js`, `scripts/verify.sh`, `scripts/e2e/run.mjs`, `tools/vite/htmlTransforms.js`, `scripts/owner/install-deps.sh`
 
 ## Run
 - `npm run dev`: dev server with hot reload.
@@ -14,8 +14,13 @@
 - `scripts/verify.sh`: the full gate (tests, lint, structure limits on touched files, both builds, e2e, doc checks). Run it through
   `~/.claude-personal/framework/bin/gate` before committing.
 
-The e2e runner needs `playwright-core`. Until `scripts/owner/install-deps.sh --run` adds it to the project, put the path of an
-existing copy in the untracked file `scripts/e2e/playwright-path.local`, or set `PLAYWRIGHT_CORE`.
+The e2e runner uses the project's `playwright-core`; the `PLAYWRIGHT_CORE` variable (or a path in an untracked
+`playwright-path.local` next to the runner) points it at another copy.
+
+## Dependencies
+Toolchain: Vite 8 (Rolldown), Vitest 5 and `@vitejs/plugin-react` 6, which need Node 22.12 or newer. `npm audit` is clean. The
+`overrides` in `package.json` pin patched transitive packages the direct dependencies have not picked up yet: `glob` under
+`workbox-build` and `brace-expansion` 1.x under ESLint 8's `minimatch`. Drop an override once its parent ships the fix.
 
 ## Where things live
 | Path | Holds |
