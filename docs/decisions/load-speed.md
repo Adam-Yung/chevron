@@ -72,3 +72,17 @@ by at most 7 of 255 on any channel in the chevron area, which is anti-aliasing.
 - Build-time prerender: still judged too costly against the same gain (previous entry); nothing new reopens it.
 - Loading the app CSS with the `media="print"` swap trick: it no longer blocks paint, but nothing then stops React mounting
   unstyled. The in-body link keeps that ordering for free.
+
+## 2026-11-26 · Live result of the first-paint shell (`452820d`)
+
+Measured on `https://adam-yung.github.io/chevron/` with `scripts/perf/load.mjs`, three runs each, against the `e9d9ac3` row above:
+
+| Network, cold | First paint | Input visible |
+|---|---|---|
+| Unthrottled | ~85 ms → ~80 ms | ~85 ms → ~100 ms |
+| Fast 4G | ~1.1 s → ~0.30 s | ~1.1 s → ~1.1 s |
+| Slow 4G | ~3.85 s → ~0.60 s | ~3.85 s → ~3.86 s |
+
+First-visit requests 16 → 14 (the Cheatsheet chunk and its CSS no longer load at boot). Warm visits ~35 ms; CLS 0; the offline reload
+boots with no failed request. No further change is planned: what remains is the bundle's own download, which only a smaller stack
+would shorten (weighed and declined in the first entry).
