@@ -27,8 +27,9 @@ export default function useChevronCanvas(canvasRef, { size, color, thickness }) 
 
     if (typeof OffscreenCanvas !== 'undefined' && canvas.transferControlToOffscreen) {
       try {
-        const offscreen = canvas.transferControlToOffscreen()
+        // Worker first: on file:// it throws, and the canvas must not be transferred yet or the fallback cannot draw on it.
         const worker = new ChevronWorker()
+        const offscreen = canvas.transferControlToOffscreen()
         worker.postMessage({
           type: 'init',
           canvas: offscreen,

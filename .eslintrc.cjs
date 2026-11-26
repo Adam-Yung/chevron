@@ -1,24 +1,27 @@
 module.exports = {
-    "env": {
-        "browser": true,
-        "es2021": true
+  root: true,
+  env: { browser: true, es2022: true },
+  extends: ['eslint:recommended', 'plugin:react/recommended', 'plugin:react-hooks/recommended'],
+  parserOptions: { ecmaVersion: 'latest', sourceType: 'module' },
+  plugins: ['react'],
+  settings: { react: { version: '18.2' } },
+  rules: {
+    'react/react-in-jsx-scope': 'off',
+    'react/prop-types': 'off'
+  },
+  overrides: [
+    {
+      files: ['scripts/**', 'tools/**', 'services/**', 'vite.config.js', '*.cjs'],
+      env: { node: true, browser: false }
     },
-    "extends": [
-        "eslint:recommended",
-        "plugin:react/recommended",
-        "plugin:react-hooks/recommended"
-    ],
-    "overrides": [
-    ],
-    "parserOptions": {
-        "ecmaVersion": "latest",
-        "sourceType": "module"
+    {
+      files: ['scripts/e2e/**'],
+      // page.evaluate callbacks run in the browser
+      env: { node: true, browser: true }
     },
-    "plugins": [
-        "react"
-    ],
-    "rules": {
-        "react/react-in-jsx-scope": "off",
-        "react/prop-types": "off"
+    {
+      files: ['**/*.test.js', '**/*.test.jsx', 'test/**'],
+      globals: { vi: 'readonly', describe: 'readonly', it: 'readonly', expect: 'readonly', beforeEach: 'readonly', afterEach: 'readonly', beforeAll: 'readonly', afterAll: 'readonly' }
     }
+  ]
 }

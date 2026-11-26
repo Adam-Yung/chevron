@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { stripModuleMarkersFromHtml } from '../build/htmlTransforms.js'
+import { stripModuleMarkersFromHtml, moveAppScriptToBodyEnd, prepareStaticHtml } from './htmlTransforms.js'
 
 describe('stripModuleMarkersFromHtml', () => {
   it('drops crossorigin from <script> tags (file:// / IIFE compat)', () => {
@@ -45,5 +45,39 @@ describe('stripModuleMarkersFromHtml', () => {
     expect(out).not.toContain('type="module"')
     // modulepreload gone
     expect(out).not.toContain('modulepreload')
+  })
+})
+
+describe('moveAppScriptToBodyEnd', () => {
+  const page = [
+    '<html><head>',
+    '<script defer src="./assets/index.abc.js"></script>',
+    '</head><body><div id="root"></div>',
+    '<script src="config.js"></script>',
+    '<script src="icons.js"></script>',
+    '</body></html>'
+  ].join('\n')
+
+  it('runs the bundle after config.js and icons.js, which define window.CONFIG and window.ICONS', () => {
+    const out = moveAppScriptToBodyEnd(page)
+    expect(out.indexOf('icons.js')).toBeLessThan(out.indexOf('assets/index.abc.js'))
+    expect(out.indexOf('assets/index.abc.js')).toBeLessThan(out.indexOf('</body>'))
+    expect(out.match(/assets\/index/g)).toHaveLength(1)
+  })
+
+  it('drops defer, which an inlined script ignores anyway', () => {
+    expect(moveAppScriptToBodyEnd(page)).toContain('<script src="./assets/index.abc.js"></script>')
+  })
+
+  it('leaves a page without an app bundle untouched', () => {
+    const plain = '<html><body><script src="config.js"></script></body></html>'
+    expect(moveAppScriptToBodyEnd(plain)).toBe(plain)
+  })
+
+  it('composes with stripModuleMarkersFromHtml for the static build', () => {
+    const vitePage = page.replace('<script defer src', '<script type="module" crossorigin src')
+    const out = prepareStaticHtml(vitePage)
+    expect(out).not.toContain('type="module"')
+    expect(out.indexOf('icons.js')).toBeLessThan(out.indexOf('assets/index.abc.js'))
   })
 })

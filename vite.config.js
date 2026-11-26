@@ -6,7 +6,7 @@ import { VitePWA } from 'vite-plugin-pwa'
 import { readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { dirname, resolve } from 'node:path'
-import { stripModuleMarkersFromHtml } from './build/htmlTransforms.js'
+import { prepareStaticHtml } from './tools/vite/htmlTransforms.js'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const pkg = JSON.parse(readFileSync(resolve(__dirname, 'package.json'), 'utf8'))
@@ -54,16 +54,14 @@ function publicCacheBust() {
   }
 }
 
-// Strip the `crossorigin` attribute and `type="module"` from <script>
-// tags in the built HTML. Browsers enforce CORS on ES module loads, which
-// blocks the page entirely when opened from file://. By emitting the JS
-// as IIFE (see rollupOptions below) and dropping these attributes, the
-// hosted build works both from an HTTP server and from the local filesystem.
-function stripModuleMarkers() {
+// Static profile only: make the single-file output run from file:// (see tools/vite/htmlTransforms.js). `apply: 'build'` keeps
+// the dev server's module scripts intact; stripping them there stopped the dev page from booting.
+function staticHtml() {
   return {
-    name: 'chevron-strip-module-markers',
+    name: 'chevron-static-html',
+    apply: 'build',
     enforce: 'post',
-    transformIndexHtml: stripModuleMarkersFromHtml
+    transformIndexHtml: prepareStaticHtml
   }
 }
 
@@ -114,7 +112,7 @@ export default defineConfig(({ mode }) => {
             navigateFallback: `${base}index.html`
           }
         })
-      ] : [viteSingleFile(), stripModuleMarkers()])
+      ] : [viteSingleFile(), staticHtml()])
     ],
     base,
     preview: {
@@ -129,7 +127,7 @@ export default defineConfig(({ mode }) => {
       environment: 'jsdom',
       globals: true,
       setupFiles: ['./test/setup.js'],
-      include: ['src/**/*.{test,spec}.{js,jsx}', 'test/**/*.{test,spec}.{js,jsx}']
+      include: ['src/**/*.{test,spec}.{js,jsx}', 'test/**/*.{test,spec}.{js,jsx}', 'tools/**/*.{test,spec}.{js,jsx}']
     },
     build: {
       // Raise the warning limit; the static single-file bundle is ~580 KB.

@@ -1,0 +1,8 @@
+{
+  "mirrors": {
+    "sources": ["tools/*.js", "scripts/*.mjs", "scripts/*.sh"],
+    "exclude": ["*.test.js", "*.test.jsx", "scripts/e2e/specs/*"]
+  },
+  "freshness": {"folders": ["docs/guides", "docs/features"], "exempt": []},
+  "links": {"skip": ["docs/decisions/", "docs/history/"]}
+}
