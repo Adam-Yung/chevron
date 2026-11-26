@@ -1,0 +1,19 @@
+docs/decisions/load-speed.md
+  s_b4a37bac32d5b1::t_2a30873e021461 75-88
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.24",
+  "base_commit_sha": "d11c2038158b602a23749fde74f8cebb4f0eee28",
+  "prompts": {},
+  "sessions": {
+    "s_b4a37bac32d5b1": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "48eb1a00-56c5-4913-a3dd-54832a4bac75",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Adam Yung <adyung@paloaltonetworks.com>"
+    }
+  }
+}
