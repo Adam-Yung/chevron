@@ -10,6 +10,7 @@ import { readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { dirname, resolve } from 'node:path'
 import { inlineFontCss, inlineFonts, prepareStaticHtml } from './tools/vite/htmlTransforms.js'
+import { workboxOptions } from './tools/vite/serviceWorker.js'
 
 const root = dirname(fileURLToPath(import.meta.url))
 const APP_VERSION = JSON.parse(readFileSync(resolve(root, 'package.json'), 'utf8')).version || '0.0.0'
@@ -54,11 +55,7 @@ function hostedPlugins(base) {
     registerType: 'autoUpdate',
     injectRegister: 'inline',
     manifest: false,
-    workbox: {
-      globPatterns: ['**/*.{html,js,css,svg,png,ico,woff,woff2,json}'],
-      cleanupOutdatedCaches: true,
-      navigateFallback: `${base}index.html`
-    }
+    workbox: workboxOptions(base)
   })]
 }
 

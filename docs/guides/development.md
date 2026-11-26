@@ -1,6 +1,6 @@
 # Development
 
-> Verified: 2026-11-26 08:39 · Sources: `package.json`, `vite.config.js`, `scripts/verify.sh`, `scripts/e2e/run.mjs`, `tools/vite/htmlTransforms.js`, `scripts/owner/install-deps.sh`
+> Verified: 2026-11-26 10:07 · Sources: `package.json`, `vite.config.js`, `scripts/verify.sh`, `scripts/e2e/run.mjs`, `tools/vite/htmlTransforms.js`, `scripts/owner/install-deps.sh`
 
 ## Run
 - `npm run dev`: dev server with hot reload.
