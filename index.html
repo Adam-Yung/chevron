@@ -19,22 +19,58 @@
     <link rel="stylesheet" href="font.css">
     <title>Chevron</title>
 
-    <!-- Paint the saved theme's background before the bundle loads, so a dark theme never flashes white. Any problem with the
-         stored settings just skips this; the app applies the theme itself a moment later. -->
+    <!-- First-paint shell (docs/code/src/app/bootShell.js.md): the idle chevron and a hidden field that keeps keys typed before React
+         mounts. The defaults below are the default theme's; the script swaps in the saved theme and chevron settings. -->
+    <style>
+      html { background: #dee1e6; --boot-chevron: #212121 }
+      @media (prefers-color-scheme: dark) { html { background: #212121; --boot-chevron: #f2f2f2 } }
+      #boot-shell { position: fixed; inset: 0; z-index: 5; pointer-events: none; --chev: 50vh }
+      @supports (height: 1dvh) { #boot-shell { --chev: 50dvh } }
+      @media (orientation: portrait) { #boot-shell { --chev: 40vw } }
+      #boot-shell svg { position: absolute; top: calc(50% - var(--chev)); left: calc(50% - var(--chev)); width: calc(var(--chev) * 2);
+        height: calc(var(--chev) * 2); overflow: visible }
+      #boot-shell path { fill: none; stroke: var(--boot-chevron); stroke-width: var(--boot-thickness, 15px); stroke-linecap: round;
+        stroke-linejoin: round; vector-effect: non-scaling-stroke; transform: scale(var(--boot-size, 0.2)) }
+      #boot-input { position: absolute; top: 50%; left: 0; width: 1px; height: 1px; padding: 0; border: 0; opacity: 0; resize: none }
+    </style>
+
+    <!-- Paint the saved theme's background and chevron before the bundle loads, so a dark theme never flashes white. Any problem
+         with the stored settings just skips this; the app applies the theme itself a moment later. -->
     <script>
       try {
-        const appearance = JSON.parse(localStorage.getItem('settings'))?.appearance
+        const settings = JSON.parse(localStorage.getItem('settings'))
+        const appearance = settings?.appearance
         const scheme = appearance?.colorScheme === 'auto' || !appearance?.colorScheme
           ? (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
           : appearance.colorScheme
-        const background = appearance?.themes?.[appearance.activeTheme]?.[scheme]?.background
-        if (background) document.documentElement.style.backgroundColor = background
+        const colors = appearance?.themes?.[appearance.activeTheme]?.[scheme]
+        const style = document.documentElement.style
+        if (colors?.background) style.backgroundColor = colors.background
+        if (colors?.chevron) style.setProperty('--boot-chevron', colors.chevron)
+        if (settings?.chevron?.size > 0) style.setProperty('--boot-size', settings.chevron.size / 100)
+        if (settings?.chevron?.thickness > 0) style.setProperty('--boot-thickness', settings.chevron.thickness + 'px')
       } catch {}
     </script>
 
   </head>
   <body>
     <div id="root"></div>
+    <div id="boot-shell">
+      <svg aria-hidden="true" viewBox="-1 -1 2 2"><path d="M0 -1L1 0L0 1" /></svg>
+      <textarea id="boot-input" aria-label="Search" tabindex="-1" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></textarea>
+    </div>
+    <script>
+      // Not on touch screens: focusing at load would pop the on-screen keyboard unasked (as in QueryField). Enter has nothing to
+      // act on yet, so it must not become a newline in the handed-over text. Escape clears, as it clears a query in the app.
+      try {
+        const early = document.getElementById('boot-input')
+        early.addEventListener('keydown', e => {
+          if (e.key === 'Enter') e.preventDefault()
+          if (e.key === 'Escape') early.value = ''
+        })
+        if (!matchMedia('(pointer: coarse)').matches) early.focus({ preventScroll: true })
+      } catch {}
+    </script>
     <script src="config.js"></script>
     <script src="icons.js"></script>
     <script type="module" src="/src/main.jsx"></script>

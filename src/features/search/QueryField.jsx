@@ -1,8 +1,9 @@
-import { lazy, memo, Suspense, useCallback, useContext, useEffect } from 'react'
+import { lazy, memo, Suspense, useCallback, useContext, useLayoutEffect } from 'react'
 import { SettingsContext } from '../../settings/SettingsProvider'
 import { useDispatch, useUi } from '../../state/UiStore'
 import { ui } from '../../state/ui'
 import { useSuggestionList } from '../../search/SearchProvider'
+import { takeBootInput } from '../../app/bootShell'
 import { sameSuggestion } from '../../search/suggestions'
 import Suggestions, { SUGGESTIONS_LISTBOX_ID, suggestionOptionId } from './Suggestions'
 import useAdaptiveFontSize from './useAdaptiveFontSize'
@@ -12,12 +13,17 @@ import classes from './QueryField.module.css'
 
 const AIcompletion = lazy(() => import('../ai/AIcompletion'))
 
-function useAutoFocus() {
-  useEffect(() => {
+// A layout effect: the shell's field leaves the DOM in this same task, so focus moves straight to the real field and no key typed in
+// between is lost.
+function useBootHandoff(dispatch) {
+  useLayoutEffect(() => {
+    const field = document.getElementById(QUERY_FIELD_ID)
+    const early = takeBootInput()
+    if (early) dispatch(ui.typed(early))
     // On touch screens focusing at load would pop the on-screen keyboard unasked.
     if (window.matchMedia?.('(pointer: coarse)').matches) return
-    document.getElementById(QUERY_FIELD_ID)?.focus({ preventScroll: true })
-  }, [])
+    field?.focus({ preventScroll: true })
+  }, [dispatch])
 }
 
 function AiPanel() {
@@ -42,7 +48,7 @@ function QueryField() {
   const items = useSuggestionList()
   const [boxRef, fontSize] = useAdaptiveFontSize(query, settings.query.field.fontSize)
   const { pick, hover } = usePick()
-  useAutoFocus()
+  useBootHandoff(dispatch)
 
   const activeIndex = selection ? items.findIndex(s => sameSuggestion(s, selection)) : -1
   const open = Boolean(query) && items.length > 0

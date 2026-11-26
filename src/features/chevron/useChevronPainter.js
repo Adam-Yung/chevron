@@ -13,10 +13,14 @@ function measure(host, thickness) {
 
 // The worker is created before the canvas is transferred: on file:// creating it throws, and a transferred canvas can no longer
 // be drawn on from the main thread.
-function startPainter(canvas, init) {
+function startPainter(canvas, init, onFirstFrame) {
   if (typeof OffscreenCanvas !== 'undefined' && canvas.transferControlToOffscreen) {
     try {
       const worker = new ChevronWorker()
+      // The worker's frame is not the page's: wait one page frame too, so the canvas has reached the screen.
+      worker.onmessage = ({ data }) => { if (data?.type === 'painted') requestAnimationFrame(onFirstFrame) }
+      // A worker chunk that fails to load never reports; drop the shell rather than leave a stale chevron for the session.
+      worker.onerror = () => onFirstFrame()
       const offscreen = canvas.transferControlToOffscreen()
       worker.postMessage({ ...init, type: 'init', canvas: offscreen }, [offscreen])
       return worker
@@ -24,20 +28,21 @@ function startPainter(canvas, init) {
       // fall through to the main-thread painter
     }
   }
-  const painter = createChevronPainter(canvas, { raf: cb => requestAnimationFrame(cb), now: () => performance.now() })
+  const painter = createChevronPainter(canvas, { raf: cb => requestAnimationFrame(cb), now: () => performance.now() }, onFirstFrame)
   painter.postMessage({ ...init, type: 'init' })
   return painter
 }
 
 /**
- * Mounts a canvas into `hostRef` and returns `post(message)` for morph/snap/style messages (see chevronPainter.js).
+ * Mounts a canvas into `hostRef` and returns `post(message)` for morph/snap/style messages (see chevronPainter.js). `onFirstFrame`
+ * runs once the first drawing is on screen.
  * The canvas is created here, not rendered by React: a transferred canvas cannot be transferred again, and React's StrictMode
  * mounts effects twice on the same element.
  */
-export default function useChevronPainter(hostRef, { stages, stage, color, thickness }) {
+export default function useChevronPainter(hostRef, { stages, stage, color, thickness, onFirstFrame }) {
   const painterRef = useRef(null)
   const latest = useRef({ stages, stage, color, thickness })
-  latest.current = { stages, stage, color, thickness }
+  latest.current = { stages, stage, color, thickness, onFirstFrame }
 
   useEffect(() => {
     const host = hostRef.current
@@ -45,7 +50,8 @@ export default function useChevronPainter(hostRef, { stages, stage, color, thick
     canvas.setAttribute('aria-hidden', 'true')
     host.appendChild(canvas)
     const { stages: s, stage: initialStage, color: c, thickness: t } = latest.current
-    const painter = startPainter(canvas, { ...measure(host, t), stages: s.map(a => Array.from(a)), stage: initialStage, color: c })
+    const firstFrame = () => latest.current.onFirstFrame?.()
+    const painter = startPainter(canvas, { ...measure(host, t), stages: s.map(a => Array.from(a)), stage: initialStage, color: c }, firstFrame)
     painterRef.current = painter
 
     let frame = 0

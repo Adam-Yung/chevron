@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { stripModuleMarkersFromHtml, moveAppScriptToBodyEnd, prepareStaticHtml, inlineFonts, inlineFontCss } from './htmlTransforms.js'
+import { stripModuleMarkersFromHtml, moveAppScriptToBodyEnd, prepareStaticHtml, inlineFonts, inlineFontCss, moveAppStylesheetsAfterShell } from './htmlTransforms.js'
 
 describe('stripModuleMarkersFromHtml', () => {
   it('drops crossorigin from <script> tags (file:// / IIFE compat)', () => {
@@ -116,5 +116,32 @@ describe('inlineFontCss', () => {
 
   it('leaves a page without the font stylesheet alone', () => {
     expect(inlineFontCss('<head></head>', css)).toBe('<head></head>')
+  })
+})
+
+describe('moveAppStylesheetsAfterShell', () => {
+  const page = [
+    '<head><link rel="stylesheet" crossorigin href="./assets/index.abc.css"><link rel="preload" href="fonts/a.woff2" as="font"></head>',
+    '<body><div id="root"></div><div id="boot-shell"></div><script src="config.js?v=1"></script>',
+    '<script src="icons.js?v=1"></script></body>'
+  ].join('')
+
+  it('moves the app stylesheet out of <head> to just before config.js', () => {
+    const out = moveAppStylesheetsAfterShell(page)
+    const head = out.slice(0, out.indexOf('</head>'))
+    expect(head).not.toContain('index.abc.css')
+    expect(out.indexOf('boot-shell')).toBeLessThan(out.indexOf('index.abc.css'))
+    expect(out.indexOf('index.abc.css')).toBeLessThan(out.indexOf('config.js'))
+  })
+
+  it('leaves other links where they are', () => {
+    expect(moveAppStylesheetsAfterShell(page)).toContain('<link rel="preload" href="fonts/a.woff2" as="font"></head>')
+  })
+
+  it('leaves a page without config.js or without app stylesheets alone', () => {
+    const noConfig = page.replace(/<script src="config[^<]*<\/script>/, '')
+    expect(moveAppStylesheetsAfterShell(noConfig)).toBe(noConfig)
+    const noCss = page.replace(/<link rel="stylesheet"[^>]*>/, '')
+    expect(moveAppStylesheetsAfterShell(noCss)).toBe(noCss)
   })
 })

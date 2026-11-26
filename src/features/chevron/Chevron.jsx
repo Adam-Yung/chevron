@@ -1,5 +1,6 @@
-import { useContext, useEffect, useMemo, useRef } from 'react'
+import { useContext, useEffect, useLayoutEffect, useMemo, useRef } from 'react'
 import { SettingsContext, ThemeContext } from '../../settings/SettingsProvider'
+import { dismissBootShell } from '../../app/bootShell'
 import parseStages from './parseStages'
 import useChevronPainter from './useChevronPainter'
 import classes from './Chevron.module.css'
@@ -15,7 +16,12 @@ export default function Chevron({ view, duration }) {
   const stages = useMemo(() => parseStages(size), [size])
   const stage = STAGE_FOR_VIEW[view] ?? 0
   const hostRef = useRef(null)
-  const post = useChevronPainter(hostRef, { stages, stage, color: theme.chevron, thickness: settings.chevron.thickness })
+  const post = useChevronPainter(hostRef, { stages, stage, color: theme.chevron, thickness: settings.chevron.thickness, onFirstFrame: dismissBootShell })
+
+  // The shell's chevron is the idle shape; it must not outlive the idle view, even if the canvas never reports its first frame.
+  useLayoutEffect(() => {
+    if (view !== 'idle') dismissBootShell()
+  }, [view])
 
   const shown = useRef(stage)
   useEffect(() => {

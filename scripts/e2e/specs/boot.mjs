@@ -23,6 +23,8 @@ export default {
     assert(errors.length === 0, 'file:// page errors: ' + errors.join(' | '))
     const fontLoaded = await page.evaluate(async () => { await document.fonts.ready; return document.fonts.check('16px Onest') })
     assert(fontLoaded, 'the Onest font did not load from file://')
+    // file:// draws the chevron on the main thread, which must hand over from the first-paint shell too.
+    await page.waitForSelector('#boot-shell', { state: 'detached', timeout: 3000 })
   },
 
   async 'boots cleanly over an empty or partial settings blob'(app) {

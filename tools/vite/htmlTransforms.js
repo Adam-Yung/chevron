@@ -45,6 +45,23 @@ export function inlineFontCss(html, fontCss) {
   return html.replace(FONT_STYLESHEET, `<style>${stripCssComments(fontCss)}</style>\n`)
 }
 
+const APP_STYLESHEETS = /<link\s+rel="stylesheet"[^>]*\bhref="[^"]*assets\/[^"]+\.css"[^>]*>\s*/g
+const FIRST_BODY_SCRIPT = /<script\s+src="config\.js/
+
+/**
+ * Hosted profile: move the app's stylesheets from <head> into <body>, just before config.js. In <head> they held back the first
+ * paint, the shell included, for a whole download; in <body> they block only what follows them, and the scripts after them still
+ * wait for them, so the app never mounts unstyled.
+ * @param {string} html
+ * @returns {string}
+ */
+export function moveAppStylesheetsAfterShell(html) {
+  const links = html.match(APP_STYLESHEETS)
+  if (!links || !FIRST_BODY_SCRIPT.test(html)) return html
+  const tags = links.map(l => l.trim()).join('\n    ')
+  return html.replace(APP_STYLESHEETS, '').replace(FIRST_BODY_SCRIPT, m => `${tags}\n    ${m}`)
+}
+
 const FONT_LINKS = /<link\s+rel="(?:stylesheet|preload)"\s+href="font\.css"[^>]*>\s*|<link\s+rel="preload"\s+href="fonts\/[^"]+"[^>]*>\s*/g
 
 /**

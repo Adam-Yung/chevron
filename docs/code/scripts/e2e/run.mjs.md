@@ -6,4 +6,6 @@ and the specs are plain async functions keyed by name in `scripts/e2e/specs/*.mj
 - Each spec gets a fresh browser context (`lib/app.mjs`), so localStorage and service-worker state never leak between specs.
 - A spec fails on any uncaught page error even if its assertions pass: stuck states usually start as a swallowed exception.
 - On failure a screenshot lands in `dist/` (ignored) for inspection.
-- It loads the static build because that is the profile most users run (release zip, `file://`, local server).
+- It loads the static build because that is the profile most users run (release zip, `file://`, local server). The `hosted-*` specs
+  serve `dist-hosted/` themselves (`E2E_HOSTED_DIST` points elsewhere): the first-paint shell, what boot fetches, the offline reload
+  and the service-worker update path.

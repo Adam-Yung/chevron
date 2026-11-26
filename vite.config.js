@@ -9,7 +9,7 @@ import { VitePWA } from 'vite-plugin-pwa'
 import { readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { dirname, resolve } from 'node:path'
-import { inlineFontCss, inlineFonts, prepareStaticHtml } from './tools/vite/htmlTransforms.js'
+import { inlineFontCss, inlineFonts, moveAppStylesheetsAfterShell, prepareStaticHtml } from './tools/vite/htmlTransforms.js'
 import { workboxOptions } from './tools/vite/serviceWorker.js'
 
 const root = dirname(fileURLToPath(import.meta.url))
@@ -46,7 +46,11 @@ function hostedHtml() {
   return {
     name: 'chevron-hosted-html',
     apply: 'build',
-    transformIndexHtml: html => inlineFontCss(html, readFileSync(resolve(root, 'public/font.css'), 'utf8'))
+    transformIndexHtml: {
+      // After Vite has injected the built asset tags, which the stylesheet move needs to see.
+      order: 'post',
+      handler: html => moveAppStylesheetsAfterShell(inlineFontCss(html, readFileSync(resolve(root, 'public/font.css'), 'utf8')))
+    }
   }
 }
 

@@ -47,7 +47,8 @@ function Overlays() {
   return (
     <Suspense fallback={null}>
       {overlay === 'settings' && <Settings onClose={close} />}
-      <Cheatsheet open={overlay === 'cheatsheet'} onClose={close} />
+      {/* Mounted only while open: mounted always, its chunk was fetched at boot, competing with the first paint on slow networks. */}
+      {overlay === 'cheatsheet' && <Cheatsheet open onClose={close} />}
     </Suspense>
   )
 }

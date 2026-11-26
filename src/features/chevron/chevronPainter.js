@@ -5,8 +5,9 @@ import { drawChevron } from './drawChevron'
 /**
  * @param {HTMLCanvasElement | OffscreenCanvas} canvas
  * @param {{ raf: (cb: () => void) => unknown, now: () => number }} clock
+ * @param {() => void} [onFirstFrame]  called one frame after the first drawing, when it is on screen
  */
-export function createChevronPainter(canvas, clock) {
+export function createChevronPainter(canvas, clock, onFirstFrame) {
   const ctx = canvas.getContext('2d')
   const style = { width: canvas.width, height: canvas.height, color: '#000', thickness: 10 }
   let morph = null
@@ -20,6 +21,7 @@ export function createChevronPainter(canvas, clock) {
       Object.assign(style, { color: m.color, thickness: m.thickness })
       morph = createMorph({ stages: m.stages, draw, ...clock })
       morph.snap(m.stage ?? 0)
+      if (onFirstFrame) clock.raf(onFirstFrame)
     },
     resize(m) {
       canvas.width = style.width = m.width

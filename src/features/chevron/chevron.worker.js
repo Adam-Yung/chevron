@@ -4,6 +4,9 @@ import { createChevronPainter } from './chevronPainter'
 let painter = null
 
 self.onmessage = ({ data }) => {
-  if (data.type === 'init') painter = createChevronPainter(data.canvas, { raf: cb => self.requestAnimationFrame(cb), now: () => performance.now() })
+  if (data.type === 'init') {
+    const clock = { raf: cb => self.requestAnimationFrame(cb), now: () => performance.now() }
+    painter = createChevronPainter(data.canvas, clock, () => self.postMessage({ type: 'painted' }))
+  }
   painter?.postMessage(data)
 }

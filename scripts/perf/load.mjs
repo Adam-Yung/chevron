@@ -66,7 +66,7 @@ async function loadOnce(context, url, network) {
   await page.addInitScript(observeVitals)
   const started = Date.now()
   await page.goto(url, { waitUntil: 'load' })
-  await page.waitForSelector('textarea', { state: 'visible', timeout: 60000 })
+  await page.waitForSelector('textarea[role="combobox"]', { state: 'visible', timeout: 60000 })
   const inputVisible = Date.now() - started
   await page.waitForTimeout(1500)
   const vitals = await page.evaluate(readVitals)
@@ -86,7 +86,7 @@ async function offlineReload(browser, url) {
   page.on('requestfailed', r => failed.push(r.url().replace(url, '')))
   page.on('pageerror', e => failed.push(`error: ${e.message}`))
   await page.reload({ waitUntil: 'load' }).catch(e => failed.push(`reload: ${e.message}`))
-  const inputVisible = await page.locator('textarea').isVisible()
+  const inputVisible = await page.locator('textarea[role="combobox"]').isVisible()
   await context.close()
   return { inputVisible, failed }
 }

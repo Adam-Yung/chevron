@@ -1,7 +1,7 @@
 # tools/vite/htmlTransforms.js
 
-HTML rewrites applied at build time by `vite.config.js`: the static-profile ones through `chevron-static-html`, `inlineFontCss`
-through `chevron-hosted-html`.
+HTML rewrites applied at build time by `vite.config.js`: the static-profile ones through `chevron-static-html`, `inlineFontCss` and
+`moveAppStylesheetsAfterShell` through `chevron-hosted-html`.
 
 - **Why strip `type="module"` and `crossorigin`:** browsers CORS-gate module scripts, and a page opened from `file://` has an opaque
   origin, so a module script never loads there. The static bundle is emitted as an IIFE, so a classic script is correct.
@@ -20,3 +20,8 @@ Tests: `tools/vite/htmlTransforms.test.js`.
 - **Why inline only the font CSS in the hosted build (`inlineFontCss`):** `font.css` is 2 KB of `@font-face`, but a stylesheet link
   blocks first paint until it arrives, one extra round-trip on GitHub Pages. Inlining it removes that wait; the woff2 stays a
   separate, preloaded, service-worker-cached file instead of a data URL that every HTML response would carry.
+- **Why move the app stylesheet into `<body>` in the hosted build (`moveAppStylesheetsAfterShell`):** a stylesheet in `<head>` holds
+  back every paint until it arrives, so the first-paint shell waited for the 19 KB app CSS. In `<body>`, after the shell and before
+  `config.js`, it blocks only what follows it. The classic scripts after it wait for it, and the module only runs once parsing is done,
+  so the app never mounts unstyled (an e2e spec holds the CSS back to prove it). It runs with `order: 'post'`, after Vite has
+  injected the asset tags.

@@ -26,7 +26,12 @@
      portrait scales off width (vw) because vh >> vw there and vh-based
      horizontal measures would overflow the screen. */
   --chev: 50vh;
-  --chev: 50dvh;
+}
+/* A custom property takes any value, so a second `--chev: 50dvh` line would win even where dvh is unsupported. */
+@supports (height: 1dvh) {
+  .app {
+    --chev: 50dvh;
+  }
 }
 @media (orientation: portrait) {
   .app {
