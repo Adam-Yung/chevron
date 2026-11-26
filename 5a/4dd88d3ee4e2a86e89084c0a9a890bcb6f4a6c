@@ -1,0 +1,1038 @@
+docs/code/src/answers/cityZones.js.md
+  s_c2024c265595f7::t_c48b21596156c7 1-7
+src/features/weather/WeatherModal.jsx
+  s_c2024c265595f7::t_da50ac1b8a923c 1,5-6,9-16,19,21-30,35-36,39-44,46-53,55-62,65-66,72-80,82-83,87,91,93-94,96,98,105,114-116
+  s_c2024c265595f7::t_2902c7472015fb 67-71
+  s_c2024c265595f7::t_a63f9718905a70 2-4,7-8,17-18,20,31-34,37-38,45,54,63-64,81,84-86,88-90,92,95,97,99-104,106-113,117-119
+src/app/LayoutButton.jsx
+  s_c2024c265595f7::t_a63f9718905a70 1-25
+src/storage/macrosConfig.test.js
+  s_c2024c265595f7::t_4c51eca575c29e 67
+  s_c2024c265595f7::t_0ebbb08cf2475c 58-66,68-70
+  s_c2024c265595f7::t_01d352ddad36b6 1-57
+src/state/UiStore.jsx
+  s_c2024c265595f7::t_5548235e1edda7 1-33
+docs/code/src/features/settings-panel/GeocodeRow.jsx.md
+  s_c2024c265595f7::t_169ac28f2622e9 1-5
+src/answers/index.js
+  s_c2024c265595f7::t_d796e9f74a5f70 1-42
+src/app/LaunchOverlay.module.css
+  s_c2024c265595f7::t_f909fe6acee115 1-30
+docs/code/src/features/macros/ChevronTop.jsx.md
+  s_c2024c265595f7::t_2f88e1fbc7ecff 1-3
+docs/code/src/features/macros-editor/EditorToolbar.jsx.md
+  s_c2024c265595f7::t_e4eaf0e5969ee0 1-3
+docs/history/roadmap.md
+  s_c2024c265595f7::t_ef8f172129a344 1-220
+src/features/search/InteractiveBackground.test.jsx
+  s_c2024c265595f7::t_a63f9718905a70 1-37
+src/features/settings-panel/GeocodeRow.module.css
+  s_c2024c265595f7::t_7bce684ac2b62a 1-52
+docs/features/shortcuts.md
+  s_c2024c265595f7::t_5405113851d352 3
+  s_c2024c265595f7::t_96a186e9b3a7dd 1-2,4-33
+docs/code/src/app/copyText.js.md
+  s_c2024c265595f7::t_2f88e1fbc7ecff 1-3
+docs/code/src/input/useTouchGestures.js.md
+  s_c2024c265595f7::t_2f88e1fbc7ecff 1-3
+docs/code/src/features/macros-editor/EngineRow.jsx.md
+  s_c2024c265595f7::t_e4eaf0e5969ee0 1-3
+src/lib/color.test.js
+  s_c2024c265595f7::t_65737db038b539 1-38,42-85
+  s_c2024c265595f7::t_ea4c51810c7a2b 40
+  s_c2024c265595f7::t_e5da527df81317 39,41
+docs/code/src/app/useIntents.js.md
+  s_c2024c265595f7::t_2f88e1fbc7ecff 1-5,7-9
+  s_c2024c265595f7::t_de193b6e9ecaf2 6
+src/settings/useColorSchemeDetector.js
+  s_c2024c265595f7::t_a63f9718905a70 1-17
+docs/code/src/features/macros/filterMacros.js.md
+  s_c2024c265595f7::t_2f88e1fbc7ecff 1-3
+src/settings/settingTypes.jsx
+  s_c2024c265595f7::t_a63f9718905a70 1-4
+src/features/search/blobPath.js
+  s_c2024c265595f7::t_f5223c1ca0448d 1-16
+src/features/search/usePick.js
+  s_c2024c265595f7::t_c30e575f7de700 1-16
+docs/code/src/state/store.js.md
+  s_c2024c265595f7::t_2f88e1fbc7ecff 1-3
+src/features/ai/createCompletion.js
+  s_c2024c265595f7::t_a63f9718905a70 2,8,10-11,19,23-25,29,35,50,54-55
+  s_c2024c265595f7::t_860cb81a1e6dcc 1,3-7,9,12-18,20-22,26-28,30-34,36-49,51-53,56-66
+docs/code/src/features/macros-editor/IconPicker/IconPicker.jsx.md
+  s_c2024c265595f7::t_e4eaf0e5969ee0 1-3
+src/search/resolve.js
+  s_c2024c265595f7::t_80844dc2237393 1-15,17-115
+  s_c2024c265595f7::t_1a95fd49f46cbd 16
+src/settings/schema.test.js
+  s_c2024c265595f7::t_0522a1236ca8f7 1-26
+src/features/macros/MacrosMenu.module.css
+  s_c2024c265595f7::t_a5a858bbff4cea 1-12,16-17,19-110
+  s_c2024c265595f7::t_93d4b495aa612c 13-15,18
+docs/code/src/answers/timezones.js.md
+  s_c2024c265595f7::t_c48b21596156c7 1-12
+src/app/useDocumentTheme.js
+  s_c2024c265595f7::t_7429bf799d1a78 1-30
+docs/code/src/answers/percent.js.md
+  s_c2024c265595f7::t_c48b21596156c7 1-7
+docs/code/src/answers/units/index.js.md
+  s_c2024c265595f7::t_b09556b79e15a8 9
+  s_c2024c265595f7::t_c48b21596156c7 1-8
+docs/code/tools/vite/htmlTransforms.js.md
+  s_c2024c265595f7::t_3740e5c0dd8db1 16-18
+docs/code/src/features/macros-editor/BgColorEditor.jsx.md
+  s_c2024c265595f7::t_e4eaf0e5969ee0 1-3
+src/features/macros/MacrosLayer.module.css
+  s_c2024c265595f7::t_4efc5737b8fa3f 1-50
+docs/code/src/features/settings-panel/ColorPicker/ColorPicker.jsx.md
+  s_c2024c265595f7::t_169ac28f2622e9 1-8
+  s_c2024c265595f7::t_6e416f11be0291 9-12
+src/navigation/navigate.test.js
+  s_c2024c265595f7::t_3221fe6a24b5a0 1-46
+docs/code/vite.config.js.md
+  s_c2024c265595f7::t_c7cb25006d89ef 1-8
+src/features/onboarding/GestureHints.jsx
+  s_c2024c265595f7::t_a63f9718905a70 3-16,19-43,46,50-51,53-54,56-75
+  s_c2024c265595f7::t_296aaa714ff547 17-18
+  s_c2024c265595f7::t_61d9010dd881d8 1-2,44-45,47-49,52,55
+docs/code/src/features/weather/WeatherModal.jsx.md
+  s_c2024c265595f7::t_03058f6244bc75 1-9
+src/answers/index.test.js
+  s_c2024c265595f7::t_192107711ce246 1-80,82-85
+  s_c2024c265595f7::t_fd4cd643d2b710 81
+src/features/macros-editor/useConfigDraft.js
+  s_c2024c265595f7::t_0586399bd040f2 1-63,65-67,69-128
+  s_c2024c265595f7::t_76123663a6e052 64,68
+docs/code/src/settings/controlTypes.jsx.md
+  s_c2024c265595f7::t_ea1aeeb1324892 1-8
+src/features/search/QueryField.module.css
+  s_c2024c265595f7::t_c30e575f7de700 1-41,43-53,55-58,61-68,74
+  s_c2024c265595f7::t_5f7d4b2bcd0c00 42,69-73
+  s_c2024c265595f7::t_9da783f851a594 75-89
+  s_c2024c265595f7::t_8e388d16635035 54
+  s_c2024c265595f7::t_c920da1209b389 59-60
+docs/code/src/features/macros/MacrosLayer.jsx.md
+  s_c2024c265595f7::t_2f88e1fbc7ecff 1-5
+docs/code/src/search/useSuggestions.js.md
+  s_c2024c265595f7::t_2f88e1fbc7ecff 1-5
+docs/code/src/features/ai/useCompletion.js.md
+  s_c2024c265595f7::t_03058f6244bc75 1-9
+tools/vite/htmlTransforms.js
+  s_c2024c265595f7::t_19911da2f27e1d 33-50
+docs/features/ai.md
+  s_c2024c265595f7::t_5405113851d352 3
+  s_c2024c265595f7::t_96a186e9b3a7dd 1-2,4-26
+src/features/weather/openWeather.test.js
+  s_c2024c265595f7::t_c63278e4e996f7 1-31
+src/features/ai/sse.test.js
+  s_c2024c265595f7::t_c63278e4e996f7 1-43
+src/features/search/useViewportSize.js
+  s_c2024c265595f7::t_f5223c1ca0448d 1-27
+docs/code/src/search/useConfig.js.md
+  s_c2024c265595f7::t_2f88e1fbc7ecff 1-3
+src/features/settings-panel/Category/Category.module.css
+  s_c2024c265595f7::t_0e0b5210640fc2 1-82
+docs/code/src/navigation/navigate.js.md
+  s_c2024c265595f7::t_2f88e1fbc7ecff 1-5
+src/lib/getClasses.js
+  s_c2024c265595f7::t_a63f9718905a70 1-6
+src/features/search/InteractiveBackground.jsx
+  s_c2024c265595f7::t_67f6bdf730a822 25,48
+  s_c2024c265595f7::t_a63f9718905a70 1-24,26-47,49-91
+docs/code/src/features/onboarding/GestureHints.jsx.md
+  s_c2024c265595f7::t_03058f6244bc75 1-4
+  s_c2024c265595f7::t_5405113851d352 5-6
+docs/code/src/features/weather/weatherCache.js.md
+  s_c2024c265595f7::t_03058f6244bc75 1-9
+src/app/Corners.jsx
+  s_c2024c265595f7::t_7429bf799d1a78 1-27
+src/features/macros/Time.jsx
+  s_c2024c265595f7::t_a63f9718905a70 1-22
+src/features/search/useAdaptiveFontSize.js
+  s_c2024c265595f7::t_e65f5a055669d1 1,3-4,6-11,13-25,28-43
+  s_c2024c265595f7::t_a63f9718905a70 2,5,12,27,44
+  s_c2024c265595f7::t_8e388d16635035 26
+src/state/ui.js
+  s_c2024c265595f7::t_2f6543f8fe648c 1-12,16-22,24,27-32,36-37,39-55,57-58,67-72,75-79,83-88,95-97,101-107,110-125,130-131
+  s_c2024c265595f7::t_eb475d5e9c7ddd 13-15,23,25-26,56,59-66,73-74,80-82,89-91,126-129
+  s_c2024c265595f7::t_436e447f4eb75b 33-35,38,92-94
+  s_c2024c265595f7::t_5548235e1edda7 98-100,108-109
+src/search/autocomplete.js
+  s_c2024c265595f7::t_9b951c1e11e868 1-42
+docs/code/src/features/macros-editor/colorHelpers.js.md
+  s_c2024c265595f7::t_e4eaf0e5969ee0 1-3
+src/answers/bases.test.js
+  s_c2024c265595f7::t_6733d1485816cb 1-28
+docs/code/src/lib/isValidURL.js.md
+  s_c2024c265595f7::t_c48b21596156c7 1-3
+src/features/macros-editor/EditorStatus.jsx
+  s_c2024c265595f7::t_76123663a6e052 1-31
+docs/code/src/features/macros-editor/ColorPicker/ColorPicker.jsx.md
+  s_c2024c265595f7::t_e4eaf0e5969ee0 1-3
+docs/code/src/lib/color.js.md
+  s_c2024c265595f7::t_c48b21596156c7 1-8
+src/features/stage/Stage.jsx
+  s_c2024c265595f7::t_68f120d18d41e6 1-22
+src/features/macros-editor/validateConfig.test.js
+  s_c2024c265595f7::t_f2238924baf776 1-41
+docs/code/src/input/usePointerInput.js.md
+  s_c2024c265595f7::t_de193b6e9ecaf2 3-4
+  s_c2024c265595f7::t_2f88e1fbc7ecff 1-2,5
+docs/code/src/features/search/InteractiveBackground.jsx.md
+  s_c2024c265595f7::t_2f88e1fbc7ecff 1-3
+src/features/macros/MacrosMenu.jsx
+  s_c2024c265595f7::t_93d4b495aa612c 98
+  s_c2024c265595f7::t_a63f9718905a70 2-3,7,12-14,16,19-20,25-26,33-36,38,41,43,46-48,77,95-96,108-112
+  s_c2024c265595f7::t_92c36d845d195f 97,99,107
+  s_c2024c265595f7::t_1d6400f1c1c741 1,4-6,8-11,15,17-18,21-24,27-32,37,39-40,42,44-45,49-76,78-94,100-106
+src/answers/percent.js
+  s_c2024c265595f7::t_e857826fb39d83 1-38
+docs/code/src/storage/macrosConfig.js.md
+  s_c2024c265595f7::t_ea1aeeb1324892 1-11
+src/search/useSuggestions.js
+  s_c2024c265595f7::t_04852d7fdb9bc0 1,5,14,17,22,24,60-61
+  s_c2024c265595f7::t_5dde1dd932f882 3-4,6-13,16,18,20-21,23,25,27-31,34,36-42,44,47,55-59,62-63
+  s_c2024c265595f7::t_1278ba4ec4e70d 49-52
+  s_c2024c265595f7::t_a63f9718905a70 2,15,19,26,32-33,35,43,45-46,48,53-54,64
+docs/code/src/app/useDocumentTheme.js.md
+  s_c2024c265595f7::t_2f88e1fbc7ecff 1-5
+src/features/search/Suggestions.module.css
+  s_c2024c265595f7::t_9da783f851a594 168-172,174-177
+  s_c2024c265595f7::t_09f3ace3f6df1b 153-157
+  s_c2024c265595f7::t_9b35e9a7035b15 4-7
+  s_c2024c265595f7::t_6a0907967539f8 1-3,8-152,158-163,173,178
+  s_c2024c265595f7::t_93d4b495aa612c 164-167
+src/answers/units/tables.js
+  s_c2024c265595f7::t_9b951c1e11e868 78-82
+  s_c2024c265595f7::t_7f72eb34eb665c 1-77,83-116
+tools/vite/htmlTransforms.test.js
+  s_c2024c265595f7::t_19911da2f27e1d 2,84-99
+  s_c2024c265595f7::t_838e360c06df18 100
+src/features/ai/providerConfig.js
+  s_c2024c265595f7::t_860cb81a1e6dcc 1-35
+src/features/settings-panel/ColorPicker/ColorPicker.jsx
+  s_c2024c265595f7::t_5461af3dd73e15 14,18,20-24,99
+  s_c2024c265595f7::t_a63f9718905a70 1-13,15-17,19,25-98,100-161
+docs/features/sites.md
+  s_c2024c265595f7::t_ef8f172129a344 1-2,4-21
+  s_c2024c265595f7::t_75f1317f99f829 3
+docs/code/src/lib/formatDate.js.md
+  s_c2024c265595f7::t_c48b21596156c7 1-5
+src/features/chevron/Chevron.jsx
+  s_c2024c265595f7::t_a63f9718905a70 2,5-6,9,12-14,21,28
+  s_c2024c265595f7::t_68f120d18d41e6 1,3-4,7-8,10-11,15-20,22-27
+src/features/macros-editor/BgColorEditor.jsx
+  s_c2024c265595f7::t_a63f9718905a70 2-4,6-7,16,22,27,39,46,50,58,66,70-74
+  s_c2024c265595f7::t_b6fde86517a375 1,5,8-15,17-21,23-26,28-38,40-45,47-49,51-57,59-65,67-69
+src/settings/schema.js
+  s_c2024c265595f7::t_a63f9718905a70 1-11,13,15-22,27-70,72-91,93-134,136-172,174-190,198,201,208-209,212,220-222
+  s_c2024c265595f7::t_81d9f46420580b 92
+  s_c2024c265595f7::t_0cf80f13f0f40c 12,14,23-26,71
+  s_c2024c265595f7::t_25b9250652bb07 191-197,199-200,202-207,210-211,213-219,223
+  s_c2024c265595f7::t_cc067e50ad550a 135,173
+docs/code/src/features/ai/AIcompletion.jsx.md
+  s_c2024c265595f7::t_03058f6244bc75 1-9
+src/features/cheatsheet/shortcuts.js
+  s_c2024c265595f7::t_ebcc0ee33184e5 1-42
+docs/code/src/features/cheatsheet/shortcuts.js.md
+  s_c2024c265595f7::t_03058f6244bc75 1-6
+src/features/macros/Dock.jsx
+  s_c2024c265595f7::t_f909fe6acee115 1-22,25-32
+  s_c2024c265595f7::t_4846bc752b54a1 23-24
+src/features/weather/WeatherScene.jsx
+  s_c2024c265595f7::t_99f133646fda83 1-92
+docs/code/src/app/Corners.jsx.md
+  s_c2024c265595f7::t_2f88e1fbc7ecff 1-3
+src/lib/isMobile.js
+  s_c2024c265595f7::t_a63f9718905a70 1-20
+src/lib/color.js
+  s_c2024c265595f7::t_a63f9718905a70 1-9,11-55,57-209,214-225
+  s_c2024c265595f7::t_65737db038b539 10
+  s_c2024c265595f7::t_2d4f6600ce736d 56,210-213
+src/features/search/queryFieldId.js
+  s_c2024c265595f7::t_cb72c3616e6f69 1
+src/features/macros/Card.module.css
+  s_c2024c265595f7::t_4efc5737b8fa3f 1-88,93-96
+  s_c2024c265595f7::t_ff3344ef1b9acb 89-92
+src/features/weather/WeatherIcon.jsx
+  s_c2024c265595f7::t_421e069fab737e 1-2,38-39,63
+  s_c2024c265595f7::t_a63f9718905a70 3-37,40-62,64-80
+src/storage/localStorageObject.js
+  s_c2024c265595f7::t_a63f9718905a70 10-19,44-47
+  s_c2024c265595f7::t_db78c7371940d2 1-9,20-43,48
+src/state/ui.test.js
+  s_c2024c265595f7::t_716c0c5f62bd92 148
+  s_c2024c265595f7::t_eb475d5e9c7ddd 103,112-140
+  s_c2024c265595f7::t_436e447f4eb75b 143-147,149-152
+  s_c2024c265595f7::t_1b06d51d4a2eee 1-102,104-111,141-142
+src/features/ai/AIcompletion.module.css
+  s_c2024c265595f7::t_860cb81a1e6dcc 1-80
+docs/code/src/features/weather/Weather.jsx.md
+  s_c2024c265595f7::t_03058f6244bc75 1-8
+docs/code/src/settings/NumberField.jsx.md
+  s_c2024c265595f7::t_5ac895e7d567dd 8-9
+  s_c2024c265595f7::t_ea1aeeb1324892 1-7
+docs/features/macros-editor.md
+  s_c2024c265595f7::t_09654c59a51455 1-2,4-43
+  s_c2024c265595f7::t_75f1317f99f829 3
+src/features/macros-editor/Fields.jsx
+  s_c2024c265595f7::t_a63f9718905a70 2-3,5,9-10,13,31-35,50-54,62-67,69-74,78,89-90,93,95,103,106-107
+  s_c2024c265595f7::t_5b32c77553779b 1,4,6-8,11-12,14-30,36-49,55-61,68,75-77,79-88,91-92,94,96-102,104-105
+docs/code/src/answers/currency.js.md
+  s_c2024c265595f7::t_c48b21596156c7 1-10
+src/features/search/QuickLook.module.css
+  s_c2024c265595f7::t_f5223c1ca0448d 1-53
+  s_c2024c265595f7::t_8e388d16635035 54-60
+index.html
+  s_c2024c265595f7::t_9deba052d117a6 5-6,17,22-23,25-32
+docs/code/src/search/SearchProvider.jsx.md
+  s_c2024c265595f7::t_2f88e1fbc7ecff 1-3
+docs/code/src/lib/ensureProtocol.js.md
+  s_c2024c265595f7::t_c48b21596156c7 1-3
+src/features/weather/Weather.jsx
+  s_c2024c265595f7::t_99f133646fda83 1,4,10-26,29,31-33,41-42,54-55
+  s_c2024c265595f7::t_a63f9718905a70 2-3,5-9,27-28,30,34-40,43-53,56-61
+src/features/cheatsheet/shortcuts.test.js
+  s_c2024c265595f7::t_c63278e4e996f7 1-16
+src/features/macros-editor/ColorPicker/ColorPicker.module.css
+  s_c2024c265595f7::t_b90fae9f07032a 7
+  s_c2024c265595f7::t_47704ad80d6033 17-18,27,39,72-73
+src/features/settings-panel/ColorPicker/ColorPicker.module.css
+  s_c2024c265595f7::t_5461af3dd73e15 28-29
+  s_c2024c265595f7::t_0e0b5210640fc2 1-27,30-128
+docs/code/src/features/chevron/parseStages.js.md
+  s_c2024c265595f7::t_2f88e1fbc7ecff 1-3
+docs/code/src/features/macros/Card.jsx.md
+  s_c2024c265595f7::t_2f88e1fbc7ecff 1-4
+docs/code/src/features/macros/MacrosMenu.jsx.md
+  s_c2024c265595f7::t_2f88e1fbc7ecff 1-7
+docs/code/src/search/googleAutocomplete.js.md
+  s_c2024c265595f7::t_2f88e1fbc7ecff 1-3
+docs/code/src/app/App.jsx.md
+  s_c2024c265595f7::t_2f88e1fbc7ecff 1-9
+src/answers/units/index.js
+  s_c2024c265595f7::t_d5b250111772be 6
+  s_c2024c265595f7::t_644b7b3b464c16 1-5,7-77
+src/search/resolve.test.js
+  s_c2024c265595f7::t_187956ba5eca0e 1-74,76-77,79-81
+  s_c2024c265595f7::t_6877f44dc0532b 75,78
+src/features/ai/useCompletion.js
+  s_c2024c265595f7::t_860cb81a1e6dcc 1-39,41-46
+  s_c2024c265595f7::t_ebcc0ee33184e5 40
+docs/code/src/features/macros-editor/MacrosEditorBody.jsx.md
+  s_c2024c265595f7::t_e4eaf0e5969ee0 1-7
+src/app/copyText.js
+  s_c2024c265595f7::t_7d8a53917600f4 1-29
+docs/code/src/state/ui.js.md
+  s_c2024c265595f7::t_2f88e1fbc7ecff 1-9
+docs/code/src/features/settings-panel/Settings.jsx.md
+  s_c2024c265595f7::t_c0f124f176e7a2 7
+  s_c2024c265595f7::t_169ac28f2622e9 1-6,8-13
+docs/code/src/answers/currencies.js.md
+  s_c2024c265595f7::t_c48b21596156c7 1-5
+docs/code/src/features/weather/WeatherIcon.jsx.md
+  s_c2024c265595f7::t_03058f6244bc75 1-6
+src/lib/randomHSLColor.js
+  s_c2024c265595f7::t_a63f9718905a70 1-26
+src/navigation/useNavigationRelease.test.jsx
+  s_c2024c265595f7::t_3221fe6a24b5a0 1-56
+src/storage/macrosConfig.js
+  s_c2024c265595f7::t_01d352ddad36b6 3-4,12-15,18,20-25,28,34,38,41,44,46-47,49-50,57-58,60-64,69,73-77,79-81,84,86,91,95,98,102-104,107,109,111,115,118
+  s_c2024c265595f7::t_e18f10ae7f113e 48,51-56
+  s_c2024c265595f7::t_a63f9718905a70 1-2,5-11,16-17,19,26-27,29-33,35-37,39-40,42-43,45,59,65-68,70-72,78,82-83,85,87-90,92-94,96-97,99-101,105-106,108,110,112-114,116-117,119
+src/lib/fetchFromScriptTag.js
+  s_c2024c265595f7::t_2d4f6600ce736d 2-4,6-7,11-13,16-17,19,23-25,27-30,32-33,35-39
+  s_c2024c265595f7::t_a63f9718905a70 1,5,8-10,14-15,18,20-22,26,31,34,40-41
+src/features/macros-editor/RowHeader.jsx
+  s_c2024c265595f7::t_435cc57a32092b 1-23
+src/features/settings-panel/SettingsPane.jsx
+  s_c2024c265595f7::t_7bce684ac2b62a 1-55
+src/features/weather/WeatherModal.module.css
+  s_c2024c265595f7::t_d422e224dba228 42-43
+  s_c2024c265595f7::t_da50ac1b8a923c 1-41,44-410
+docs/code/src/features/weather/forecast.js.md
+  s_c2024c265595f7::t_03058f6244bc75 1-5
+src/settings/resolveSettings.js
+  s_c2024c265595f7::t_a63f9718905a70 1-3,32-33,35-36,51-52,57-58,66,89-92,97-98,110
+  s_c2024c265595f7::t_5fa1fe666b94ca 4-31,34,37-50,53-56,59-65,85-88,93-96,99-109
+  s_c2024c265595f7::t_1d2d9b4f895246 67-84
+src/features/ai/Icon.jsx
+  s_c2024c265595f7::t_a63f9718905a70 1-13
+docs/code/src/settings/SettingsProvider.jsx.md
+  s_c2024c265595f7::t_ea1aeeb1324892 1-15
+src/features/macros/useClock.js
+  s_c2024c265595f7::t_a63f9718905a70 1-62
+docs/code/src/features/macros-editor/RowHeader.jsx.md
+  s_c2024c265595f7::t_e4eaf0e5969ee0 1-3
+src/lib/helpers.test.js
+  s_c2024c265595f7::t_8d3dae062191c7 10
+  s_c2024c265595f7::t_07fcbb221c9fa2 1-9,11-64
+docs/code/src/features/macros/Dock.jsx.md
+  s_c2024c265595f7::t_2f88e1fbc7ecff 1-5
+docs/code/src/lib/propertyByPath.js.md
+  s_c2024c265595f7::t_c48b21596156c7 1-3
+scripts/e2e/specs/panels.mjs
+  s_c2024c265595f7::t_9bac1505540da2 233,265
+  s_c2024c265595f7::t_9027be8d7e5095 1-57,59,64-164,171-173,177-232,234-264,266,269-315,317-343,363-365,367-368,370,372-375
+  s_c2024c265595f7::t_1095ab94454976 58,60-63,165-170,174-176,316,366,369,371
+  s_c2024c265595f7::t_67582f67b17608 344-362
+  s_c2024c265595f7::t_2902c7472015fb 267-268
+scripts/owner/install-deps.sh
+  s_c2024c265595f7::t_74a58a32e302f1 9-10,13
+docs/code/src/features/settings-panel/SettingsSidebar.jsx.md
+  s_c2024c265595f7::t_73dc2502f4c8ef 4-5
+  s_c2024c265595f7::t_169ac28f2622e9 1-3
+src/features/macros-editor/MacroRow.jsx
+  s_c2024c265595f7::t_435cc57a32092b 1-60
+  s_c2024c265595f7::t_7330ad2ce5ff0f 61
+src/features/cheatsheet/Cheatsheet.jsx
+  s_c2024c265595f7::t_2902c7472015fb 1,3-4,7,9-13,16,20-22,24-25,27-42,44-45,48-55,59-62,65,70
+  s_c2024c265595f7::t_a63f9718905a70 2,5-6,8,14-15,17-19,23,26,43,46-47,56-58,63-64,66-69,71-77
+docs/code/src/features/ai/createCompletion.js.md
+  s_c2024c265595f7::t_03058f6244bc75 1-12
+src/app/ErrorBoundary.jsx
+  s_c2024c265595f7::t_a63f9718905a70 1-62
+docs/code/src/settings/useColorSchemeDetector.js.md
+  s_c2024c265595f7::t_ea1aeeb1324892 1-4
+docs/code/src/answers/index.js.md
+  s_c2024c265595f7::t_c48b21596156c7 1-9
+src/settings/resolveSettings.test.js
+  s_c2024c265595f7::t_88ba6f692a5c4a 91-92
+  s_c2024c265595f7::t_a63f9718905a70 1,3-5,16-45,48-75,77,85,93,99,105,111-112,118-119,126-127
+  s_c2024c265595f7::t_565bd105078ad9 6-15
+  s_c2024c265595f7::t_0473003ddb6184 2,46-47,78-84,86-90,94-98,100-104,106-110,113-117,120-125
+src/input/keyRouter.test.js
+  s_c2024c265595f7::t_436e447f4eb75b 120-125
+  s_c2024c265595f7::t_4846bc752b54a1 109-119
+  s_c2024c265595f7::t_8500158a412229 1-108
+docs/code/src/settings/resolveSettings.js.md
+  s_c2024c265595f7::t_ea1aeeb1324892 1-13
+docs/code/src/lib/pseudoHash.js.md
+  s_c2024c265595f7::t_c48b21596156c7 1-3
+docs/code/src/features/macros/Time.jsx.md
+  s_c2024c265595f7::t_2f88e1fbc7ecff 1-3
+docs/code/src/features/weather/WeatherScene.jsx.md
+  s_c2024c265595f7::t_03058f6244bc75 1-6
+docs/code/src/lib/renderMarkdown.jsx.md
+  s_c2024c265595f7::t_c48b21596156c7 1-8
+docs/code/src/features/settings-panel/Property/Property.jsx.md
+  s_c2024c265595f7::t_169ac28f2622e9 1-3
+docs/code/src/features/chevron/morph.js.md
+  s_c2024c265595f7::t_2f88e1fbc7ecff 1-5
+docs/code/src/app/LaunchOverlay.jsx.md
+  s_c2024c265595f7::t_2f88e1fbc7ecff 1-8
+src/features/macros-editor/EditorToolbar.jsx
+  s_c2024c265595f7::t_76123663a6e052 1-26
+src/features/macros-editor/MacrosTab.jsx
+  s_c2024c265595f7::t_435cc57a32092b 1,3-4,17-22,25-33,37,39,41-42,44-51,53,60-61,65,69-70,72
+  s_c2024c265595f7::t_a63f9718905a70 2,5-16,23-24,34-36,38,40,43,52,54-59,62-64,66-68,71,73-80
+src/settings/settingType.jsx
+  s_c2024c265595f7::t_2910a918163cb4 2-73
+  s_c2024c265595f7::t_31296e8d641ab7 1
+docs/code/src/storage/obfuscate.js.md
+  s_c2024c265595f7::t_ea1aeeb1324892 1-5
+src/features/macros-editor/configDraft.js
+  s_c2024c265595f7::t_0586399bd040f2 1-46,48-50
+  s_c2024c265595f7::t_67b9d095868de7 47
+docs/code/src/features/macros-editor/MacroRow.jsx.md
+  s_c2024c265595f7::t_e4eaf0e5969ee0 1-3
+docs/code/src/features/macros-editor/validateConfig.js.md
+  s_c2024c265595f7::t_e4eaf0e5969ee0 1-7
+docs/code/src/settings/themeTypes.jsx.md
+  s_c2024c265595f7::t_ea1aeeb1324892 1-5
+src/features/macros-editor/useAutosave.js
+  s_c2024c265595f7::t_0586399bd040f2 1-47
+docs/code/src/app/useLaunch.js.md
+  s_c2024c265595f7::t_2f88e1fbc7ecff 1-7
+src/search/autocomplete.test.js
+  s_c2024c265595f7::t_9b951c1e11e868 1-44
+src/features/search/blobPath.test.js
+  s_c2024c265595f7::t_f5223c1ca0448d 1-10
+docs/code/src/features/search/QuickLook.jsx.md
+  s_c2024c265595f7::t_2f88e1fbc7ecff 1-5
+docs/code/src/features/weather/openWeather.js.md
+  s_c2024c265595f7::t_03058f6244bc75 1-10
+docs/code/src/features/search/usePick.js.md
+  s_c2024c265595f7::t_2f88e1fbc7ecff 1-3
+src/app/global.css
+  s_c2024c265595f7::t_67f6bdf730a822 1-125
+docs/decisions/testing.md
+  s_c2024c265595f7::t_98660ab7803274 1-13
+src/answers/query.js
+  s_c2024c265595f7::t_efc64f7540c1ca 1-27
+src/lib/camelCaseToTitle.js
+  s_c2024c265595f7::t_a63f9718905a70 1-13
+src/input/gestureEvents.js
+  s_c2024c265595f7::t_a63f9718905a70 3,5-8
+  s_c2024c265595f7::t_e18f10ae7f113e 1-2,4
+src/features/macros-editor/EnginesTab.jsx
+  s_c2024c265595f7::t_3ca3c4ad83a0ed 1,3-14,17-18,22-27,29-32,34-36,42-44,46-47,52,54-57,60
+  s_c2024c265595f7::t_a63f9718905a70 2,15-16,19-21,28,33,37-41,45,48-51,53,58-59,61-65
+docs/code/src/features/chevron/chevronPainter.js.md
+  s_c2024c265595f7::t_2f88e1fbc7ecff 1-3
+src/features/chevron/morph.js
+  s_c2024c265595f7::t_75b82eda3e9133 1-56
+src/settings/SettingsProvider.jsx
+  s_c2024c265595f7::t_1d2d9b4f895246 6,19,21-22,39,48
+  s_c2024c265595f7::t_81d9f46420580b 8-10,12-15,18,28-33,36-38,40-42,45-47,56-60,62-65,67-68,77
+  s_c2024c265595f7::t_a63f9718905a70 1-5,7,11,16-17,20,23-27,34-35,43-44,49-55,61,66,69-76
+.github/workflows/ci.yml
+  s_c2024c265595f7::t_4c3db285d3a240 18-20
+src/features/search/QueryField.jsx
+  s_c2024c265595f7::t_a63f9718905a70 2,7,11-12,14,16,20,22,28,32-34,49,63-64
+  s_c2024c265595f7::t_c30e575f7de700 1,3-6,8-10,13,15,17-19,21,23-27,29-31,35-48,50-53,55-59,61-62,65
+  s_c2024c265595f7::t_5f7d4b2bcd0c00 54
+  s_c2024c265595f7::t_6790918114b310 60
+src/features/macros-editor/configDraft.test.js
+  s_c2024c265595f7::t_f2238924baf776 1-49
+src/features/ai/createCompletion.test.js
+  s_c2024c265595f7::t_c63278e4e996f7 1-71
+src/features/macros-editor/recordOps.test.js
+  s_c2024c265595f7::t_f2238924baf776 1-24
+src/state/store.js
+  s_c2024c265595f7::t_884afbafd8c0a4 1-24
+src/features/weather/openWeather.js
+  s_c2024c265595f7::t_a63f9718905a70 2-4,20-21,24,26-27,30,32-33,36,38
+  s_c2024c265595f7::t_705ea5b277343b 1,5-19,22-23,25,28-29,31,34-35,37
+src/answers/format.js
+  s_c2024c265595f7::t_efc64f7540c1ca 1-13,15-18
+  s_c2024c265595f7::t_50e0a4c4bb89cd 14
+docs/code/src/storage/settingsStorage.js.md
+  s_c2024c265595f7::t_ea1aeeb1324892 1-5
+docs/code/src/lib/getCssGradient.js.md
+  s_c2024c265595f7::t_c48b21596156c7 1-3
+src/lib/getCssGradient.test.js
+  s_c2024c265595f7::t_65737db038b539 1-27,33-34
+  s_c2024c265595f7::t_ea97bafd2a8939 28-32
+docs/code/src/settings/settingsMigration.js.md
+  s_c2024c265595f7::t_ea1aeeb1324892 1-11
+docs/code/src/lib/getClasses.js.md
+  s_c2024c265595f7::t_c48b21596156c7 1-3
+src/app/LaunchOverlay.jsx
+  s_c2024c265595f7::t_ffaa48f140e18d 1,37-40,54
+  s_c2024c265595f7::t_f909fe6acee115 2-36,41-53,55-61
+src/features/settings-panel/Category/Category.jsx
+  s_c2024c265595f7::t_807c86af056bd4 1,42-43,46-59
+  s_c2024c265595f7::t_a63f9718905a70 2-3,5-8,20,26-27,37-38,41,44-45,62,71,85-87
+  s_c2024c265595f7::t_ac8f70dc9f877f 4,9-19,21-25,28-36,39-40,60-61,63-70,72-84
+src/lib/normaliseURL.js
+  s_c2024c265595f7::t_a63f9718905a70 1-29
+scripts/e2e/specs/boot.mjs
+  s_c2024c265595f7::t_348728a401b26a 26-34
+  s_c2024c265595f7::t_6857e72549c09e 2-3,21
+  s_c2024c265595f7::t_81aa99cdb48535 24-25
+src/app/useIntents.js
+  s_c2024c265595f7::t_cb72c3616e6f69 1-6,9-20,23-114
+  s_c2024c265595f7::t_4846bc752b54a1 7-8,21-22
+src/features/macros-editor/ColorPicker/ColorPicker.jsx
+  s_c2024c265595f7::t_d674c426570715 5,32,34-35,40,42,45-46,53,55-58
+  s_c2024c265595f7::t_7a70eb4d358117 1,7-31,59
+  s_c2024c265595f7::t_a63f9718905a70 2-4,6,33,36-39,41,43-44,47-52,54,60-68
+src/app/Notice.module.css
+  s_c2024c265595f7::t_f909fe6acee115 1-25
+src/features/macros-editor/IconPicker/IconPicker.module.css
+  s_c2024c265595f7::t_b90fae9f07032a 8
+  s_c2024c265595f7::t_768fa12378515b 18-19,28,95-96
+src/features/macros/useClock.test.js
+  s_c2024c265595f7::t_a63f9718905a70 1-75
+src/answers/currency.js
+  s_c2024c265595f7::t_8809e627cc1898 63,66-69
+  s_c2024c265595f7::t_bad6531db32ba7 1-62,64-65,70-121
+src/search/suggestions.js
+  s_c2024c265595f7::t_78eac079da21cd 1-51,64-75
+  s_c2024c265595f7::t_4846bc752b54a1 52-59,61-63
+  s_c2024c265595f7::t_436e447f4eb75b 60
+docs/code/src/features/macros-editor/useConfigDraft.js.md
+  s_c2024c265595f7::t_e4eaf0e5969ee0 1-9
+scripts/e2e/specs/settings.mjs
+  s_c2024c265595f7::t_bd5e367068466c 163-165,168-181
+  s_c2024c265595f7::t_b62fe39a35fe64 166
+  s_c2024c265595f7::t_9fead125d58403 167
+  s_c2024c265595f7::t_2a13eece075945 1-162,182-191
+docs/code/src/features/macros-editor/GradientStops.jsx.md
+  s_c2024c265595f7::t_e4eaf0e5969ee0 1-3
+src/search/useConfig.js
+  s_c2024c265595f7::t_5dde1dd932f882 1-22
+docs/code/src/features/status/OfflineIndicator.jsx.md
+  s_c2024c265595f7::t_03058f6244bc75 1-4
+docs/features/instant-answers.md
+  s_c2024c265595f7::t_75f1317f99f829 3
+  s_c2024c265595f7::t_4f605b5993e964 1-2,4-79
+docs/code/src/features/stage/Stage.jsx.md
+  s_c2024c265595f7::t_2f88e1fbc7ecff 1-5
+.framework.json
+  s_c2024c265595f7::t_c7cb25006d89ef 3-15,17-30
+src/features/weather/forecast.js
+  s_c2024c265595f7::t_99f133646fda83 1-34
+docs/code/src/features/macros-editor/MacrosTab.jsx.md
+  s_c2024c265595f7::t_e4eaf0e5969ee0 1-3
+src/search/useDestination.js
+  s_c2024c265595f7::t_4846bc752b54a1 7-8,30,35-36,38
+  s_c2024c265595f7::t_436e447f4eb75b 34
+  s_c2024c265595f7::t_623b26c21622e8 1-6,9-29,31-33,37,39
+docs/code/src/lib/isMobile.js.md
+  s_c2024c265595f7::t_c48b21596156c7 1-3
+src/lib/pseudoHash.js
+  s_c2024c265595f7::t_a63f9718905a70 1-9
+src/features/macros-editor/GradientStops.jsx
+  s_c2024c265595f7::t_b6fde86517a375 1-41
+src/features/macros-editor/MacrosEditor.module.css
+  s_c2024c265595f7::t_67c7aa96b0610c 1-132,135-452
+  s_c2024c265595f7::t_5039f48f10bd84 133-134
+docs/code/src/features/chevron/drawChevron.js.md
+  s_c2024c265595f7::t_2f88e1fbc7ecff 1-3
+docs/code/src/input/gestureEvents.js.md
+  s_c2024c265595f7::t_2f88e1fbc7ecff 1-3
+docs/code/src/navigation/useNavigationRelease.js.md
+  s_c2024c265595f7::t_2f88e1fbc7ecff 1-5
+docs/code/src/search/history.js.md
+  s_c2024c265595f7::t_2f88e1fbc7ecff 1-7
+docs/code/src/features/search/blobPath.js.md
+  s_c2024c265595f7::t_2f88e1fbc7ecff 1-3
+docs/code/src/state/UiStore.jsx.md
+  s_c2024c265595f7::t_2f88e1fbc7ecff 1-3
+docs/code/src/search/resolve.js.md
+  s_c2024c265595f7::t_2f88e1fbc7ecff 1-6
+docs/code/src/settings/settingType.jsx.md
+  s_c2024c265595f7::t_ea1aeeb1324892 1-11
+src/features/search/QuickLook.jsx
+  s_c2024c265595f7::t_f5223c1ca0448d 1,3-5,7,10-12,15,17-28,30-33,35-46,48-49,52,55
+  s_c2024c265595f7::t_a63f9718905a70 2,6,8-9,13-14,16,29,34,47,50-51,53-54
+src/features/weather/weatherCache.js
+  s_c2024c265595f7::t_a63f9718905a70 1-3,6-8,14-16,20-21,27-28,31-32,37-38,40
+  s_c2024c265595f7::t_705ea5b277343b 4-5,9-13,17-19,22-26,29-30,33-36,39
+docs/code/src/features/settings-panel/Category/Category.jsx.md
+  s_c2024c265595f7::t_169ac28f2622e9 1-8
+src/features/macros-editor/colorHelpers.js
+  s_c2024c265595f7::t_a63f9718905a70 1-8,20-22,24-148
+  s_c2024c265595f7::t_67b9d095868de7 9-19,23
+src/answers/currency.test.js
+  s_c2024c265595f7::t_fff9dface0afb3 97
+  s_c2024c265595f7::t_192107711ce246 1-96,98-133
+src/lib/formatDate.test.js
+  s_c2024c265595f7::t_65737db038b539 1-23
+src/answers/calculator.js
+  s_c2024c265595f7::t_565bd105078ad9 38,113-121,185-186
+  s_c2024c265595f7::t_3221fe6a24b5a0 1-28,30-37,39-42,44-50,52-56,58-65,70-79,81,83,85-88,90-104,106,109-112,122,125-128,130-134,136-138,140,143-151,153-159,161-167,169-176,178-182,184,187-192,196-201,203-218,220-228
+  s_c2024c265595f7::t_a63f9718905a70 29,43,51,57,66-69,80,82,84,89,105,107-108,123-124,129,135,139,141-142,152,160,168,177,183,193-195,202,219,229
+src/features/status/useOnlineStatus.js
+  s_c2024c265595f7::t_a63f9718905a70 1-17
+  s_c2024c265595f7::t_53e4713637776e 18,20
+docs/code/src/features/search/QueryField.jsx.md
+  s_c2024c265595f7::t_2f88e1fbc7ecff 1-5
+docs/code/src/features/search/useViewportSize.js.md
+  s_c2024c265595f7::t_2f88e1fbc7ecff 1-3
+docs/code/src/features/macros/useClock.js.md
+  s_c2024c265595f7::t_2f88e1fbc7ecff 1-3
+src/settings/settingsMigration.js
+  s_c2024c265595f7::t_a63f9718905a70 4,6,11-13,15,23,27,30,37-39,41-45,47-48,50-52,55-60,75-77,80-81,85-86
+  s_c2024c265595f7::t_e25ca7b87476d6 1-3,5,7-10,14,16-22,24-26,28-29,31-36,40,46,49,53-54,61-74,78-79,82-84
+src/features/ai/sse.js
+  s_c2024c265595f7::t_860cb81a1e6dcc 1-33
+docs/code/src/storage/localStorageObject.js.md
+  s_c2024c265595f7::t_ea1aeeb1324892 1-8
+docs/code/src/input/swipe.js.md
+  s_c2024c265595f7::t_2f88e1fbc7ecff 1-3
+src/features/chevron/chevron.worker.js
+  s_c2024c265595f7::t_75b82eda3e9133 1-2,4,7-8
+  s_c2024c265595f7::t_a63f9718905a70 3,5-6,9
+src/features/search/Suggestions.jsx
+  s_c2024c265595f7::t_4846bc752b54a1 32-36
+  s_c2024c265595f7::t_a63f9718905a70 4-5,9-10,20,47,50,56-59
+  s_c2024c265595f7::t_e65f5a055669d1 1-3,6-8,11-13,23-31,37-41,43-46,48,51-52,54-55,60
+  s_c2024c265595f7::t_6dbb31bd776801 14-19,21-22,42,49,53
+src/storage/obfuscate.js
+  s_c2024c265595f7::t_a63f9718905a70 1-50
+src/features/ai/providerConfig.test.js
+  s_c2024c265595f7::t_c63278e4e996f7 1-26
+src/features/macros/Card.jsx
+  s_c2024c265595f7::t_a63f9718905a70 2,5-6,12,17,28-30
+  s_c2024c265595f7::t_4846bc752b54a1 19-20
+  s_c2024c265595f7::t_4efc5737b8fa3f 1,3-4,7-11,13-16,18,21-27,31
+src/features/weather/useWeather.js
+  s_c2024c265595f7::t_705ea5b277343b 1-58
+docs/code/src/features/macros-editor/ChipInput.jsx.md
+  s_c2024c265595f7::t_e4eaf0e5969ee0 1-3
+docs/code/src/features/macros-editor/EnginesTab.jsx.md
+  s_c2024c265595f7::t_e4eaf0e5969ee0 1-3
+docs/code/src/features/macros-editor/usePopover.js.md
+  s_c2024c265595f7::t_e4eaf0e5969ee0 1-3
+src/features/settings-panel/Property/Property.jsx
+  s_c2024c265595f7::t_a63f9718905a70 1-6,8-23
+  s_c2024c265595f7::t_807c86af056bd4 7
+docs/code/src/features/macros-editor/configFiles.js.md
+  s_c2024c265595f7::t_e4eaf0e5969ee0 1-3
+docs/code/src/answers/calculator.js.md
+  s_c2024c265595f7::t_c48b21596156c7 1-20
+src/lib/getContrast.js
+  s_c2024c265595f7::t_a63f9718905a70 1-16
+docs/code/src/settings/schema.js.md
+  s_c2024c265595f7::t_ea1aeeb1324892 1-10
+docs/guides/development.md
+  s_c2024c265595f7::t_c226b4c5a32f35 1-2,4-33
+  s_c2024c265595f7::t_75f1317f99f829 3
+src/lib/getCssGradient.js
+  s_c2024c265595f7::t_a63f9718905a70 2,5-13,15-23,25-28
+  s_c2024c265595f7::t_70bf18251b5d20 1,3-4,14,24
+src/search/history.test.js
+  s_c2024c265595f7::t_04852d7fdb9bc0 3,81-91
+  s_c2024c265595f7::t_a63f9718905a70 20-21,27-28,37-38,44-45,55,59-60,68,76,92-93
+  s_c2024c265595f7::t_9e85142ab27f4e 1-2,4-19,22-26,29-36,39-43,46-54,56-58,61-67,69-75,77-80
+src/storage/localStorageObject.test.js
+  s_c2024c265595f7::t_88ba6f692a5c4a 1-52
+docs/code/src/features/ai/Icon.jsx.md
+  s_c2024c265595f7::t_03058f6244bc75 1-3
+docs/README.md
+  s_c2024c265595f7::t_c226b4c5a32f35 12,15-28
+src/input/usePointerInput.js
+  s_c2024c265595f7::t_9da783f851a594 14-19,24
+  s_c2024c265595f7::t_4846bc752b54a1 13,27-30,51
+  s_c2024c265595f7::t_a28e58afb28e14 1-4,6-7,9-12,20-21,23,26,31-32,34,37,40-41,43-45,47-50,52,54-63,68,70,73-80
+scripts/e2e/specs/macros-editor.mjs
+  s_c2024c265595f7::t_cdcdc293fd3675 37,58-160
+  s_c2024c265595f7::t_5a9e1b96bea1d6 1-36,38-57,161-165
+docs/code/src/storage/applyConfig.js.md
+  s_c2024c265595f7::t_e18f10ae7f113e 1-5
+docs/status.md
+  s_c2024c265595f7::t_4c3db285d3a240 6-15
+src/features/macros/filterMacros.test.js
+  s_c2024c265595f7::t_623b26c21622e8 1-33
+docs/code/src/features/chevron/useChevronPainter.js.md
+  s_c2024c265595f7::t_2f88e1fbc7ecff 1-6
+src/lib/renderMarkdown.jsx
+  s_c2024c265595f7::t_a63f9718905a70 1-31,45,88-91,99,104,108,123,129,138,154-155,163-167,170-172,176-178
+  s_c2024c265595f7::t_4722225b6c12b6 47-87,92-98,100-103,105-107,109-122,124-128,130-137,139-153,156-162,168-169,173-175
+  s_c2024c265595f7::t_fef88e6c84c2e0 32-44,46
+vite.config.js
+  s_c2024c265595f7::t_c7cb25006d89ef 2-4,14-15,17,19,22,44-78,80-81,84,86-87,96
+  s_c2024c265595f7::t_19911da2f27e1d 12,26,28-31,37-40
+  s_c2024c265595f7::t_f46ef08db0e7ae 27
+src/features/settings-panel/Buttons/Buttons.jsx
+  s_c2024c265595f7::t_a63f9718905a70 1-17
+src/features/chevron/Chevron.module.css
+  s_c2024c265595f7::t_68f120d18d41e6 1-21
+  s_c2024c265595f7::t_8e388d16635035 22-27
+src/features/chevron/drawChevron.js
+  s_c2024c265595f7::t_75b82eda3e9133 1-21
+src/input/keyRouter.js
+  s_c2024c265595f7::t_4846bc752b54a1 21,98
+  s_c2024c265595f7::t_8500158a412229 97
+  s_c2024c265595f7::t_436e447f4eb75b 71,83
+  s_c2024c265595f7::t_02a6632e4d838a 1-20,22-37,41-43,52-57,60-63,65-68,70,84,86-96,99-102
+  s_c2024c265595f7::t_6a8a73492e7069 38-40,44-51,58-59,64,69,72-82,85
+docs/code/src/lib/getContrast.js.md
+  s_c2024c265595f7::t_c48b21596156c7 1-3
+docs/todo.md
+  s_c2024c265595f7::t_3740e5c0dd8db1 6
+  s_c2024c265595f7::t_4c3db285d3a240 5
+scripts/e2e/lib/app.mjs
+  s_c2024c265595f7::t_6857e72549c09e 29,39
+  s_c2024c265595f7::t_433699d12b14d2 42
+src/settings/SettingsProvider.test.jsx
+  s_c2024c265595f7::t_0522a1236ca8f7 1-81
+src/features/macros-editor/usePopover.js
+  s_c2024c265595f7::t_d674c426570715 1-46
+docs/code/src/features/cheatsheet/ShortcutTable.jsx.md
+  s_c2024c265595f7::t_03058f6244bc75 1-3
+src/lib/ensureProtocol.js
+  s_c2024c265595f7::t_a63f9718905a70 1-9
+src/features/chevron/chevronPainter.js
+  s_c2024c265595f7::t_75b82eda3e9133 1-43
+src/app/LayoutButton.module.css
+  s_c2024c265595f7::t_67f6bdf730a822 1-60
+docs/code/src/features/macros-editor/configDraft.js.md
+  s_c2024c265595f7::t_e4eaf0e5969ee0 1-6
+docs/code/src/answers/bases.js.md
+  s_c2024c265595f7::t_c48b21596156c7 1-9
+src/storage/applyConfig.js
+  s_c2024c265595f7::t_e18f10ae7f113e 1-5
+src/features/settings-panel/Settings.module.css
+  s_c2024c265595f7::t_0e0b5210640fc2 1-166
+  s_c2024c265595f7::t_456fdbdffe05a5 167-184
+src/features/chevron/parseStages.js
+  s_c2024c265595f7::t_a63f9718905a70 1-45
+src/lib/propertyByPath.js
+  s_c2024c265595f7::t_a63f9718905a70 1-17
+src/lib/isValidURL.js
+  s_c2024c265595f7::t_0d3b331c55dfa2 1-14,16
+  s_c2024c265595f7::t_a63f9718905a70 15,17-19
+src/features/weather/weatherCache.test.js
+  s_c2024c265595f7::t_c63278e4e996f7 1-34
+docs/code/src/answers/query.js.md
+  s_c2024c265595f7::t_c48b21596156c7 1-7
+src/search/googleAutocomplete.js
+  s_c2024c265595f7::t_9b951c1e11e868 1-17,20-29
+  s_c2024c265595f7::t_a63f9718905a70 18-19
+docs/code/src/features/settings-panel/Buttons/Buttons.jsx.md
+  s_c2024c265595f7::t_169ac28f2622e9 1-3
+src/search/suggestions.test.js
+  s_c2024c265595f7::t_4846bc752b54a1 2,65-83
+  s_c2024c265595f7::t_78eac079da21cd 1,3-64,84-85
+src/answers/timezones.js
+  s_c2024c265595f7::t_d796e9f74a5f70 1-113,116-162
+  s_c2024c265595f7::t_9b951c1e11e868 114-115
+src/app/Notice.jsx
+  s_c2024c265595f7::t_f909fe6acee115 1-22
+docs/code/src/app/LayoutButton.jsx.md
+  s_c2024c265595f7::t_2f88e1fbc7ecff 1-3
+src/features/settings-panel/Settings.jsx
+  s_c2024c265595f7::t_913144ba891c63 17-20
+  s_c2024c265595f7::t_7bce684ac2b62a 1-2,5-6,9,11-13,16,22-23,26-27,29-38,40-56,59,67,72,77-83,85-86
+  s_c2024c265595f7::t_a63f9718905a70 3-4,7-8,10,14-15,21,24-25,28,39,57-58,60-66,68-71,73-76,84,87-93
+src/settings/controlStyles.js
+  s_c2024c265595f7::t_2910a918163cb4 1-53
+docs/code/src/settings/controlStyles.js.md
+  s_c2024c265595f7::t_ea1aeeb1324892 1-4
+docs/code/src/features/chevron/chevron.worker.js.md
+  s_c2024c265595f7::t_2f88e1fbc7ecff 1-3
+docs/code/src/input/useKeyboard.js.md
+  s_c2024c265595f7::t_2f88e1fbc7ecff 1-7
+docs/code/src/search/autocomplete.js.md
+  s_c2024c265595f7::t_2f88e1fbc7ecff 1-3
+docs/features/search.md
+  s_c2024c265595f7::t_ef8f172129a344 1-2,4-36
+  s_c2024c265595f7::t_75f1317f99f829 3
+docs/code/src/lib/camelCaseToTitle.js.md
+  s_c2024c265595f7::t_c48b21596156c7 1-3
+README.md
+  s_c2024c265595f7::t_e36eaf01e9c70d 44-45,47-52,61-62,225-236,275-276
+docs/decisions/instant-answers.md
+  s_c2024c265595f7::t_98660ab7803274 1-16
+src/answers/timezones.test.js
+  s_c2024c265595f7::t_192107711ce246 1-19,21-72,78-96
+  s_c2024c265595f7::t_75626c486d313e 20,73-77
+src/features/macros/filterMacros.js
+  s_c2024c265595f7::t_623b26c21622e8 1-29
+docs/code/src/lib/fetchFromScriptTag.js.md
+  s_c2024c265595f7::t_c48b21596156c7 1-7
+docs/code/src/features/macros/useGridShape.js.md
+  s_c2024c265595f7::t_2f88e1fbc7ecff 1-3
+src/features/macros-editor/EngineRow.jsx
+  s_c2024c265595f7::t_3ca3c4ad83a0ed 1-52
+docs/features/offline.md
+  s_c2024c265595f7::t_5405113851d352 3
+  s_c2024c265595f7::t_96a186e9b3a7dd 1-2,4-21
+src/features/macros/Dock.module.css
+  s_c2024c265595f7::t_f909fe6acee115 1-8,14-46,50-78
+  s_c2024c265595f7::t_9da783f851a594 9-13,47-49
+src/navigation/useNavigationRelease.js
+  s_c2024c265595f7::t_3221fe6a24b5a0 1-39
+src/app/App.jsx
+  s_c2024c265595f7::t_a63f9718905a70 12,14-16,23-25,28,42,54,60,64,69-70,82-84,86-87
+  s_c2024c265595f7::t_c30e575f7de700 22,57,71,85
+  s_c2024c265595f7::t_7429bf799d1a78 2-11,13,17-21,26-27,29-41,43-53,55-56,58-59,68,72-81
+  s_c2024c265595f7::t_4846bc752b54a1 1,61-63,65-67
+src/features/macros-editor/IconPicker/IconPicker.jsx
+  s_c2024c265595f7::t_a63f9718905a70 2-3,26-27,29,31,33-34,36,44-48,50,52-53,56,59-60,63-64,66,70-73,75-79,81-94
+  s_c2024c265595f7::t_07cf7b34d5c1b4 12
+  s_c2024c265595f7::t_d674c426570715 1,4-11,13-25,28,30,32,35,37-43,49,51,54-55,57-58,61-62,65,67-69,74,80
+src/features/status/OfflineIndicator.jsx
+  s_c2024c265595f7::t_296aaa714ff547 5
+  s_c2024c265595f7::t_1095ab94454976 11
+  s_c2024c265595f7::t_a63f9718905a70 1-4,6-10,12-22
+docs/features/weather.md
+  s_c2024c265595f7::t_5405113851d352 3
+  s_c2024c265595f7::t_96a186e9b3a7dd 1-2,4-33
+docs/code/src/features/macros-editor/recordOps.js.md
+  s_c2024c265595f7::t_e4eaf0e5969ee0 1-3
+docs/code/src/features/macros-editor/CommandsTab.jsx.md
+  s_c2024c265595f7::t_e4eaf0e5969ee0 1-3
+src/features/macros/ChevronTop.jsx
+  s_c2024c265595f7::t_a63f9718905a70 1-5,7-27
+  s_c2024c265595f7::t_67f6bdf730a822 6
+src/features/macros-editor/CommandsBlock.jsx
+  s_c2024c265595f7::t_435cc57a32092b 1-34
+docs/code/src/features/macros-editor/useAutosave.js.md
+  s_c2024c265595f7::t_e4eaf0e5969ee0 1-7
+docs/code/src/features/status/useOnlineStatus.js.md
+  s_c2024c265595f7::t_03058f6244bc75 1-4
+src/features/settings-panel/GeocodeRow.jsx
+  s_c2024c265595f7::t_7bce684ac2b62a 1-97
+docs/code/src/features/macros-editor/CommandsBlock.jsx.md
+  s_c2024c265595f7::t_e4eaf0e5969ee0 1-3
+src/answers/calculator.test.js
+  s_c2024c265595f7::t_6733d1485816cb 1-25,28-90
+  s_c2024c265595f7::t_d7851df354fb83 26-27
+docs/code/src/lib/randomHSLColor.js.md
+  s_c2024c265595f7::t_c48b21596156c7 1-3
+docs/code/src/features/settings-panel/SettingsPane.jsx.md
+  s_c2024c265595f7::t_169ac28f2622e9 1-5
+src/lib/formatDate.js
+  s_c2024c265595f7::t_a63f9718905a70 3,7,26-28,33-34
+  s_c2024c265595f7::t_2d4f6600ce736d 1-2,4-6,8-25,29-32
+src/features/macros-editor/ChipInput.jsx
+  s_c2024c265595f7::t_5b32c77553779b 1-58
+docs/code/src/features/cheatsheet/Cheatsheet.jsx.md
+  s_c2024c265595f7::t_03058f6244bc75 1-9
+docs/features/settings.md
+  s_c2024c265595f7::t_6e416f11be0291 3
+  s_c2024c265595f7::t_cbad38db30c255 1-2,4-54
+docs/code/src/features/macros/MacroIcon.jsx.md
+  s_c2024c265595f7::t_2f88e1fbc7ecff 1-3
+src/lib/urls.test.js
+  s_c2024c265595f7::t_65737db038b539 1-54
+  s_c2024c265595f7::t_0d3b331c55dfa2 55-58,62-64
+  s_c2024c265595f7::t_31ac609b7aa657 59-61
+src/search/history.js
+  s_c2024c265595f7::t_04852d7fdb9bc0 30-46,51,53,63-64,66,69,72-78,82-83,87-89,93,96-99
+  s_c2024c265595f7::t_9e85142ab27f4e 1-29,47-50,52,54-60,65,70-71,79-81,84-86,90-92,94-95,101,103,105-107
+  s_c2024c265595f7::t_a63f9718905a70 61-62,67-68,100,102,104
+docs/code/src/answers/units/tables.js.md
+  s_c2024c265595f7::t_c48b21596156c7 1-12
+scripts/verify.sh
+  s_c2024c265595f7::t_6857e72549c09e 14
+src/main.jsx
+  s_c2024c265595f7::t_7429bf799d1a78 5-6,14-18
+  s_c2024c265595f7::t_e18f10ae7f113e 1
+  s_c2024c265595f7::t_a63f9718905a70 4,7-8
+scripts/e2e/run.mjs
+  s_c2024c265595f7::t_6857e72549c09e 5,18,33,39,52
+src/navigation/navigate.js
+  s_c2024c265595f7::t_3221fe6a24b5a0 1-35
+docs/code/src/features/macros-editor/EditorStatus.jsx.md
+  s_c2024c265595f7::t_e4eaf0e5969ee0 1-3
+docs/code/src/answers/format.js.md
+  s_c2024c265595f7::t_c48b21596156c7 1-8
+src/features/stage/Stage.module.css
+  s_c2024c265595f7::t_68f120d18d41e6 1-10
+docs/code/src/settings/settingTypes.jsx.md
+  s_c2024c265595f7::t_ea1aeeb1324892 1-5
+src/answers/bases.js
+  s_c2024c265595f7::t_224c677763bcf0 5,14,16
+  s_c2024c265595f7::t_e857826fb39d83 1-4,7-13,15,17-40,42-43
+  s_c2024c265595f7::t_9b951c1e11e868 6,41
+docs/code/src/features/ai/providerConfig.js.md
+  s_c2024c265595f7::t_03058f6244bc75 1-7
+src/features/ai/AIcompletion.jsx
+  s_c2024c265595f7::t_ebcc0ee33184e5 15-16
+  s_c2024c265595f7::t_a63f9718905a70 3-5,7-8,10,17,20,22,26-28,43-44
+  s_c2024c265595f7::t_860cb81a1e6dcc 1-2,6,9,11-14,18-19,21,23-25,29-42
+src/search/SearchProvider.jsx
+  s_c2024c265595f7::t_cb72c3616e6f69 1-10,13-25
+  s_c2024c265595f7::t_436e447f4eb75b 11-12
+src/features/macros/MacroIcon.jsx
+  s_c2024c265595f7::t_4efc5737b8fa3f 1-14
+src/app/IntentsContext.js
+  s_c2024c265595f7::t_c30e575f7de700 1-5
+src/app/useLaunch.js
+  s_c2024c265595f7::t_7d8a53917600f4 1-23
+src/features/macros-editor/configFiles.js
+  s_c2024c265595f7::t_0586399bd040f2 1-20
+src/features/weather/forecast.test.js
+  s_c2024c265595f7::t_c63278e4e996f7 1-44
+src/answers/percent.test.js
+  s_c2024c265595f7::t_6733d1485816cb 1-33
+docs/code/src/features/macros-editor/Fields.jsx.md
+  s_c2024c265595f7::t_e4eaf0e5969ee0 1-5
+src/answers/units/index.test.js
+  s_c2024c265595f7::t_d7851df354fb83 1-12,16-29,31,33-34,36,38-39,41-44,46-56,58-67,69-95
+  s_c2024c265595f7::t_50e0a4c4bb89cd 13-15,30,40,57
+  s_c2024c265595f7::t_d6a655c998af66 32,35,37,45,68
+src/features/settings-panel/SettingsSidebar.jsx
+  s_c2024c265595f7::t_7bce684ac2b62a 1-67
+src/features/macros/MacrosLayer.jsx
+  s_c2024c265595f7::t_4efc5737b8fa3f 1-24,26-37
+  s_c2024c265595f7::t_9da783f851a594 25
+src/features/macros/useGridShape.js
+  s_c2024c265595f7::t_1d6400f1c1c741 1-21
+docs/code/src/app/ErrorBoundary.jsx.md
+  s_c2024c265595f7::t_2f88e1fbc7ecff 1-3
+src/storage/settingsStorage.js
+  s_c2024c265595f7::t_db78c7371940d2 4,57-58
+  s_c2024c265595f7::t_a63f9718905a70 1-3,5-56,59-60
+docs/code/src/features/chevron/Chevron.jsx.md
+  s_c2024c265595f7::t_2f88e1fbc7ecff 1-5
+docs/code/src/features/search/useAdaptiveFontSize.js.md
+  s_c2024c265595f7::t_2f88e1fbc7ecff 1-3
+docs/code/src/search/suggestions.js.md
+  s_c2024c265595f7::t_2f88e1fbc7ecff 1-5
+docs/code/src/search/useDestination.js.md
+  s_c2024c265595f7::t_2f88e1fbc7ecff 1-3
+docs/code/src/features/search/queryFieldId.js.md
+  s_c2024c265595f7::t_2f88e1fbc7ecff 1-3
+docs/code/src/input/keyRouter.js.md
+  s_c2024c265595f7::t_2f88e1fbc7ecff 1-7
+  s_c2024c265595f7::t_de193b6e9ecaf2 8-9
+docs/code/src/app/Notice.jsx.md
+  s_c2024c265595f7::t_2f88e1fbc7ecff 1-3
+src/answers/currencies.js
+  s_c2024c265595f7::t_a63f9718905a70 1-7
+src/settings/NumberField.jsx
+  s_c2024c265595f7::t_31296e8d641ab7 2-8,16-26,28-38
+  s_c2024c265595f7::t_5ed165be4adf7b 9-11,13-14,27
+  s_c2024c265595f7::t_9fead125d58403 1,12,15
+src/input/useKeyboard.js
+  s_c2024c265595f7::t_31a1eec305f98d 1-10,13-16,19-75
+  s_c2024c265595f7::t_4846bc752b54a1 11-12,17-18
+docs/code/src/main.jsx.md
+  s_c2024c265595f7::t_2f88e1fbc7ecff 1-2,4-5
+  s_c2024c265595f7::t_e18f10ae7f113e 3
+docs/code/src/app/IntentsContext.js.md
+  s_c2024c265595f7::t_2f88e1fbc7ecff 1-3
+docs/code/src/features/weather/useWeather.js.md
+  s_c2024c265595f7::t_03058f6244bc75 1-10
+src/features/macros-editor/useAutosave.test.jsx
+  s_c2024c265595f7::t_f2238924baf776 1-48
+docs/code/src/lib/normaliseURL.js.md
+  s_c2024c265595f7::t_c48b21596156c7 1-3
+docs/code/src/features/ai/sse.js.md
+  s_c2024c265595f7::t_03058f6244bc75 1-7
+docs/code/src/features/search/Suggestions.jsx.md
+  s_c2024c265595f7::t_2f88e1fbc7ecff 1-4
+src/features/macros-editor/CommandsTab.jsx
+  s_c2024c265595f7::t_3ca3c4ad83a0ed 1,6,9,13,16-21,24
+  s_c2024c265595f7::t_a63f9718905a70 2-5,7-8,10-12,14-15,22-23,25-29
+scripts/e2e/specs/stuck-states.mjs
+  s_c2024c265595f7::t_88a440e60e328d 128-147
+  s_c2024c265595f7::t_433699d12b14d2 1-14,16,18-108,110-127,191-192
+  s_c2024c265595f7::t_1cb0130f893292 148-173
+  s_c2024c265595f7::t_10681ec9050d28 174-190
+  s_c2024c265595f7::t_ff667045a94d68 15,17,109
+src/features/macros-editor/MacrosEditorBody.jsx
+  s_c2024c265595f7::t_76123663a6e052 1,6-9,18-31,33-37,39-46,49-57,60,62,65-67,69,75-78,81-82,85-86
+  s_c2024c265595f7::t_a63f9718905a70 2-5,10-17,32,38,47-48,58-59,61,63-64,68,70-74,79-80,83-84,87-92
+src/answers/cityZones.js
+  s_c2024c265595f7::t_a2328bd7a00fa6 1-107
+src/features/cheatsheet/ShortcutTable.jsx
+  s_c2024c265595f7::t_c7f2aba9785092 1-37
+src/features/chevron/morph.test.js
+  s_c2024c265595f7::t_b3b27bc80bba58 1-53
+src/features/chevron/useChevronPainter.js
+  s_c2024c265595f7::t_570023ffa9bc8f 1,3,5-30,33-35,37-40,43-49,51-54,56,58-62,64,67-70,72-74,76
+src/features/macros-editor/recordOps.js
+  s_c2024c265595f7::t_43aafca6f12d1e 1-22
+src/features/macros-editor/validateConfig.js
+  s_c2024c265595f7::t_cf54ac28e4555b 1-84
+src/input/swipe.js
+  s_c2024c265595f7::t_db5786e2a0d9c7 1-18
+src/input/swipe.test.js
+  s_c2024c265595f7::t_f800e1d4fb85de 1-17
+src/input/useTouchGestures.js
+  s_c2024c265595f7::t_3f4361b035ba82 2-6,8-17,19-23,26-39,41-49,51-59
+src/lib/fetchFromScriptTag.test.js
+  s_c2024c265595f7::t_f7f70be93ec7d6 1-101
+src/lib/renderMarkdown.test.jsx
+  s_c2024c265595f7::t_9472a73729ba20 1-93
+src/settings/NumberField.test.jsx
+  s_c2024c265595f7::t_d59de50a75ce48 1-39
+src/settings/controlTypes.jsx
+  s_c2024c265595f7::t_d3b9a3c050a3c1 1-93
+src/settings/themeTypes.jsx
+  s_c2024c265595f7::t_0493a90dfbc012 1-2
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.24",
+  "base_commit_sha": "5a4dd88d3ee4e2a86e89084c0a9a890bcb6f4a6c",
+  "prompts": {},
+  "sessions": {
+    "s_c2024c265595f7": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "954383cb-eeab-4ca2-85f5-82cd23be8768",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Adam Yung <adyung@paloaltonetworks.com>"
+    }
+  }
+}
