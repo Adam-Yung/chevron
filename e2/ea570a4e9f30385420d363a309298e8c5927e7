@@ -1,0 +1,82 @@
+.framework.json
+  s_c2024c265595f7::t_8c78d86b28de19 1,6-8
+  s_c2024c265595f7::t_a869a4ced428e0 2-5
+src/components/Chevron/useChevronCanvas.js
+  s_c2024c265595f7::t_31bc137881ced7 30,32
+docs/code/scripts/e2e/lib/playwright.mjs.md
+  s_c2024c265595f7::t_a869a4ced428e0 1-5
+docs/code/scripts/e2e/run.mjs.md
+  s_c2024c265595f7::t_a869a4ced428e0 1-9
+.gitignore
+  s_c2024c265595f7::t_28313751523817 24-25
+vite.config.js
+  s_c2024c265595f7::t_fb9db28537aa55 9,57-59,61-62,64,115
+  s_c2024c265595f7::t_a4a9f9bb20b2a9 130
+docs/todo.md
+  s_c2024c265595f7::t_5a41a5b528ab0c 1-9
+tools/vite/htmlTransforms.test.js
+  s_c2024c265595f7::t_a4a9f9bb20b2a9 1-83
+.eslintrc.cjs
+  s_c2024c265595f7::t_2db10f1743f304 2-15,17-20,22-24,26
+docs/status.md
+  s_c2024c265595f7::t_5a41a5b528ab0c 1-11
+docs/README.md
+  s_c2024c265595f7::t_a869a4ced428e0 1-13
+tools/vite/htmlTransforms.js
+  s_c2024c265595f7::t_1aa5ef09b27be2 1-40
+docs/code/scripts/add-icon.mjs.md
+  s_c2024c265595f7::t_a869a4ced428e0 1-4
+CLAUDE.md
+  s_c2024c265595f7::t_78ec1adb674167 1
+scripts/verify.sh
+  s_c2024c265595f7::t_d412ebef92eccd 13-15
+  s_c2024c265595f7::t_0a4baf2f267b59 1-12,16-34
+docs/brief.md
+  s_c2024c265595f7::t_11e10c97808ec7 1-31
+scripts/e2e/lib/server.mjs
+  s_c2024c265595f7::t_eb77d3d4aea021 1-29
+AGENTS.md
+  s_c2024c265595f7::t_78ec1adb674167 1-23
+scripts/e2e/lib/app.mjs
+  s_c2024c265595f7::t_dca4f827c32db1 1-41,43-62
+  s_c2024c265595f7::t_d412ebef92eccd 42
+scripts/e2e/specs/boot.mjs
+  s_c2024c265595f7::t_d38b6f970b830c 1-4,8-19,21-23
+  s_c2024c265595f7::t_d412ebef92eccd 5-7,20
+scripts/e2e/run.mjs
+  s_c2024c265595f7::t_ed4232da67936d 1-67
+docs/decisions/architecture.md
+  s_c2024c265595f7::t_adfb72dd9ff9be 1-41
+docs/decisions/README.md
+  s_c2024c265595f7::t_5a41a5b528ab0c 1-4
+docs/code/scripts/e2e/lib/app.mjs.md
+  s_c2024c265595f7::t_a869a4ced428e0 1-7
+scripts/owner/install-deps.sh
+  s_c2024c265595f7::t_8c78d86b28de19 1-16
+scripts/e2e/lib/playwright.mjs
+  s_c2024c265595f7::t_eb77d3d4aea021 1-25
+docs/code/scripts/verify.sh.md
+  s_c2024c265595f7::t_a869a4ced428e0 1-10
+docs/code/scripts/e2e/lib/server.mjs.md
+  s_c2024c265595f7::t_a869a4ced428e0 1-4
+docs/code/tools/vite/htmlTransforms.js.md
+  s_c2024c265595f7::t_a869a4ced428e0 1-15
+docs/code/scripts/owner/install-deps.sh.md
+  s_c2024c265595f7::t_a869a4ced428e0 1-4
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.24",
+  "base_commit_sha": "e2ea570a4e9f30385420d363a309298e8c5927e7",
+  "prompts": {},
+  "sessions": {
+    "s_c2024c265595f7": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "954383cb-eeab-4ca2-85f5-82cd23be8768",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Adam Yung <adyung@paloaltonetworks.com>"
+    }
+  }
+}
