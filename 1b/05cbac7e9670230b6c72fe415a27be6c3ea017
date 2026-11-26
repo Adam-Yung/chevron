@@ -1,0 +1,25 @@
+tools/vite/serviceWorker.js
+  s_1071c9603c23a4::t_8d0857d0ba5046 1-18
+docs/code/tools/vite/serviceWorker.js.md
+  s_1071c9603c23a4::t_8d0857d0ba5046 1-14
+vite.config.js
+  s_1071c9603c23a4::t_8d0857d0ba5046 13,58
+tools/vite/serviceWorker.test.js
+  s_1071c9603c23a4::t_ced7f53659fa20 1-24
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.24",
+  "base_commit_sha": "1b05cbac7e9670230b6c72fe415a27be6c3ea017",
+  "prompts": {},
+  "sessions": {
+    "s_1071c9603c23a4": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "d0ff48bb-8201-4852-b8b2-83212ae25e5e",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Adam Yung <adyung@paloaltonetworks.com>"
+    }
+  }
+}
