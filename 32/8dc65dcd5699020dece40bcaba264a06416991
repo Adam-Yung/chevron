@@ -1,0 +1,158 @@
+src/features/chevron/chevronPainter.js
+  s_f170e9ca6a3523::t_85d1ad4c699aad 21,29,33
+  s_f170e9ca6a3523::t_0740597c8436e7 12
+src/features/chevron/drawChevron.test.js
+  s_f170e9ca6a3523::t_85d1ad4c699aad 1,5,13,27-37
+  s_f170e9ca6a3523::t_0740597c8436e7 2-4,6-12,14-26,38-39
+src/features/search/Suggestions.module.css
+  s_f170e9ca6a3523::t_85d1ad4c699aad 70,72-73
+  s_f170e9ca6a3523::t_0740597c8436e7 23,30-31,33-37,46,66,85
+docs/code/src/settings/themeTypes.jsx.md
+  s_f170e9ca6a3523::t_85d1ad4c699aad 7-8
+  s_f170e9ca6a3523::t_25c11e8a32ab90 6
+docs/code/src/settings/settingsMigration.js.md
+  s_f170e9ca6a3523::t_85d1ad4c699aad 12-14
+docs/code/src/features/search/useAdaptiveFontSize.js.md
+  s_f170e9ca6a3523::t_25c11e8a32ab90 4-5
+scripts/e2e/specs/boot.mjs
+  s_f170e9ca6a3523::t_85d1ad4c699aad 26-27
+src/app/global.css
+  s_f170e9ca6a3523::t_0740597c8436e7 11-28,36-37
+  s_f170e9ca6a3523::t_85d1ad4c699aad 30-32
+  s_f170e9ca6a3523::t_c900922ad432ca 29
+docs/features/macros-editor.md
+  s_f170e9ca6a3523::t_85d1ad4c699aad 3,17
+src/features/macros/Dock.module.css
+  s_f170e9ca6a3523::t_0740597c8436e7 21,41,44-45,51,59-65,71-72
+  s_f170e9ca6a3523::t_85d1ad4c699aad 43
+docs/code/src/features/chevron/drawChevron.js.md
+  s_f170e9ca6a3523::t_85d1ad4c699aad 8
+  s_f170e9ca6a3523::t_25c11e8a32ab90 4-7,9
+src/features/search/QuickLook.jsx
+  s_f170e9ca6a3523::t_0740597c8436e7 5,53
+  s_f170e9ca6a3523::t_e77e79af2732a5 36-37,45,51-52
+  s_f170e9ca6a3523::t_85d1ad4c699aad 44,47
+src/features/chevron/useChevronPainter.js
+  s_f170e9ca6a3523::t_0740597c8436e7 45,47-48,55,57,79
+  s_f170e9ca6a3523::t_85d1ad4c699aad 11-12,15-16,78
+src/features/search/QuickLook.module.css
+  s_f170e9ca6a3523::t_0740597c8436e7 25-31,33,42-45,59,63
+  s_f170e9ca6a3523::t_e77e79af2732a5 58,61-62
+  s_f170e9ca6a3523::t_85d1ad4c699aad 60
+src/features/macros/Time.module.css
+  s_f170e9ca6a3523::t_0740597c8436e7 4-5
+src/settings/theme.test.js
+  s_f170e9ca6a3523::t_85d1ad4c699aad 2,6-10,15-17
+  s_f170e9ca6a3523::t_0740597c8436e7 1,3-5,11-14,18-20
+src/features/settings-panel/Settings.module.css
+  s_f170e9ca6a3523::t_0740597c8436e7 17,25-27,41,43
+docs/code/src/features/search/QuickLook.jsx.md
+  s_f170e9ca6a3523::t_25c11e8a32ab90 6-8
+src/app/LaunchOverlay.jsx
+  s_f170e9ca6a3523::t_85d1ad4c699aad 54
+  s_f170e9ca6a3523::t_0740597c8436e7 6,56,58
+docs/code/src/settings/schema.js.md
+  s_f170e9ca6a3523::t_25c11e8a32ab90 11-12
+public/manifest.json
+  s_f170e9ca6a3523::t_0740597c8436e7 7-8
+docs/decisions/visual-style.md
+  s_f170e9ca6a3523::t_25c11e8a32ab90 1-20,26-30
+  s_f170e9ca6a3523::t_85d1ad4c699aad 21-25
+src/settings/schema.js
+  s_f170e9ca6a3523::t_85d1ad4c699aad 34-35,76,195
+  s_f170e9ca6a3523::t_0740597c8436e7 32-33,36,84
+docs/features/settings.md
+  s_f170e9ca6a3523::t_25c11e8a32ab90 28-29
+  s_f170e9ca6a3523::t_85d1ad4c699aad 3,19
+src/settings/settingsMigration.js
+  s_f170e9ca6a3523::t_85d1ad4c699aad 11-22,89-100,109
+src/features/macros/Card.jsx
+  s_f170e9ca6a3523::t_e77e79af2732a5 24
+  s_f170e9ca6a3523::t_0740597c8436e7 2,15,21,23
+  s_f170e9ca6a3523::t_85d1ad4c699aad 22
+src/features/macros/Dock.jsx
+  s_f170e9ca6a3523::t_0740597c8436e7 5,22,25
+  s_f170e9ca6a3523::t_85d1ad4c699aad 21
+src/features/status/OfflineIndicator.module.css
+  s_f170e9ca6a3523::t_0740597c8436e7 10-14
+scripts/owner/add-graduate-font.sh
+  s_f170e9ca6a3523::t_85d1ad4c699aad 3,12,26-27
+  s_f170e9ca6a3523::t_0740597c8436e7 1-2,4-11,13-25,28
+index.html
+  s_f170e9ca6a3523::t_0740597c8436e7 9,25-28,34-42,61
+  s_f170e9ca6a3523::t_85d1ad4c699aad 43,60,64
+  s_f170e9ca6a3523::t_e77e79af2732a5 72
+src/features/chevron/drawChevron.js
+  s_f170e9ca6a3523::t_0740597c8436e7 2-3,20-29,31-33,35-37
+  s_f170e9ca6a3523::t_e77e79af2732a5 14
+  s_f170e9ca6a3523::t_85d1ad4c699aad 6-7,9,30
+src/app/Notice.module.css
+  s_f170e9ca6a3523::t_0740597c8436e7 12-14,18
+src/settings/themeTypes.jsx
+  s_f170e9ca6a3523::t_85d1ad4c699aad 62,114-119,122
+  s_f170e9ca6a3523::t_0740597c8436e7 145-146,151-152
+docs/code/scripts/owner/add-graduate-font.sh.md
+  s_f170e9ca6a3523::t_25c11e8a32ab90 1-5
+src/features/chevron/chevronPainter.test.js
+  s_f170e9ca6a3523::t_0740597c8436e7 6
+src/features/macros/MacrosMenu.module.css
+  s_f170e9ca6a3523::t_85d1ad4c699aad 24
+  s_f170e9ca6a3523::t_0740597c8436e7 27-28
+docs/status.md
+  s_f170e9ca6a3523::t_25c11e8a32ab90 17-18
+  s_f170e9ca6a3523::t_85d1ad4c699aad 19
+src/features/search/QueryField.module.css
+  s_f170e9ca6a3523::t_0740597c8436e7 20-26,40
+src/features/macros/Card.module.css
+  s_f170e9ca6a3523::t_85d1ad4c699aad 39,85
+  s_f170e9ca6a3523::t_0740597c8436e7 1,9-10,19,22,27,35,40,44-54,57-59,67-69,82-83
+  s_f170e9ca6a3523::t_e77e79af2732a5 36,80-81
+src/app/LaunchOverlay.module.css
+  s_f170e9ca6a3523::t_85d1ad4c699aad 10
+  s_f170e9ca6a3523::t_0740597c8436e7 21
+src/features/weather/WeatherModal.module.css
+  s_f170e9ca6a3523::t_0740597c8436e7 22,27-29
+docs/code/src/lib/getCssGradient.js.md
+  s_f170e9ca6a3523::t_25c11e8a32ab90 3-6
+README.md
+  s_f170e9ca6a3523::t_25c11e8a32ab90 170-171
+src/features/chevron/Chevron.jsx
+  s_f170e9ca6a3523::t_85d1ad4c699aad 19
+src/lib/getCssGradient.js
+  s_f170e9ca6a3523::t_0740597c8436e7 28-36
+docs/code/src/features/macros/Dock.jsx.md
+  s_f170e9ca6a3523::t_25c11e8a32ab90 5
+src/settings/settingsMigration.test.js
+  s_f170e9ca6a3523::t_85d1ad4c699aad 1-22
+docs/features/sites.md
+  s_f170e9ca6a3523::t_85d1ad4c699aad 3
+  s_f170e9ca6a3523::t_25c11e8a32ab90 5-6
+src/lib/getCssGradient.test.js
+  s_f170e9ca6a3523::t_0740597c8436e7 2,35-47
+  s_f170e9ca6a3523::t_872a05b83869e3 48
+src/features/cheatsheet/Cheatsheet.module.css
+  s_f170e9ca6a3523::t_0740597c8436e7 19,27-29,43,45
+docs/code/src/features/macros/Card.jsx.md
+  s_f170e9ca6a3523::t_25c11e8a32ab90 5-6
+docs/features/search.md
+  s_f170e9ca6a3523::t_85d1ad4c699aad 3
+  s_f170e9ca6a3523::t_25c11e8a32ab90 31
+src/features/search/useAdaptiveFontSize.js
+  s_f170e9ca6a3523::t_0740597c8436e7 9,26
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.24",
+  "base_commit_sha": "328dc65dcd5699020dece40bcaba264a06416991",
+  "prompts": {},
+  "sessions": {
+    "s_f170e9ca6a3523": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "78039f60-dcdc-4bd2-991b-c99ea1ed7569",
+        "model": "claude-sonnet-5-5"
+      },
+      "human_author": "Adam Yung <adyung@paloaltonetworks.com>"
+    }
+  }
+}
