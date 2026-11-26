@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { stripModuleMarkersFromHtml, moveAppScriptToBodyEnd, prepareStaticHtml, inlineFonts } from './htmlTransforms.js'
+import { stripModuleMarkersFromHtml, moveAppScriptToBodyEnd, prepareStaticHtml, inlineFonts, inlineFontCss } from './htmlTransforms.js'
 
 describe('stripModuleMarkersFromHtml', () => {
   it('drops crossorigin from <script> tags (file:// / IIFE compat)', () => {
@@ -96,5 +96,25 @@ describe('inlineFonts', () => {
 
   it('leaves a page without the font stylesheet alone', () => {
     expect(inlineFonts('<head></head>', css, {})).toBe('<head></head>')
+  })
+})
+
+describe('inlineFontCss', () => {
+  const head = '<head><link rel="preload" href="fonts/Onest/Onest.woff2" as="font" type="font/woff2" crossorigin>\n<link rel="stylesheet" href="font.css">\n</head>'
+  const css = "/* note */ @font-face { font-family: 'Onest'; src: url('./fonts/Onest/Onest.woff2') format('woff2'); }"
+
+  it('replaces the render-blocking font.css request with the same rules inline', () => {
+    const out = inlineFontCss(head, css)
+    expect(out).not.toContain('href="font.css"')
+    expect(out).toContain("<style>@font-face { font-family: 'Onest'; src: url('./fonts/Onest/Onest.woff2') format('woff2'); }</style>")
+    expect(out).not.toContain('note')
+  })
+
+  it('keeps the font preload, so the font file still starts downloading from the first parse', () => {
+    expect(inlineFontCss(head, css)).toContain('rel="preload" href="fonts/Onest/Onest.woff2" as="font" type="font/woff2" crossorigin')
+  })
+
+  it('leaves a page without the font stylesheet alone', () => {
+    expect(inlineFontCss('<head></head>', css)).toBe('<head></head>')
   })
 })

@@ -9,7 +9,7 @@ import { VitePWA } from 'vite-plugin-pwa'
 import { readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { dirname, resolve } from 'node:path'
-import { inlineFonts, prepareStaticHtml } from './tools/vite/htmlTransforms.js'
+import { inlineFontCss, inlineFonts, prepareStaticHtml } from './tools/vite/htmlTransforms.js'
 
 const root = dirname(fileURLToPath(import.meta.url))
 const APP_VERSION = JSON.parse(readFileSync(resolve(root, 'package.json'), 'utf8')).version || '0.0.0'
@@ -41,8 +41,16 @@ function staticHtml() {
   }
 }
 
+function hostedHtml() {
+  return {
+    name: 'chevron-hosted-html',
+    apply: 'build',
+    transformIndexHtml: html => inlineFontCss(html, readFileSync(resolve(root, 'public/font.css'), 'utf8'))
+  }
+}
+
 function hostedPlugins(base) {
-  return [VitePWA({
+  return [hostedHtml(), VitePWA({
     registerType: 'autoUpdate',
     injectRegister: 'inline',
     manifest: false,

@@ -1,4 +1,4 @@
-// Pure HTML transforms for the static (single-file, file://) build profile. Kept apart from vite.config.js so they are unit-tested.
+// Pure HTML transforms for the build profiles (mostly the static, single-file, file:// one). Kept apart from vite.config.js so they are unit-tested.
 // docs/code/tools/vite/htmlTransforms.js.md explains why each rewrite exists.
 
 const SCRIPT_CROSSORIGIN = /<script\b([^>]*?)\s+crossorigin\b/g
@@ -30,6 +30,21 @@ export function moveAppScriptToBodyEnd(html) {
   return html.replace(match[0], '').replace('</body>', `${tag}\n</body>`)
 }
 
+const stripCssComments = css => css.replace(/\/\*[\s\S]*?\*\//g, '').trim()
+
+const FONT_STYLESHEET = /<link\s+rel="stylesheet"\s+href="font\.css"[^>]*>\s*/
+
+/**
+ * Hosted profile: put public/font.css inline where its <link> stood. The stylesheet only declares @font-face, yet as a separate file
+ * it blocked first paint for a whole round-trip. The font file itself stays external, cached, and preloaded.
+ * @param {string} html
+ * @param {string} fontCss  public/font.css
+ */
+export function inlineFontCss(html, fontCss) {
+  if (!FONT_STYLESHEET.test(html)) return html
+  return html.replace(FONT_STYLESHEET, `<style>${stripCssComments(fontCss)}</style>\n`)
+}
+
 const FONT_LINKS = /<link\s+rel="(?:stylesheet|preload)"\s+href="font\.css"[^>]*>\s*|<link\s+rel="preload"\s+href="fonts\/[^"]+"[^>]*>\s*/g
 
 /**
@@ -42,7 +57,7 @@ const FONT_LINKS = /<link\s+rel="(?:stylesheet|preload)"\s+href="font\.css"[^>]*
 export function inlineFonts(html, fontCss, fontsBase64) {
   const css = Object.entries(fontsBase64).reduce(
     (text, [url, b64]) => text.split(url).join(`data:font/woff2;base64,${b64}`),
-    fontCss.replace(/\/\*[\s\S]*?\*\//g, '').trim()
+    stripCssComments(fontCss)
   )
   if (!html.includes('href="font.css"')) return html
   return html.replace(FONT_LINKS, '').replace('</head>', `<style>${css}</style>\n</head>`)

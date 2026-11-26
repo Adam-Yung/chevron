@@ -1,6 +1,7 @@
 # tools/vite/htmlTransforms.js
 
-HTML rewrites for the static profile, applied by the `chevron-static-html` plugin in `vite.config.js` (build only).
+HTML rewrites applied at build time by `vite.config.js`: the static-profile ones through `chevron-static-html`, `inlineFontCss`
+through `chevron-hosted-html`.
 
 - **Why strip `type="module"` and `crossorigin`:** browsers CORS-gate module scripts, and a page opened from `file://` has an opaque
   origin, so a module script never loads there. The static bundle is emitted as an IIFE, so a classic script is correct.
@@ -16,3 +17,6 @@ Tests: `tools/vite/htmlTransforms.test.js`.
 - **Why inline the font (`inlineFonts`):** a `file://` page may not fetch font files (CORS), so the release zip showed a fallback
   font. The static build now carries Onest as a data URL (about 35 KB); comments in `public/font.css` are stripped first so the
   commented-out CJK example is never read as a real font.
+- **Why inline only the font CSS in the hosted build (`inlineFontCss`):** `font.css` is 2 KB of `@font-face`, but a stylesheet link
+  blocks first paint until it arrives, one extra round-trip on GitHub Pages. Inlining it removes that wait; the woff2 stays a
+  separate, preloaded, service-worker-cached file instead of a data URL that every HTML response would carry.

@@ -6,5 +6,7 @@
   splitting off, so the config does not repeat it.
 - **Hosted profile:** real ES modules split by lazy boundary (settings, weather, AI, cheatsheet, sites menu) with React and Splide
   in their own long-cached chunks; Workbox precaches everything so a repeat visit is served offline.
+  `public/font.css` is inlined into the HTML (`inlineFontCss`): as its own file it was a render-blocking request that only declared
+  `@font-face`. The font file stays external and preloaded, so it is cached once rather than re-sent inside every HTML response.
 - `config.js` and `icons.js` are plain scripts in `public/` so users can edit them without a build; the version query busts caches.
 - Vite 8 bundles with Rolldown, so build output options sit under `build.rolldownOptions`; `manualChunks` keeps the vendor split.
