@@ -8,8 +8,11 @@ function measure(host, thickness) {
   const rect = host.getBoundingClientRect()
   const dpr = Math.min(window.devicePixelRatio || 1, 2)
   const side = Math.max(1, Math.min(MAX_PIXELS, Math.round(Math.max(rect.width, rect.height) * dpr)))
-  return { width: side, height: side, thickness: thickness * (side / Math.max(rect.height, 1)) }
+  const scale = side / Math.max(rect.height, 1)
+  return { width: side, height: side, scale, thickness: thickness * scale }
 }
+
+const pick = ({ thickness, scale }) => ({ thickness, scale })
 
 // The worker is created before the canvas is transferred: on file:// creating it throws, and a transferred canvas can no longer
 // be drawn on from the main thread.
@@ -39,19 +42,19 @@ function startPainter(canvas, init, onFirstFrame) {
  * The canvas is created here, not rendered by React: a transferred canvas cannot be transferred again, and React's StrictMode
  * mounts effects twice on the same element.
  */
-export default function useChevronPainter(hostRef, { stages, stage, color, thickness, onFirstFrame }) {
+export default function useChevronPainter(hostRef, { stages, stage, color, thread, thickness, onFirstFrame }) {
   const painterRef = useRef(null)
-  const latest = useRef({ stages, stage, color, thickness })
-  latest.current = { stages, stage, color, thickness, onFirstFrame }
+  const latest = useRef({ stages, stage, color, thread, thickness })
+  latest.current = { stages, stage, color, thread, thickness, onFirstFrame }
 
   useEffect(() => {
     const host = hostRef.current
     const canvas = document.createElement('canvas')
     canvas.setAttribute('aria-hidden', 'true')
     host.appendChild(canvas)
-    const { stages: s, stage: initialStage, color: c, thickness: t } = latest.current
+    const { stages: s, stage: initialStage, color: c, thread: th, thickness: t } = latest.current
     const firstFrame = () => latest.current.onFirstFrame?.()
-    const painter = startPainter(canvas, { ...measure(host, t), stages: s.map(a => Array.from(a)), stage: initialStage, color: c }, firstFrame)
+    const painter = startPainter(canvas, { ...measure(host, t), stages: s.map(a => Array.from(a)), stage: initialStage, color: c, thread: th }, firstFrame)
     painterRef.current = painter
 
     let frame = 0
@@ -72,8 +75,8 @@ export default function useChevronPainter(hostRef, { stages, stage, color, thick
   useEffect(() => {
     const host = hostRef.current
     if (!host) return
-    painterRef.current?.postMessage({ type: 'style', color, thickness: measure(host, thickness).thickness })
-  }, [hostRef, color, thickness])
+    painterRef.current?.postMessage({ type: 'style', color, thread, ...pick(measure(host, thickness)) })
+  }, [hostRef, color, thread, thickness])
 
   useEffect(() => {
     painterRef.current?.postMessage({ type: 'stages', stages: stages.map(a => Array.from(a)), stage: latest.current.stage })

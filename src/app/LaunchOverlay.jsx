@@ -3,7 +3,7 @@ import { SettingsContext } from '../settings/SettingsProvider'
 import { useUi } from '../state/UiStore'
 import useDestination from '../search/useDestination'
 import { usePinnedMacros } from '../search/useConfig'
-import getCssGradient from '../lib/getCssGradient'
+import { feltColor } from '../lib/getCssGradient'
 import MacroIcon from '../features/macros/MacroIcon'
 import classes from './LaunchOverlay.module.css'
 
@@ -51,11 +51,11 @@ export default function LaunchOverlay() {
   const { rect } = frame
   return (
     <div className={classes.overlay} aria-hidden='true' style={{ '--t': t + 'ms' }}>
-      <div className={classes.disc} style={{
+      <div className={`felt ${classes.disc}`} style={{
         left: rect.left, top: rect.top, width: rect.width, height: rect.width,
-        background: getCssGradient(look.bgColor), transform: frame.grown ? `scale(${frame.scale})` : 'none'
+        '--felt': feltColor(look.bgColor), transform: frame.grown ? `scale(${frame.scale})` : 'none'
       }} />
-      {macro && <MacroIcon icon={macro.icon} color={macro.textColor} className={classes.icon} />}
+      {macro && <MacroIcon icon={macro.icon} color='currentColor' className={classes.icon} />}
     </div>
   )
 }

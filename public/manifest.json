@@ -4,8 +4,8 @@
   "description": "Keyboard-driven browser start page with search, macros, AI, and weather.",
   "start_url": "./",
   "display": "standalone",
-  "background_color": "#1a1a2e",
-  "theme_color": "#1a1a2e",
+  "background_color": "#26364a",
+  "theme_color": "#26364a",
   "icons": [
     {
       "src": "favicon.svg",

@@ -167,7 +167,8 @@ Host your own instance for free on GitHub — accessible from anywhere with an i
 ### Settings panel
 Click the gear icon (top-right) to configure:
 - **General** — search engine, language, history on/off
-- **Appearance** — theme presets (midnight, forest, burgundy, slate, dune, noir) or full custom colors
+- **Appearance** — theme presets (midnight, forest, burgundy, slate, dune, noir) or full custom colors. The default look is a
+  sewn sleeve patch; the earlier glass look is the `stable` git tag
 - **Query** — font sizes, suggestion limits, AI provider setup
 - **Weather** — API key, location, units
 

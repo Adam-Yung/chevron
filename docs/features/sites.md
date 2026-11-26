@@ -1,8 +1,9 @@
 # Sites menu and dock
 
-> Verified: 2026-11-26 00:24 · Sources: `src/features/macros/MacrosMenu.jsx`, `src/features/macros/MacrosLayer.jsx`, `src/features/macros/Card.jsx`, `src/features/macros/Dock.jsx`, `src/features/macros/filterMacros.js`, `src/input/keyRouter.js`, `src/input/usePointerInput.js`, `src/input/useTouchGestures.js`
+> Verified: 2026-11-26 15:26 · Sources: `src/features/macros/MacrosMenu.jsx`, `src/features/macros/MacrosLayer.jsx`, `src/features/macros/Card.jsx`, `src/features/macros/Dock.jsx`, `src/features/macros/filterMacros.js`, `src/input/keyRouter.js`, `src/input/usePointerInput.js`, `src/input/useTouchGestures.js`
 
-Pinned macros appear in two places.
+Pinned macros appear in two places. Each site is a round sewn badge cut from the first colour of its background, with its icon
+stitched in the theme's thread colour; the macro's text colour and gradient are not shown.
 
 **The dock** sits along the bottom of the idle screen: one click opens a site (Cmd/Ctrl+click opens it in a new tab). It fades while
 you search or use the menu. Turn it off with Settings, Appearance, `dock`.

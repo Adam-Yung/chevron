@@ -1,6 +1,6 @@
 # Macros editor
 
-> Verified: 2026-11-26 00:24 · Sources: `src/features/macros-editor/MacrosEditorBody.jsx`, `src/features/macros-editor/useConfigDraft.js`, `src/features/macros-editor/useAutosave.js`, `src/features/macros-editor/validateConfig.js`, `src/features/macros-editor/configDraft.js`, `src/storage/macrosConfig.js`, `public/config.js`, `public/icons.js`
+> Verified: 2026-11-26 15:26 · Sources: `src/features/macros-editor/MacrosEditorBody.jsx`, `src/features/macros-editor/useConfigDraft.js`, `src/features/macros-editor/useAutosave.js`, `src/features/macros-editor/validateConfig.js`, `src/features/macros-editor/configDraft.js`, `src/storage/macrosConfig.js`, `public/config.js`, `public/icons.js`
 
 Edit the macros, global commands and search engines without touching files. Open **Settings** (gear, top right, `aria-label` "Open settings"), then **Macros** in the sidebar.
 
@@ -14,7 +14,7 @@ There is no Save/Cancel pair. Edits are **saved automatically** about 0.8 s afte
 
 ## Tabs
 
-- **Macros**: one row per macro; click it to expand. Fields: name, category, URL, normalised URL (host), hotkey (a `KeyboardEvent.code` such as `KeyG`, used with Shift), icon, text colour, pinned (shown in the macros menu), triggers, background (solid or gradient with stops), and per-macro commands (type, template, description). Use the arrows to reorder and the bin to delete.
+- **Macros**: one row per macro; click it to expand. Fields: name, category, URL, normalised URL (host), hotkey (a `KeyboardEvent.code` such as `KeyG`, used with Shift), icon, text colour (kept in the config; badges stitch the icon in the theme's thread colour), pinned (shown in the macros menu), triggers, background (solid or gradient with stops), and per-macro commands (type, template, description). Use the arrows to reorder and the bin to delete.
 - **Commands**: the global `type` + `trigger` pairs that macros can implement.
 - **Engines**: search engines. The engine id (key) and each query type are edited as text that is applied when you leave the field (Enter or click away); an empty or already used id reverts. Templates use `{@}` (the query as typed) and `{$}` (the parsed query).
 - **Raw JSON**: the whole config as text. It must contain `macros` (array), `commands` (array) and `engines` (object). Leaving the tab while the JSON is broken restores the last valid version and says so.

@@ -16,7 +16,7 @@ export default function Chevron({ view, duration }) {
   const stages = useMemo(() => parseStages(size), [size])
   const stage = STAGE_FOR_VIEW[view] ?? 0
   const hostRef = useRef(null)
-  const post = useChevronPainter(hostRef, { stages, stage, color: theme.chevron, thickness: settings.chevron.thickness, onFirstFrame: dismissBootShell })
+  const post = useChevronPainter(hostRef, { stages, stage, color: theme.chevron, thread: theme.seam, thickness: settings.chevron.thickness, onFirstFrame: dismissBootShell })
 
   // The shell's chevron is the idle shape; it must not outlive the idle view, even if the canvas never reports its first frame.
   useLayoutEffect(() => {

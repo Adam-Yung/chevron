@@ -20,32 +20,30 @@
   font-size: var(--font-size-suggestions);
 }
 
-/* ── Suggestion pill ─────────────────────────────────────────────────── */
+/* ── Suggestion patch ────────────────────────────────────────────────── */
 .suggestion > div {
   color: var(--suggestions);
   display: flex;
   text-align: center;
   width: fit-content;
   margin: 0 auto;
-  padding: 6px 18px;
-  border-radius: 999px;
+  padding: 7px 18px;
+  border-radius: 6px;
   cursor: pointer;
-  /* Glass pill base */
-  background: color-mix(in srgb, var(--primary) 8%, transparent);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  transition: background 0.15s, border-color 0.15s, transform 0.15s;
-  /* The list re-renders per keystroke: containment keeps one pill's backdrop-filter repaint from invalidating its siblings. */
+  background: color-mix(in srgb, var(--primary) 10%, transparent);
+  outline: 1.5px dashed color-mix(in srgb, var(--primary) 40%, transparent);
+  outline-offset: -4px;
+  transition: background 0.15s, transform 0.15s;
+  /* The list re-renders per keystroke: containment keeps one patch's repaint from invalidating its siblings. */
   contain: layout paint style;
 }
 body[data-glass-mode] .suggestion > div {
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  background: color-mix(in srgb, var(--primary) 4%, transparent);
 }
 @media (hover: hover) {
   .suggestion > div:hover {
-    background: color-mix(in srgb, var(--primary) 12%, transparent);
-    border-color: rgba(255, 255, 255, 0.14);
+    background: color-mix(in srgb, var(--primary) 18%, transparent);
     transform: translateY(-1px);
   }
 }
@@ -65,18 +63,14 @@ body[data-glass-mode] .suggestion > div {
   margin-right: .5ch;
   background-color: var(--prefix);
   padding: 0 .5ch;
-  border-radius: 8px;
+  border-radius: 3px;
   color: var(--secondary);
 }
 
-/* Selection state — glass highlight instead of thick solid border */
-.suggestion > div {
-  border: 1px solid rgba(255, 255, 255, 0.08);
-}
+/* Selected: a heavier patch with an accent seam. The text keeps its own colour, which every theme keeps readable. */
 .suggestion[data-selected] > div {
-  background: color-mix(in srgb, var(--primary) 18%, transparent);
-  border-color: color-mix(in srgb, var(--primary) 55%, transparent);
-  box-shadow: 0 0 0 1px color-mix(in srgb, var(--primary) 30%, transparent);
+  background: color-mix(in srgb, var(--primary) 20%, transparent);
+  outline: 2px dashed var(--accent);
   transform: translateY(-1px);
 }
 .suggestion:active > div,
@@ -88,7 +82,7 @@ body[data-glass-mode] .suggestion > div {
 
 /* Keyboard focus ring */
 .suggestion:focus-visible > div {
-  outline: 2px solid color-mix(in srgb, var(--primary) 80%, transparent);
+  outline: 2px solid var(--primary);
   outline-offset: 2px;
 }
 
@@ -100,47 +94,6 @@ body[data-glass-mode] .suggestion > div {
 .suggestion-trigger {
   opacity: 0.5;
   font-size: 0.85em;
-}
-
-/* Light theme — liquid glass pills */
-body[data-color-scheme=light] .suggestion > div {
-  background: rgba(255, 255, 255, 0.52);
-  border-color: rgba(0, 0, 0, 0.08);
-  box-shadow:
-    0 2px 8px rgba(0, 0, 0, 0.08),
-    0 1px 0 rgba(255, 255, 255, 0.9) inset;
-  color: var(--suggestions);
-}
-body[data-glass-mode][data-color-scheme=light] .suggestion > div {
-  backdrop-filter: blur(14px) saturate(1.6);
-  -webkit-backdrop-filter: blur(14px) saturate(1.6);
-  background: rgba(255, 255, 255, 0.42);
-}
-@media (hover: hover) {
-  body[data-color-scheme=light] .suggestion > div:hover {
-    background: rgba(255, 255, 255, 0.72);
-    border-color: rgba(0, 0, 0, 0.12);
-    box-shadow:
-      0 4px 16px rgba(0, 0, 0, 0.10),
-      0 1px 0 rgba(255, 255, 255, 1) inset;
-    transform: translateY(-1px);
-  }
-}
-body[data-color-scheme=light] .suggestion[data-selected] > div {
-  background: rgba(255, 255, 255, 0.82);
-  border-color: color-mix(in srgb, var(--primary) 45%, transparent);
-  box-shadow:
-    0 0 0 1px color-mix(in srgb, var(--primary) 22%, transparent),
-    0 4px 20px rgba(0, 0, 0, 0.12),
-    0 1px 0 rgba(255, 255, 255, 1) inset;
-  transform: translateY(-1px);
-}
-body[data-color-scheme=light] .suggestion:active > div,
-body[data-color-scheme=light] [data-leaving] .suggestion[data-selected] > div {
-  background: var(--primary);
-  color: var(--secondary);
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
-  transform: scale(0.97);
 }
 
 /* At least 44px rows for fingers. */

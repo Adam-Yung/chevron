@@ -16,15 +16,17 @@
 .dialog {
   background: var(--secondary, #111);
   color: var(--query, #eee);
-  border-radius: 16px;
+  border-radius: 8px;
   width: min(720px, 92vw);
   max-height: 88vh;
   display: flex;
   flex-direction: column;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45);
   font-family: inherit;
-  outline: none;
   overflow: hidden;
+  background-image: var(--weave);
+  outline: 2px dashed color-mix(in srgb, var(--accent) 70%, transparent);
+  outline-offset: -7px;
 }
 
 .header {
@@ -38,8 +40,9 @@
 
 .title {
   margin: 0;
+  font-family: var(--font-display);
   font-size: 1.25em;
-  font-weight: 600;
+  font-weight: 400;
   line-height: 1.2;
 }
 

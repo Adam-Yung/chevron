@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import getCssGradient from './getCssGradient'
+import getCssGradient, { feltColor } from './getCssGradient'
 
 describe('getCssGradient', () => {
   it('returns a solid colour untouched', () => {
@@ -30,5 +30,19 @@ describe('getCssGradient', () => {
     expect(getCssGradient(undefined)).toBe('transparent')
     expect(getCssGradient({ type: 'gradient', gradientType: 'linear' })).toBe('transparent')
     expect(getCssGradient('#fff')).toBe('#fff')
+  })
+})
+
+describe('feltColor', () => {
+  it('takes a solid colour or the first stop of a gradient', () => {
+    expect(feltColor({ type: 'solid', color: '#123456' })).toBe('#123456')
+    expect(feltColor({ type: 'gradient', gradientType: 'linear', colors: ['red', 'blue'] })).toBe('red')
+    expect(feltColor('#888')).toBe('#888')
+  })
+
+  it('is undefined for anything it cannot reduce to one colour', () => {
+    expect(feltColor(undefined)).toBeUndefined()
+    expect(feltColor({ type: 'gradient' })).toBeUndefined()
+    expect(feltColor('linear-gradient(red,blue)')).toBeUndefined()
   })
 })

@@ -8,3 +8,5 @@ renders from `template`; `defaults` seeds the store; `hidden` lists paths shown 
   only primary, secondary and accent are edited, the rest follow through `dependants`.
 - Search engines are read from `window.CONFIG` at import, so `config.js` must load first (it does in both builds).
 - Adding a setting: add it here with a description, then read it where used. A persisted store without it falls back to the default.
+
+- The default theme names its own `chevron` colour, which stops it following `primary` (a dependant only inherits when unset).

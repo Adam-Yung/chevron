@@ -6,7 +6,7 @@ let measureCtx = null
 function textWidth(text, px, family) {
   measureCtx ??= document.createElement('canvas').getContext('2d')
   if (!measureCtx) return 0
-  measureCtx.font = `600 ${px}px ${family}`
+  measureCtx.font = `400 ${px}px ${family}`
   return measureCtx.measureText(text.toUpperCase()).width
 }
 
@@ -23,7 +23,7 @@ export default function useAdaptiveFontSize(text, max) {
     if (!el) return undefined
     const read = () => {
       const style = getComputedStyle(el)
-      setBox(b => ({ ...b, width: el.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight), basePx: parseFloat(style.fontSize) || 16, family: style.fontFamily || 'sans-serif' }))
+      setBox(b => ({ ...b, width: el.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight), basePx: parseFloat(style.fontSize) || 16, family: style.getPropertyValue('--font-display').trim() || style.fontFamily || 'sans-serif' }))
     }
     read()
     const observer = new ResizeObserver(read)

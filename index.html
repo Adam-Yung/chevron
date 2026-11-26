@@ -6,7 +6,7 @@
          fails low-vision users. -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, interactive-widget=resizes-content, viewport-fit=cover" />
     <meta name="description" content="Chevron — a keyboard-driven browser start page with search, macros, AI, and weather.">
-    <meta name="theme-color" content="#1a1a2e">
+    <meta name="theme-color" content="#26364a">
     <meta property="og:title" content="Chevron">
     <meta property="og:description" content="Your browser's blank tab is wasted space. Chevron turns it into a command center.">
     <meta property="og:image" content="https://i.imgur.com/Wa7HcuW.png">
@@ -22,15 +22,25 @@
     <!-- First-paint shell (docs/code/src/app/bootShell.js.md): the idle chevron and a hidden field that keeps keys typed before React
          mounts. The defaults below are the default theme's; the script swaps in the saved theme and chevron settings. -->
     <style>
-      html { background: #dee1e6; --boot-chevron: #212121 }
-      @media (prefers-color-scheme: dark) { html { background: #212121; --boot-chevron: #f2f2f2 } }
+      html { background-color: #cbbd94; --boot-chevron: #a8402c; --boot-thread: #efe6cc; --boot-accent: #71500d;
+        background-image: repeating-linear-gradient(0deg, rgb(255 255 255 / 0.05) 0 1px, transparent 1px 3px),
+          repeating-linear-gradient(90deg, rgb(0 0 0 / 0.1) 0 1px, transparent 1px 3px) }
+      @media (prefers-color-scheme: dark) { html { background-color: #26364a; --boot-chevron: #d9a02b; --boot-thread: #e9dfc4; --boot-accent: #d9a02b } }
       #boot-shell { position: fixed; inset: 0; z-index: 5; pointer-events: none; --chev: 50vh }
       @supports (height: 1dvh) { #boot-shell { --chev: 50dvh } }
       @media (orientation: portrait) { #boot-shell { --chev: 40vw } }
       #boot-shell svg { position: absolute; top: calc(50% - var(--chev)); left: calc(50% - var(--chev)); width: calc(var(--chev) * 2);
         height: calc(var(--chev) * 2); overflow: visible }
-      #boot-shell path { fill: none; stroke: var(--boot-chevron); stroke-width: var(--boot-thickness, 15px); stroke-linecap: round;
-        stroke-linejoin: round; vector-effect: non-scaling-stroke; transform: scale(var(--boot-size, 0.2)) }
+      #boot-shell::after { content: ''; position: absolute; inset: 10px; border-radius: 10px;
+        border: 2px dashed color-mix(in srgb, var(--boot-accent) 65%, transparent) }
+      /* The four strokes of src/features/chevron/drawChevron.js, in the same proportions. */
+      #boot-shell path { --t: var(--boot-thickness, 32px); fill: none; stroke: var(--boot-chevron); stroke-width: var(--t);
+        stroke-linecap: round; stroke-linejoin: round; vector-effect: non-scaling-stroke; transform: scale(var(--boot-size, 0.2)) }
+      #boot-shell path:nth-child(1) { stroke: rgb(0 0 0 / 0.3); stroke-width: calc(var(--t) * 1.2) }
+      #boot-shell path:nth-child(3) { stroke: var(--boot-thread); stroke-width: calc(var(--t) * 0.7); stroke-linecap: butt;
+        stroke-dasharray: calc(var(--t) * 0.3) calc(var(--t) * 0.2) }
+      #boot-shell path:nth-child(4) { stroke-width: calc(var(--t) * 0.56) }
+      #boot-shell path:nth-child(n+3) { display: var(--boot-stitch, inline) }
       #boot-input { position: absolute; top: 50%; left: 0; width: 1px; height: 1px; padding: 0; border: 0; opacity: 0; resize: none }
     </style>
 
@@ -47,8 +57,11 @@
         const style = document.documentElement.style
         if (colors?.background) style.backgroundColor = colors.background
         if (colors?.chevron) style.setProperty('--boot-chevron', colors.chevron)
+        if (colors?.seam) style.setProperty('--boot-thread', colors.seam)
+        if (colors?.accent) style.setProperty('--boot-accent', colors.accent)
         if (settings?.chevron?.size > 0) style.setProperty('--boot-size', settings.chevron.size / 100)
         if (settings?.chevron?.thickness > 0) style.setProperty('--boot-thickness', settings.chevron.thickness + 'px')
+        if (settings?.chevron?.thickness < 12) style.setProperty('--boot-stitch', 'none')
       } catch {}
     </script>
 
@@ -56,7 +69,7 @@
   <body>
     <div id="root"></div>
     <div id="boot-shell">
-      <svg aria-hidden="true" viewBox="-1 -1 2 2"><path d="M0 -1L1 0L0 1" /></svg>
+      <svg aria-hidden="true" viewBox="-1 -1 2 2"><path d="M1 0L0 1M1 0L0 -1" /><path d="M1 0L0 1M1 0L0 -1" /><path d="M1 0L0 1M1 0L0 -1" /><path d="M1 0L0 1M1 0L0 -1" /></svg>
       <textarea id="boot-input" aria-label="Search" tabindex="-1" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></textarea>
     </div>
     <script>

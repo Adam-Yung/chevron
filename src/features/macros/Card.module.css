@@ -1,3 +1,4 @@
+/* A site is a sewn badge on the cloth: no card behind it, only the felt, its stitch ring and its name. */
 .card {
   position: relative;
   width: 100%;
@@ -5,8 +6,8 @@
   aspect-ratio: 1;
   margin: 0;
   padding: 0;
-  border-radius: 22%;
-  overflow: hidden;
+  border: none;
+  background: none;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -15,30 +16,15 @@
   font: inherit;
   color: var(--primary);
   cursor: pointer;
-  background: color-mix(in srgb, var(--card) 62%, transparent);
-  border: 1px solid rgba(255, 255, 255, 0.10);
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.28), 0 1px 0 rgba(255, 255, 255, 0.07) inset;
-  transition: transform .2s var(--ease-pop, ease-out), box-shadow .2s, border-color .2s;
-}
-body[data-glass-mode] .card {
-  backdrop-filter: blur(12px) saturate(1.3);
-  -webkit-backdrop-filter: blur(12px) saturate(1.3);
-  background: color-mix(in srgb, var(--card) 38%, transparent);
-}
-body[data-color-scheme=light] .card {
-  background: color-mix(in srgb, var(--card) 60%, transparent);
-  border-color: rgba(0, 0, 0, 0.08);
-  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.12), 0 1px 0 rgba(255, 255, 255, 0.8) inset;
+  transition: transform .2s var(--ease-pop, ease-out);
 }
 .card[data-focused], .card:focus-visible {
-  transform: scale(1.05);
-  border-color: var(--accent, rgba(255, 255, 255, 0.4));
+  transform: scale(1.07);
   outline: none;
 }
 @media (hover: hover) {
   .card:hover {
-    transform: scale(1.05);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35), 0 1px 0 rgba(255, 255, 255, 0.12) inset;
+    transform: scale(1.07);
   }
 }
 .card:active {
@@ -46,20 +32,31 @@ body[data-color-scheme=light] .card {
   transition-duration: .08s;
 }
 .plate {
-  width: 52%;
+  position: relative;
+  width: 70%;
   aspect-ratio: 1;
   border-radius: 50%;
-  background: var(--plate);
+  background-color: var(--felt-mixed);
+  background-image: var(--weave);
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 2px 0 rgba(255, 255, 255, 0.15) inset, 0 4px 16px rgba(0, 0, 0, 0.25);
+  box-shadow: 3px 4px 0 rgba(0, 0, 0, 0.3);
+}
+.plate::after {
+  content: '';
+  position: absolute;
+  inset: 7%;
+  border: 2px dashed var(--thread);
+  border-radius: 50%;
+}
+.card[data-focused] .plate, .card:focus-visible .plate {
+  box-shadow: 0 0 0 3px var(--accent), 3px 4px 0 3px rgba(0, 0, 0, 0.3);
 }
 .logo {
-  width: 62%;
-  height: 62%;
-  color: var(--macro-text);
-  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.3));
+  width: 50%;
+  height: 50%;
+  color: var(--thread);
 }
 .logo svg {
   display: block;
@@ -67,13 +64,12 @@ body[data-color-scheme=light] .card {
   height: 100%;
 }
 .name {
-  max-width: 90%;
-  font-size: clamp(0.6rem, 1.6vmin, 0.85rem);
-  font-weight: 600;
+  max-width: 96%;
+  font-family: var(--font-display);
+  font-size: clamp(0.6rem, 1.6vmin, 0.9rem);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  opacity: 0.85;
 }
 .name mark {
   background: none;
@@ -81,16 +77,10 @@ body[data-color-scheme=light] .card {
 }
 .key {
   position: absolute;
-  top: 8%;
-  right: 8%;
-  min-width: 1.4em;
-  padding: 0.1em 0.3em;
-  border-radius: 0.35em;
-  font-family: inherit;
-  font-weight: 700;
-  font-size: clamp(0.55rem, 1.4vmin, 0.75rem);
+  top: -4%;
+  left: 92%;
+  font-family: var(--font-display);
+  font-size: clamp(0.7rem, 1.9vmin, 1rem);
   line-height: 1.2;
-  background: color-mix(in srgb, var(--primary) 85%, transparent);
-  color: var(--secondary);
-  text-align: center;
+  color: var(--primary);
 }

@@ -9,3 +9,6 @@ values).
   is indistinguishable from a choice; it is dropped so the new default applies, and any other value is kept.
 - Steps must be idempotent: a crash between migrating and persisting means they run again.
 - Backups (`chevron.settings.bak.<ms>`) are never pruned automatically; they are small and only written on a problem.
+
+The old-look step only removes values equal to the former defaults; anything else was chosen. It shares the `< 4` gate because
+stores at version 4 already hold only changes.

@@ -1,6 +1,6 @@
 # Settings
 
-> Verified: 2026-11-26 00:12 · Sources: `src/features/settings-panel/Settings.jsx`, `src/features/settings-panel/SettingsPane.jsx`, `src/features/settings-panel/SettingsSidebar.jsx`, `src/features/settings-panel/GeocodeRow.jsx`, `src/settings/schema.js`, `src/settings/SettingsProvider.jsx`, `src/settings/resolveSettings.js`, `src/settings/settingsMigration.js`, `src/storage/settingsStorage.js`, `src/storage/macrosConfig.js`
+> Verified: 2026-11-26 15:26 · Sources: `src/features/settings-panel/Settings.jsx`, `src/features/settings-panel/SettingsPane.jsx`, `src/features/settings-panel/SettingsSidebar.jsx`, `src/features/settings-panel/GeocodeRow.jsx`, `src/settings/schema.js`, `src/settings/SettingsProvider.jsx`, `src/settings/resolveSettings.js`, `src/settings/settingsMigration.js`, `src/storage/settingsStorage.js`, `src/storage/macrosConfig.js`
 
 ## Using the panel
 
@@ -16,7 +16,7 @@ curvature, weather coordinates). "Reset settings" and "Clean history" ask first,
 | Category | Holds |
 | --- | --- |
 | General | Default search engine, search history on/off, quick redirect, open results in a new tab, animation speed (ms; 0 turns animation off; default 250), locale, tab title |
-| Appearance | Colour scheme (auto, light, dark), active theme and its colours, show the pinned-sites dock, frosted-glass blur, swipe and trackpad gestures |
+| Appearance | Colour scheme (auto, light, dark), active theme and its colours, show the pinned-sites dock, blur behind suggestions, arrows and weather, swipe and trackpad gestures |
 | Chevron | Stroke thickness and size of the chevron, quick-look marquee and macro labels |
 | Query | Search field and suggestion font sizes and limits, caret, Ctrl-forces-search-engine, and the AI block (provider, endpoint, model, key, temperature, language) |
 | Menu | Macro grid rows, columns, gap, pagination dots, arrows, dragging, and the clock (size and format) |
@@ -25,7 +25,8 @@ curvature, weather coordinates). "Reset settings" and "Clean history" ask first,
 
 Theme colours: each theme has a light and a dark set; the switch beside a theme chooses which set you are editing. Only primary,
 secondary and accent are edited, the other colours follow them. A colour change applies when you press the check button, and
-shows a contrast rating. Built-in presets: default, midnight, forest, burgundy, slate, dune, noir.
+shows a contrast rating. Built-in presets: default, midnight, forest, burgundy, slate, dune, noir. Every preset is sewn the same
+way (canvas, stitching, badges); `default` is the Sleeve Patch colours, navy and gold when dark, khaki and brick when light.
 
 Number fields take any value in range while typing; an empty or out-of-range entry is not applied and the field returns to the saved
 value when you leave it.

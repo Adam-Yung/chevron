@@ -8,10 +8,33 @@
   --z-toast: 1000;
   --z-popover: 9000;
   --z-top: 10000;
+
+  --font-display: 'Graduate', Rockwell, 'Roboto Slab', 'Courier New', serif;
+  /* Duck canvas: two crossing hairlines, static, no image to load. index.html repeats it for the first paint. */
+  --weave: repeating-linear-gradient(0deg, rgb(255 255 255 / 0.05) 0 1px, transparent 1px 3px),
+    repeating-linear-gradient(90deg, rgb(0 0 0 / 0.1) 0 1px, transparent 1px 3px);
+  /* Felt keeps a site's hue but is dyed down enough for cream thread to read on it. */
+  --felt-dye: #17212f;
+}
+
+/* The stitched hem around the page. */
+.app::after {
+  content: '';
+  position: fixed;
+  inset: 10px;
+  border: 2px dashed color-mix(in srgb, var(--accent) 65%, transparent);
+  border-radius: 10px;
+  pointer-events: none;
+}
+
+/* A badge or blob cut from a site's colour (--felt, set on the same element). */
+.felt {
+  --felt-mixed: color-mix(in oklab, var(--felt, #888) 68%, var(--felt-dye));
 }
 
 .app {
-  background: var(--background);
+  background-color: var(--background);
+  background-image: var(--weave);
   color: var(--primary);
   width: 100vw;
   height: 100vh;

@@ -9,7 +9,7 @@ import { drawChevron } from './drawChevron'
  */
 export function createChevronPainter(canvas, clock, onFirstFrame) {
   const ctx = canvas.getContext('2d')
-  const style = { width: canvas.width, height: canvas.height, color: '#000', thickness: 10 }
+  const style = { width: canvas.width, height: canvas.height, color: '#000', thread: '#fff', thickness: 10 }
   let morph = null
 
   const draw = points => drawChevron(ctx, points, style)
@@ -18,7 +18,7 @@ export function createChevronPainter(canvas, clock, onFirstFrame) {
     init(m) {
       canvas.width = style.width = m.width
       canvas.height = style.height = m.height
-      Object.assign(style, { color: m.color, thickness: m.thickness })
+      Object.assign(style, { color: m.color, thread: m.thread, thickness: m.thickness, scale: m.scale })
       morph = createMorph({ stages: m.stages, draw, ...clock })
       morph.snap(m.stage ?? 0)
       if (onFirstFrame) clock.raf(onFirstFrame)
@@ -26,11 +26,11 @@ export function createChevronPainter(canvas, clock, onFirstFrame) {
     resize(m) {
       canvas.width = style.width = m.width
       canvas.height = style.height = m.height
-      style.thickness = m.thickness ?? style.thickness
+      Object.assign(style, { thickness: m.thickness ?? style.thickness, scale: m.scale ?? style.scale })
       morph?.redraw()
     },
     style(m) {
-      Object.assign(style, { color: m.color ?? style.color, thickness: m.thickness ?? style.thickness })
+      Object.assign(style, { color: m.color ?? style.color, thread: m.thread ?? style.thread, thickness: m.thickness ?? style.thickness, scale: m.scale ?? style.scale })
       morph?.redraw()
     },
     stages(m) {

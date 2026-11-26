@@ -1,6 +1,6 @@
 # Search
 
-> Verified: 2026-11-26 11:04 · Sources: `src/features/search/QueryField.jsx`, `src/features/search/Suggestions.jsx`, `src/features/search/QuickLook.jsx`, `src/search/resolve.js`, `src/search/suggestions.js`, `src/search/useSuggestions.js`, `src/search/history.js`, `src/search/autocomplete.js`, `src/app/useIntents.js`, `src/app/useLaunch.js`, `src/navigation/navigate.js`, `src/navigation/useNavigationRelease.js`
+> Verified: 2026-11-26 15:26 · Sources: `src/features/search/QueryField.jsx`, `src/features/search/Suggestions.jsx`, `src/features/search/QuickLook.jsx`, `src/search/resolve.js`, `src/search/suggestions.js`, `src/search/useSuggestions.js`, `src/search/history.js`, `src/search/autocomplete.js`, `src/app/useIntents.js`, `src/app/useLaunch.js`, `src/navigation/navigate.js`, `src/navigation/useNavigationRelease.js`
 
 ## What you can type
 Start typing anywhere: the search field always has the keyboard, even while a first visit is still loading; what you type
@@ -28,7 +28,7 @@ Local suggestions appear on the same keystroke. Google's arrive after a short pa
 waits. Offline, everything except Google's suggestions and currency still works.
 
 ## The blob
-While you type, the shape on the left shows where Enter will go, in that site's or engine's colours.
+While you type, the shape on the left shows where Enter will go, in that site's or engine's first colour, dyed to sit on the canvas.
 
 ## Never stuck
 Leaving the page in the same tab starts the navigation on the keypress; the colour animation only covers loading time. If the page

@@ -8,6 +8,18 @@ export const SETTINGS_VERSION = 4
 // it is treated as the old default and replaced by the new, snappier one.
 const OLD_ANIMATION_SPEED = 400
 
+// Defaults before the Sleeve Patch look. A store from that era holds every value, so these would pin the old look as a "choice".
+const OLD_THICKNESS = 15
+const OLD_THEME = {
+  light: { primary: '#212121', secondary: '#dee1e6', accent: '#3b72ff' },
+  dark: { primary: '#f2f2f2', secondary: '#212121', accent: '#ffa00b' }
+}
+// Which old primary colour each derived colour used to copy.
+const FOLLOWED = {
+  chevron: 'primary', query: 'primary', suggestions: 'primary', time: 'primary', secondary: 'secondary', background: 'secondary',
+  card: 'secondary', primary: 'primary', accent: 'accent', prefix: 'accent', visited: 'accent'
+}
+
 const BACKUP_KEY_PREFIX = 'chevron.settings.bak'
 const VERSION_KEY = 'chevron.settings.version'
 
@@ -74,6 +86,18 @@ function migratePerformanceMode(appearance) {
   if (Object.keys(menu).length === 0) delete appearance.macroMenu
 }
 
+function dropOldThemeColors(scheme, old) {
+  if (!isObject(scheme)) return
+  for (const [name, source] of Object.entries(FOLLOWED)) {
+    if (scheme[name] === old[source]) delete scheme[name]
+  }
+}
+
+function migrateOldLook(stored) {
+  if (stored?.chevron?.thickness === OLD_THICKNESS) delete stored.chevron.thickness
+  for (const [name, old] of Object.entries(OLD_THEME)) dropOldThemeColors(stored?.appearance?.themes?.default?.[name], old)
+}
+
 /**
  * Applies every step newer than `fromVersion` to `stored` in place and returns it. Callers pass a clone.
  * v1 to v2 (API keys obfuscated at rest) needs no data change; the storage class handles it.
@@ -82,5 +106,6 @@ export function migrateSettings(stored, fromVersion) {
   const from = fromVersion ?? 0
   if (from < 3 && isObject(stored?.appearance)) migratePerformanceMode(stored.appearance)
   if (from < 4 && stored?.general?.animationSpeed === OLD_ANIMATION_SPEED) delete stored.general.animationSpeed
+  if (from < 4) migrateOldLook(stored)
   return stored
 }

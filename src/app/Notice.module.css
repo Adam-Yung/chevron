@@ -9,11 +9,13 @@
 .pill {
   display: inline-block;
   padding: 6px 16px;
-  border-radius: 999px;
+  border-radius: 5px;
+  outline: 1.5px dashed var(--secondary);
+  outline-offset: -3px;
   background: var(--primary);
   color: var(--secondary);
   font-size: 0.85rem;
-  font-weight: 600;
+  font-family: var(--font-display);
   letter-spacing: 0.06em;
   text-transform: uppercase;
   white-space: nowrap;

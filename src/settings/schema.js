@@ -29,7 +29,11 @@ const template = {
     colorScheme: new types.List('auto', ['auto', 'light', 'dark'], { description: 'Follow OS preference, or pin to light / dark.' }),
     activeTheme: new types.List('default', 'appearance.themes', { description: 'Currently applied theme.' }),
     themes: {
-      default: new types.Theme(),
+      // Sleeve patch: navy duck canvas and gold stripe by night, khaki twill and brick by day.
+      default: new types.Theme({
+        light: { primary: '#22324a', secondary: '#cbbd94', accent: '#71500d', chevron: '#a8402c', seam: '#efe6cc' },
+        dark:  { primary: '#e9dfc4', secondary: '#26364a', accent: '#d9a02b', chevron: '#d9a02b', seam: '#e9dfc4' }
+      }),
 
       // A deep navy + electric cyan pair — feels like a late-night terminal.
       midnight: new types.Theme({
@@ -69,7 +73,7 @@ const template = {
     },
     style: new types.List('default', ['default']),
     dock: new types.Switch(true, undefined, { description: 'Show your pinned sites along the bottom of the start screen.' }),
-    glassmorphism: new types.Switch(false, undefined, { description: 'Enable frosted glass blur effects. Beautiful on macOS; may reduce smoothness on Windows.' }),
+    glassmorphism: new types.Switch(false, undefined, { description: 'Blur what is behind suggestions, menu arrows and the weather panel. May reduce smoothness on Windows.' }),
     gestures: {
       enableSwipe:    new types.Switch(true, undefined, { description: 'Swipe up to open the macros menu, swipe down to close.' }),
       enableTrackpad: new types.Switch(true, undefined, { description: 'Trackpad scroll paginates the macros menu horizontally.' })
@@ -77,7 +81,7 @@ const template = {
   },
   chevron: {
     thickness: new types.Range(
-      15,
+      32,
       { min: 1, max: 50 },
       { format: '{@}px', description: 'Stroke thickness of the central chevron.' }
     ),
@@ -188,7 +192,7 @@ const hidden = [
   'weather.lon'
 ]
 
-const HIDDEN_THEME_COLORS = ['chevron', 'query', 'suggestions', 'background', 'prefix', 'visited', 'time', 'card']
+const HIDDEN_THEME_COLORS = ['chevron', 'query', 'suggestions', 'background', 'prefix', 'visited', 'time', 'thread', 'seam']
 
 function getDefaults(structure) {
   const result = {}

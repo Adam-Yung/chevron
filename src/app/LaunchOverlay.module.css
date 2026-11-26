@@ -7,6 +7,7 @@
 .disc {
   position: absolute;
   border-radius: 50%;
+  background: var(--felt-mixed);
   transform-origin: center;
   transition: transform calc(var(--t) * 1.6 + 120ms) cubic-bezier(0.5, 0, 0.2, 1);
   will-change: transform;
@@ -17,6 +18,7 @@
   top: 50%;
   width: 22vmin;
   height: 22vmin;
+  color: var(--thread);
   transform: translate(-50%, -50%);
   animation: icon-in calc(var(--t) * 1.6 + 120ms) ease-out both;
 }

@@ -17,6 +17,13 @@
   margin-bottom: 20px;
   overflow-x: hidden;
   overflow-y: auto;
+  box-sizing: border-box;
+  padding: 0 12px;
+  border: 2px dashed color-mix(in srgb, var(--accent) 50%, transparent);
+  border-radius: 8px;
+}
+.ai-completion:empty {
+  border: none;
 }
 
 .field {
@@ -30,7 +37,7 @@
   font-size: var(--font-size);
   text-align: center;
   text-transform: uppercase;
-  font-family: inherit;
+  font-family: var(--font-display);
   cursor: default;
   caret-color: color-mix(in srgb, var(--query) 80%, transparent);
   resize: none;

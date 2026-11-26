@@ -1,3 +1,9 @@
 # src/features/chevron/drawChevron.js
 
 Strokes the two bezier arms. Points are normalised with x measured from the canvas centre, which is how `parseStages.js` defines every stage.
+
+The stripe is four strokes of one path: shadow, cloth, a dashed thread band, then cloth again over the band's middle, which leaves
+a stitch line inside each edge without offset curves or compositing layers. Both arms are separate subpaths starting at the tip: a
+morph that folds one arm onto the other (the menu's bar) would otherwise put their dashes out of step and fill in the gaps.
+The thin-stripe cut-off is judged in CSS pixels (`scale`), or a dense screen would disagree with the shell.
+`STITCH` holds the proportions; `index.html` repeats them for the first-paint shell.

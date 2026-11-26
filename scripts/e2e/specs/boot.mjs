@@ -23,6 +23,8 @@ export default {
     assert(errors.length === 0, 'file:// page errors: ' + errors.join(' | '))
     const fontLoaded = await page.evaluate(async () => { await document.fonts.ready; return document.fonts.check('16px Onest') })
     assert(fontLoaded, 'the Onest font did not load from file://')
+    // Rejects if a declared face cannot load; passes while the display face has not been added.
+    await page.evaluate(() => Promise.all([...document.fonts].filter(f => f.family.includes('Graduate')).map(f => f.load())))
     // file:// draws the chevron on the main thread, which must hand over from the first-paint shell too.
     await page.waitForSelector('#boot-shell', { state: 'detached', timeout: 3000 })
   },

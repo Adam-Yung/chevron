@@ -59,7 +59,7 @@ export class Theme {
         path: '_parent_.primary'
       },
       dependants: [
-        'background'
+        'background', 'seam'
       ]
     },
     {
@@ -111,13 +111,15 @@ export class Theme {
         name: 'primary',
         isBackground: false,
         path: '_parent_.primary'
-      },
-      dependants: [
-        'card'
-      ]
+      }
+    },
+    // Two threads: `thread` sews the felt badges, which are always dyed dark; `seam` sews the chevron, which is pale on a dark
+    // theme, so it follows the cloth.
+    {
+      name: 'thread'
     },
     {
-      name: 'card'
+      name: 'seam'
     },
     {
       name: 'prefix',
@@ -140,12 +142,14 @@ export class Theme {
     light: {
       primary: '#212121',
       secondary: '#dee1e6',
-      accent: '#3b72ff'
+      accent: '#3b72ff',
+      thread: '#efe6cc'
     },
     dark: {
       primary: '#f2f2f2',
       secondary: '#212121',
-      accent: '#ffa00b'
+      accent: '#ffa00b',
+      thread: '#e9dfc4'
     }
   }
 
