@@ -51,3 +51,26 @@ describe('createMorph', () => {
     expect(h.drawn).toHaveLength(0)
   })
 })
+
+describe('a morph with a second step', () => {
+  it('goes through the first shape and carries on to the next', () => {
+    const h = harness()
+    h.morph.morph(1, 100, 'linear', [{ stage: 2, duration: 100, ease: 'linear' }])
+    h.tick(100)
+    expect(h.drawn.at(-1)).toEqual([10, 10])
+    h.tick(100)
+    expect(h.drawn.at(-1)).toEqual([20, 0])
+    expect(h.frames).toHaveLength(0)
+  })
+
+  it('forgets the second step when a new target interrupts', () => {
+    const h = harness()
+    h.morph.morph(1, 100, 'linear', [{ stage: 2, duration: 100, ease: 'linear' }])
+    h.tick(50)
+    h.morph.morph(0, 100, 'linear')
+    h.tick(100)
+    h.tick(100)
+    expect(h.drawn.at(-1)).toEqual([0, 0])
+    expect(h.frames).toHaveLength(0)
+  })
+})

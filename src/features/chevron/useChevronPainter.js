@@ -14,10 +14,15 @@ function measure(host, thickness) {
 
 const pick = ({ thickness, scale }) => ({ thickness, scale })
 
-// The worker is created before the canvas is transferred: on file:// creating it throws, and a transferred canvas can no longer
-// be drawn on from the main thread.
+// Never from a local file: Chromium throws there, but Safari and Firefox construct a worker that never draws.
+export function canUseWorker(canvas, protocol) {
+  return protocol !== 'file:' && typeof OffscreenCanvas !== 'undefined' && Boolean(canvas.transferControlToOffscreen)
+}
+
+// The worker is created before the canvas is transferred: if creating it throws, a transferred canvas could no longer be drawn on
+// from the main thread.
 function startPainter(canvas, init, onFirstFrame) {
-  if (typeof OffscreenCanvas !== 'undefined' && canvas.transferControlToOffscreen) {
+  if (canUseWorker(canvas, window.location.protocol)) {
     try {
       const worker = new ChevronWorker()
       // The worker's frame is not the page's: wait one page frame too, so the canvas has reached the screen.
@@ -42,7 +47,7 @@ function startPainter(canvas, init, onFirstFrame) {
  * The canvas is created here, not rendered by React: a transferred canvas cannot be transferred again, and React's StrictMode
  * mounts effects twice on the same element.
  */
-export default function useChevronPainter(hostRef, { stages, stage, color, thread, thickness, onFirstFrame }) {
+export default function useChevronPainter(hostRef, { stages, stage, color, thread, thickness, viewport, onFirstFrame }) {
   const painterRef = useRef(null)
   const latest = useRef({ stages, stage, color, thread, thickness })
   latest.current = { stages, stage, color, thread, thickness, onFirstFrame }
@@ -57,20 +62,19 @@ export default function useChevronPainter(hostRef, { stages, stage, color, threa
     const painter = startPainter(canvas, { ...measure(host, t), stages: s.map(a => Array.from(a)), stage: initialStage, color: c, thread: th }, firstFrame)
     painterRef.current = painter
 
-    let frame = 0
-    const onResize = () => {
-      cancelAnimationFrame(frame)
-      frame = requestAnimationFrame(() => painter.postMessage({ type: 'resize', ...measure(host, latest.current.thickness) }))
-    }
-    window.addEventListener('resize', onResize)
     return () => {
-      window.removeEventListener('resize', onResize)
-      cancelAnimationFrame(frame)
       painter.terminate()
       painterRef.current = null
       canvas.remove()
     }
   }, [hostRef])
+
+  // The same viewport the stages are built from, which also notices a size gained without a resize event.
+  useEffect(() => {
+    const host = hostRef.current
+    if (!host) return
+    painterRef.current?.postMessage({ type: 'resize', ...measure(host, latest.current.thickness) })
+  }, [hostRef, viewport])
 
   useEffect(() => {
     const host = hostRef.current

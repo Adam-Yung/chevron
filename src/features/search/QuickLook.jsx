@@ -1,17 +1,15 @@
 import { memo, useContext, useMemo } from 'react'
-import { SettingsContext, ThemeContext } from '../../settings/SettingsProvider'
+import { SettingsContext } from '../../settings/SettingsProvider'
 import { useUi } from '../../state/UiStore'
 import useDestination from '../../search/useDestination'
 import { feltColor } from '../../lib/getCssGradient'
+import { BOUNCE_BEAT, LINE_BEAT, SPRING_CSS } from '../chevron/searchMotion'
 import useViewportSize from './useViewportSize'
 import InteractiveBackground from './InteractiveBackground'
-import { blobPath } from './blobPath'
+import { blobPath, blobReach } from './blobPath'
 import classes from './QuickLook.module.css'
 
-function blobReach(width, height) {
-  // Same measure as --chev in global.css: half the height in landscape, 40% of the width in portrait.
-  return width < height ? width * 0.4 : height * 0.5
-}
+const BEATS = { '--line-beat': LINE_BEAT, '--bounce-beat': BOUNCE_BEAT, '--spring': SPRING_CSS }
 
 function useLabel(destination) {
   const settings = useContext(SettingsContext)
@@ -22,19 +20,15 @@ function useLabel(destination) {
 }
 
 /**
- * The blob on the left while searching: where Enter will go, in that destination's colours. The shape is fixed per viewport and
- * only translated in and out, so the animation never repaints the clipped marquee.
+ * The blob on the left while searching: where Enter will go, in that destination's colours. Only the fill and label are here; the
+ * curve around them is the chevron itself (Chevron.jsx), so this springs out with the line, on the same curve, once the chevron has become one.
  */
 function QuickLook({ view }) {
   const settings = useContext(SettingsContext)
-  const theme = useContext(ThemeContext)
   const destination = useDestination()
   const forceEngine = useUi(s => s.forceEngine)
   const { width, height } = useViewportSize()
   const reach = blobReach(width, height)
-  const thickness = settings.chevron.thickness
-  // The blob's piping is lighter than the chevron: at full width it swamps the screen.
-  const seam = thickness / 2
   const { top, bottom } = { top: settings.chevron.quickLook.topCurvature, bottom: settings.chevron.quickLook.bottomCurvature }
   const path = useMemo(() => blobPath({ reach, height, top, bottom }), [reach, height, top, bottom])
   const label = useLabel(destination)
@@ -42,16 +36,12 @@ function QuickLook({ view }) {
 
   return (
     <div className={`felt ${classes.quicklook}`} data-active={active || undefined} data-forced={(active && forceEngine) || undefined}
-      style={{ '--reach': reach + 'px', '--thickness': seam + 'px', '--felt': feltColor(destination?.bgColor) }}>
-      <div className={classes.fill} style={{ clipPath: `path('${path.fill}')` }}>
+      style={{ '--reach': reach + 'px', '--felt': feltColor(destination?.bgColor), ...BEATS }}>
+      <div className={classes.fill} style={{ clipPath: `path('${path}')` }}>
         <InteractiveBackground width={reach} height={height} color='var(--felt-mixed)' textColor='var(--thread)'
           marqueeText={destination?.marquee ?? ''} paused={!active} />
         <div className={classes.label}>{label}</div>
       </div>
-      <svg className={classes.outline} width={reach + seam} height={height} aria-hidden='true'>
-        <path d={path.stroke} fill='none' stroke={theme.chevron} strokeWidth={seam} strokeLinecap='round' />
-        <path className={classes.stitch} d={path.stroke} fill='none' />
-      </svg>
     </div>
   )
 }

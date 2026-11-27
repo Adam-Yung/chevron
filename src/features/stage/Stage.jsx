@@ -3,6 +3,7 @@ import { SettingsContext } from '../../settings/SettingsProvider'
 import Chevron from '../chevron/Chevron'
 import QuickLook from '../search/QuickLook'
 import MacrosLayer from '../macros/MacrosLayer'
+import useReducedMotion from './useReducedMotion'
 import classes from './Stage.module.css'
 
 /**
@@ -11,7 +12,8 @@ import classes from './Stage.module.css'
  */
 export default function Stage({ view, onOpenMacro }) {
   const settings = useContext(SettingsContext)
-  const speed = Math.max(0, Number(settings.general.animationSpeed) || 0)
+  const reduced = useReducedMotion()
+  const speed = reduced ? 0 : Math.max(0, Number(settings.general.animationSpeed) || 0)
   return (
     <div className={classes.stage} data-view={view} style={{ '--t': speed + 'ms' }}>
       <QuickLook view={view} />

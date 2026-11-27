@@ -28,3 +28,17 @@ maintain. The old look is the git tag `stable` (d11c203).
 - Graduate is the display face only (query, blob label, clock, site names, headings); Onest stays for reading. It must be bundled
   (the static build runs from `file://`); until `scripts/owner/add-graduate-font.sh` has run, a system slab stands in.
 - The other theme presets keep their colours and inherit canvas and stitching.
+
+## 2026-11-26 · Into search: a line, then a long bounce
+
+**Problem:** typing morphed the chevron into a straight line, then slid a separately outlined blob over it. The stitched stripe made
+the two objects obvious: a stray bar at the edge, and a transition the owner rejected as not smooth.
+
+**Approaches weighed:** narrowing and cross-fading the stripe (rejected); morphing straight into the curve (smooth, but lost the
+line and the bounce the owner wanted); overshooting that morph (its overshoot points against the travel, so it read as a slow stop);
+a small swell after arrival (not enough ground); **line, then spring (chosen, as the owner specified it).**
+
+**Chosen:** the chevron is the blob's only outline. It becomes a straight line on the left edge, then a damped spring takes it from
+there into the curve, about 23% past and back; the fill follows with a horizontal scale on the same spring. Leaving is one direct
+morph. The canvas is 1.4 viewport heights square so the furthest swing is not cut. At the default speed the move takes about 0.8 s,
+an owner-accepted exception to the 250 ms budget in `architecture.md`; input is never held. Reduced motion runs at speed zero.

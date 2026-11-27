@@ -1,18 +1,27 @@
-/* A square of side 2 x --chev whose centre is the chevron's anchor. It sits centred on the screen, or on the left edge while
-   searching, where its vertical-line shape becomes the edge of the search blob. Only transform animates. */
+/* A square a little over the viewport height (CANVAS_OVERHANG in blobPath.js) whose centre is the chevron's anchor: tall enough for the search curve in any orientation. It
+   sits centred on the screen, or on the left edge while searching. Only transform animates. */
 .chevron {
+  --side: 140vh;
   position: absolute;
-  top: calc(50% - var(--chev));
-  left: calc(var(--chev) * -1);
-  width: calc(var(--chev) * 2);
-  height: calc(var(--chev) * 2);
+  top: calc(50% - var(--side) / 2);
+  left: calc(var(--side) / -2);
+  width: var(--side);
+  height: var(--side);
   transform: translateX(50vw);
   transition: transform var(--t) var(--ease-move);
   will-change: transform;
   z-index: 2;
 }
+/* A second declaration would win even where dvh is unsupported, as for --chev in global.css. */
+@supports (height: 1dvh) {
+  .chevron {
+    --side: 140dvh;
+  }
+}
+/* The travel takes the first beat (searchMotion.js): the line is on the edge when the bounce begins. */
 .chevron[data-view='search'] {
   transform: translateX(0);
+  transition-duration: var(--line-t);
 }
 .chevron > canvas {
   width: 100%;

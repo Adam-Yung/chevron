@@ -37,7 +37,7 @@ export function createChevronPainter(canvas, clock, onFirstFrame) {
       morph?.setStages(m.stages)
       morph?.snap(m.stage ?? 0)
     },
-    morph: m => morph?.morph(m.stage, m.duration, m.ease),
+    morph: m => morph?.morph(m.stage, m.duration, m.ease, m.then),
     snap: m => morph?.snap(m.stage)
   }
 

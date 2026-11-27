@@ -1,17 +1,32 @@
-/* Hidden off the left edge; slides in once the chevron has reached the edge, slightly overshooting like a bulge popping out.
-   Leaving is quicker and starts at once. Only transform animates. */
+/* The chevron draws the outline. This is the felt inside it: held at no width while the chevron becomes a line, then stretched out
+   from the edge on the same spring as that line (searchMotion.js). Transitions, not a keyframe: leaving half-way must carry on from
+   the current width. Only scale and opacity animate. */
 .quicklook {
   position: absolute;
   inset: 0 auto 0 0;
-  width: calc(var(--reach) + var(--thickness));
-  transform: translateX(calc(-100% - var(--thickness)));
-  transition: transform calc(var(--t) * 0.6) var(--ease-move);
-  will-change: transform;
+  width: var(--reach);
+  opacity: 0;
+  scale: 0 1;
+  transform-origin: left center;
+  transition: opacity calc(var(--t) * 0.2), scale calc(var(--t) * 0.6) var(--ease-move);
   z-index: 1;
 }
 .quicklook[data-active] {
-  transform: none;
-  transition: transform calc(var(--t) * 1.2) var(--ease-pop) calc(var(--t) * 0.5);
+  opacity: 1;
+  scale: 1 1;
+  transition: scale calc(var(--t) * var(--bounce-beat)) ease-out calc(var(--t) * var(--line-beat));
+}
+@supports (animation-timing-function: linear(0, 1)) {
+  .quicklook[data-active] {
+    transition-timing-function: var(--spring);
+  }
+}
+/* The label would look squashed while the felt stretches, so it arrives after the widest swing. */
+.quicklook[data-active] .label {
+  animation: label-in calc(var(--t) * 0.8) ease-out calc(var(--t) * (var(--line-beat) + var(--bounce-beat) * 0.4)) both;
+}
+@keyframes label-in {
+  from { opacity: 0; }
 }
 .fill {
   position: absolute;
@@ -49,21 +64,9 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.outline {
-  position: absolute;
-  top: 0;
-  left: 0;
-  overflow: visible;
-}
-/* The seam, sewn along the middle of the piping. */
-.stitch {
-  stroke: var(--seam);
-  stroke-width: 2.5px;
-  stroke-dasharray: 12 8;
-}
 @media (prefers-reduced-motion: reduce) {
-  .quicklook, .quicklook[data-active] {
-    transition-delay: 0s;
+  .quicklook[data-active] .label {
+    animation: none;
   }
 }
 
