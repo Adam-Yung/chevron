@@ -1,0 +1,25 @@
+docs/status.md
+  s_f170e9ca6a3523::t_657c6191417ede 18
+scripts/e2e/specs/boot.mjs
+  s_f170e9ca6a3523::t_657c6191417ede 26-29
+index.html
+  s_f170e9ca6a3523::t_774f6712082277 19
+public/font.css
+  s_f170e9ca6a3523::t_006d79de44fe29 50-56
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.24",
+  "base_commit_sha": "27a3a9f0ed8037b28d6f0abac86b84b02cd5f717",
+  "prompts": {},
+  "sessions": {
+    "s_f170e9ca6a3523": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "78039f60-dcdc-4bd2-991b-c99ea1ed7569",
+        "model": "claude-sonnet-5-5"
+      },
+      "human_author": "Adam Yung <adyung@paloaltonetworks.com>"
+    }
+  }
+}
