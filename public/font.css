@@ -47,3 +47,10 @@
 :root {
   --font: 'Onest'
 }
+
+/* Graduate (OFL), Latin subset: the display face. */
+@font-face {
+  font-family: 'Graduate';
+  src: url('./fonts/Graduate/Graduate.woff2') format('woff2');
+  font-display: swap;
+}

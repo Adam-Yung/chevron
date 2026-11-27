@@ -15,5 +15,4 @@ Vite 8, Vitest 5 (Node 22.12+); `npm audit` reports 0 vulnerabilities.
 
 **Blockers waiting on the owner:** approve `docs/brief.md` (drafted overnight).
 
-**On branch `sleeve-patch`, not deployed:** the Sleeve Patch look (`docs/decisions/visual-style.md`). Waiting on the owner: run
-`scripts/owner/add-graduate-font.sh` (it bundles and preloads the display face; a system slab stands in until then), look it over, and say whether to merge to `master` (which deploys). `stable` tags the live look.
+**On branch `sleeve-patch`, not deployed:** the Sleeve Patch look (`docs/decisions/visual-style.md`). Waiting on the owner: look it over and say whether to merge to `master` (which deploys). `stable` tags the live look.
