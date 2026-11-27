@@ -15,4 +15,4 @@ Vite 8, Vitest 5 (Node 22.12+); `npm audit` reports 0 vulnerabilities.
 
 **Blockers waiting on the owner:** approve `docs/brief.md` (drafted overnight).
 
-**On branch `sleeve-patch`, not deployed:** the Sleeve Patch look (`docs/decisions/visual-style.md`). Waiting on the owner: look it over and say whether to merge to `master` (which deploys). `stable` tags the live look.
+**Look:** Sleeve Patch is the default (`docs/decisions/visual-style.md`), live since 2026-11-26; owner review pending. The previous look is the git tag `stable`.
