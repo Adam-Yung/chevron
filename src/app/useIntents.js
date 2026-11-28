@@ -26,7 +26,7 @@ function useSearchActions(live) {
         return dispatch(ui.noticed(copied ? 'Copied' : 'Could not copy'))
       }
       if (settings.general.searchHistory && REMEMBERED_KINDS.has(destination.kind)) history.add(target.suggestion)
-      launch(destination.url, { newTab })
+      launch(destination.url, { newTab, macro: destination.macro?.name })
     },
     move({ delta }) {
       const { state, suggestions, dispatch } = live.current

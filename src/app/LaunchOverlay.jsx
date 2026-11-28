@@ -2,9 +2,10 @@ import { useContext, useLayoutEffect, useState } from 'react'
 import { SettingsContext } from '../settings/SettingsProvider'
 import { useUi } from '../state/UiStore'
 import useDestination from '../search/useDestination'
-import { usePinnedMacros } from '../search/useConfig'
+import useConfig from '../search/useConfig'
 import { feltColor } from '../lib/getCssGradient'
 import MacroIcon from '../features/macros/MacroIcon'
+import InteractiveBackground from '../features/search/InteractiveBackground'
 import classes from './LaunchOverlay.module.css'
 
 function originRect(macroName) {
@@ -15,47 +16,62 @@ function originRect(macroName) {
   return { left: -side / 2, top: (window.innerHeight - side) / 2, width: side, height: side }
 }
 
-function coverScale(rect) {
-  const cx = rect.left + rect.width / 2
-  const cy = rect.top + rect.height / 2
-  const far = Math.hypot(Math.max(cx, window.innerWidth - cx), Math.max(cy, window.innerHeight - cy))
-  return (far * 2) / Math.max(rect.width, 1) + 0.2
+function circles(rect) {
+  const x = rect.left + rect.width / 2
+  const y = rect.top + rect.height / 2
+  const far = Math.hypot(Math.max(x, window.innerWidth - x), Math.max(y, window.innerHeight - y))
+  return { start: `circle(${rect.width / 2}px at ${x}px ${y}px)`, covering: `circle(${far + 1}px at ${x}px ${y}px)` }
 }
 
-/**
- * While a same-tab navigation loads, a disc of the destination's colour grows from where it was launched until it covers the
- * screen. Purely decorative: the navigation started before this rendered, so it adds no delay.
- */
-export default function LaunchOverlay() {
-  const leaving = useUi(s => s.leaving)
-  const settings = useContext(SettingsContext)
-  const destination = useDestination()
-  const pinned = usePinnedMacros()
+function useGrowingCircle(leaving, fromSearch) {
   const [frame, setFrame] = useState(null)
-
   useLayoutEffect(() => {
     if (!leaving) {
       setFrame(null)
       return undefined
     }
-    const rect = originRect(leaving.macro)
-    setFrame({ rect, scale: coverScale(rect), grown: false })
+    // From search the disc starts at the blob: the site's dock badge is still in the page, but faded out.
+    setFrame({ ...circles(originRect(fromSearch ? null : leaving.macro)), grown: false })
     const id = requestAnimationFrame(() => requestAnimationFrame(() => setFrame(f => f && { ...f, grown: true })))
     return () => cancelAnimationFrame(id)
-  }, [leaving])
+  }, [leaving, fromSearch])
+  return frame
+}
+
+function Badge({ macro, named }) {
+  return (
+    <div className={classes.badge}>
+      <MacroIcon icon={macro.icon} color='currentColor' className={classes.icon} />
+      {named && <div className={classes.name} data-launch-name>{macro.name}</div>}
+    </div>
+  )
+}
+
+/**
+ * While a same-tab navigation loads, a disc of the destination's colour grows from where it was launched until it covers the
+ * screen, carrying the blob's banner with it. Purely decorative: the navigation started before this rendered.
+ */
+export default function LaunchOverlay() {
+  const leaving = useUi(s => s.leaving)
+  const fromSearch = useUi(s => s.view === 'search')
+  const settings = useContext(SettingsContext)
+  const destination = useDestination()
+  const { macros } = useConfig()
+  const frame = useGrowingCircle(leaving, fromSearch)
 
   if (!leaving || !frame) return null
-  const macro = leaving.macro ? pinned.find(m => m.name === leaving.macro) : null
+  const macro = leaving.macro ? macros.find(m => m.name === leaving.macro) : null
   const look = macro ?? destination ?? {}
   const t = Math.max(0, Number(settings.general.animationSpeed) || 0)
-  const { rect } = frame
   return (
-    <div className={classes.overlay} aria-hidden='true' style={{ '--t': t + 'ms' }}>
-      <div className={`felt ${classes.disc}`} style={{
-        left: rect.left, top: rect.top, width: rect.width, height: rect.width,
-        '--felt': feltColor(look.bgColor), transform: frame.grown ? `scale(${frame.scale})` : 'none'
-      }} />
-      {macro && <MacroIcon icon={macro.icon} color='currentColor' className={classes.icon} />}
+    <div className={classes.overlay} aria-hidden='true' data-launch style={{ '--t': t + 'ms' }}>
+      <div className={`felt ${classes.disc}`} style={{ '--felt': feltColor(look.bgColor), clipPath: frame.grown ? frame.covering : frame.start }}>
+        {fromSearch && (
+          <InteractiveBackground width={window.innerWidth} height={window.innerHeight} color='var(--felt-mixed)'
+            textColor='var(--thread)' marqueeText={destination?.marquee ?? ''} />
+        )}
+      </div>
+      {macro && <Badge macro={macro} named={fromSearch} />}
     </div>
   )
 }

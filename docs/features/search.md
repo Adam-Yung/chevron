@@ -1,6 +1,6 @@
 # Search
 
-> Verified: 2026-11-26 19:00 · Sources: `src/features/search/QueryField.jsx`, `src/features/search/Suggestions.jsx`, `src/features/search/QuickLook.jsx`, `src/search/resolve.js`, `src/search/suggestions.js`, `src/search/useSuggestions.js`, `src/search/history.js`, `src/search/autocomplete.js`, `src/app/useIntents.js`, `src/app/useLaunch.js`, `src/navigation/navigate.js`, `src/navigation/useNavigationRelease.js`
+> Verified: 2026-11-27 23:38 · Sources: `src/features/search/QueryField.jsx`, `src/features/search/Suggestions.jsx`, `src/features/search/QuickLook.jsx`, `src/search/resolve.js`, `src/search/suggestions.js`, `src/search/useSuggestions.js`, `src/search/history.js`, `src/search/autocomplete.js`, `src/app/useIntents.js`, `src/app/useLaunch.js`, `src/navigation/navigate.js`, `src/navigation/useNavigationRelease.js`
 
 ## What you can type
 Start typing anywhere: the search field always has the keyboard, even while a first visit is still loading; what you type
@@ -29,6 +29,9 @@ waits. Offline, everything except Google's suggestions and currency still works.
 
 ## The blob
 While you type, the chevron becomes a line on the left that springs out into a curve, and the shape inside it shows where Enter will go, in that site's or engine's first colour, dyed to sit on the canvas.
+
+When Enter opens a result in the same tab, a disc grows from the blob over the screen and keeps the blob's scrolling banner; for a
+site it also shows the site's icon and name.
 
 ## Never stuck
 Leaving the page in the same tab starts the navigation on the keypress; the colour animation only covers loading time. If the page

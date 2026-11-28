@@ -66,6 +66,20 @@ export default {
     await expectCleanIdle(app, 'after a 204 navigation')
   },
 
+  async 'a site launched by its trigger keeps its banner on the growing disc'(app) {
+    // A 204 keeps the start page up, so the launch screen can be read.
+    await app.context.route(/youtube\.com/, route => route.fulfill({ status: 204 }))
+    await app.page.keyboard.type('y')
+    await app.page.keyboard.press('Enter')
+    await app.page.waitForSelector('[data-launch] svg', { state: 'attached', timeout: 2000 })
+    assertEqual(await app.page.textContent('[data-launch-name]'), 'YouTube', 'launch screen name')
+    const banner = await app.page.textContent('[data-launch] > div:first-child')
+    assert(banner.includes('YouTubeYouTube'), 'the scrolling banner is missing: ' + banner.slice(0, 40))
+    // It grows from the blob on the left edge, not from the site's badge in the faded dock.
+    const clip = await app.page.$eval('[data-launch] > div:first-child', e => e.style.clipPath)
+    assert(clip.includes('at 0px'), 'disc should be centred on the left edge: ' + clip)
+  },
+
   async 'typing and clearing quickly leaves no search blob behind'(app) {
     for (let i = 0; i < 5; i++) {
       await app.page.keyboard.type('ab')
