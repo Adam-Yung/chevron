@@ -7,4 +7,7 @@ end-to-end suite after both builds because it loads `dist/index.html`.
   last one written.
 - `LINT_DIRS` is a ratchet while the re-architecture moves code: a directory joins once it has been rewritten to pass. The structure
   rule (depth 3, complexity 12) applies to every touched file regardless.
+- The de-slop ratchets run last, from the skill folder (not copied: CI does not run this script). Their settings are `.deslop.json`,
+  their counts `scripts/gate/baselines/`, their analyzers `scripts/gate/lint/` (eslint 9 and jscpd, apart from the app's eslint 8).
+  Install them with `npm ci --prefix scripts/gate/lint`.
 - Every step is offline: the e2e suite stubs outside requests and finds `playwright-core` locally (`scripts/e2e/run.mjs`).

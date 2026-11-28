@@ -1,0 +1,11 @@
+{
+ "js-unused": {
+  "src/features/macros-editor/colorHelpers.js": 1
+ },
+ "script-unreferenced": {
+  "scripts/e2e/specs/hosted-boot.mjs": 1,
+  "scripts/e2e/specs/hosted-offline.mjs": 1,
+  "scripts/e2e/specs/macros-editor.mjs": 1,
+  "scripts/e2e/specs/stuck-states.mjs": 1
+ }
+}

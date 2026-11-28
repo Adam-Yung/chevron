@@ -1,0 +1,6 @@
+{
+  "devDependencies": {
+    "eslint": "9.39.5",
+    "jscpd": "5.4.3"
+  }
+}

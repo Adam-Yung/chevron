@@ -27,5 +27,20 @@ Accounts, sync servers, telemetry, a browser extension, a news feed or any conte
 3. Useful: answers and destinations in fewer keystrokes than the browser's address bar. *(inferred)*
 4. The chevron look, wherever it costs nothing against 1 to 3.
 
+## Objectives
+What every part of the code must serve (confirmed by the owner 2026-11-27).
+
+| id | objective |
+|----|-----------|
+| `never-stuck` | Every state can be left; no animation or network call blocks input |
+| `fast-launch` | Typing works on the first frame; Enter navigates at once |
+| `search-and-go` | Search, macros, addresses, history, suggestions, the sites menu and dock |
+| `answers` | Math, units, currency, time zones and AI inline |
+| `glance` | Time and weather |
+| `own-your-setup` | Settings and the macro editor, stored locally and never lost |
+| `runs-anywhere` | Single HTML file, offline, hosted build, touch devices |
+| `look` | The chevron look, where it costs nothing against the others |
+| `dev-tooling` | Build, test, gate and release scripts |
+
 ## Where to look
 `docs/status.md` (present state) · `docs/todo.md` (next work, in order) · `docs/decisions/` (settled calls) · `docs/README.md` (map).

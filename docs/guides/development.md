@@ -1,6 +1,6 @@
 # Development
 
-> Verified: 2026-11-26 11:04 · Sources: `package.json`, `vite.config.js`, `scripts/verify.sh`, `scripts/e2e/run.mjs`, `tools/vite/htmlTransforms.js`, `scripts/owner/install-deps.sh`, `scripts/perf/load.mjs`
+> Verified: 2026-11-27 23:35 · Sources: `package.json`, `vite.config.js`, `scripts/verify.sh`, `scripts/e2e/run.mjs`, `tools/vite/htmlTransforms.js`, `scripts/owner/install-deps.sh`, `scripts/perf/load.mjs`
 
 ## Run
 - `npm run dev`: dev server with hot reload.
@@ -12,8 +12,9 @@
 - `node scripts/e2e/run.mjs [filter]`: end-to-end specs in Chromium against `dist/` (build first). `E2E_DIST=<dir>` tests another
   build folder, `E2E_HOSTED_DIST=<dir>` the hosted one for the `hosted-*` specs (default `dist-hosted/`, which `scripts/verify.sh`
   builds), `E2E_HEADED=1` shows the browser. Every outside request is stubbed; nothing leaves the machine.
-- `scripts/verify.sh`: the full gate (tests, lint, structure limits on touched files, both builds, e2e, doc checks). Run it through
-  `~/.claude-personal/framework/bin/gate` before committing.
+- `scripts/verify.sh`: the full gate (tests, lint, structure limits on touched files, both builds, e2e, doc checks, de-slop
+  ratchets). Run it through `~/.claude-personal/framework/bin/gate` before committing. It needs `npm ci --prefix scripts/gate/lint`
+  once; what the ratchets measure is in `.deslop.json`.
 
 - `node scripts/perf/load.mjs <url | build dir> [--runs N] [--out report.json]`: cold and warm load timings at three network
   speeds, plus an offline reload, in Chromium. Not part of the gate. Baseline numbers are in `docs/decisions/load-speed.md`.

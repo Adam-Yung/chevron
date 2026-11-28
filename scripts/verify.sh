@@ -31,4 +31,9 @@ node scripts/e2e/run.mjs
 # 6. Docs: brief, mirrors, links, freshness, map.
 python3 "$FW/gate/docgate.py" check .
 
+# 7. De-slop ratchets: structure, duplication, dead code and doc hygiene may only improve (.deslop.json).
+DESLOP="${DESLOP_HOME:-$HOME/.claude-personal/skills/de-slop}/scripts"
+[[ -f $DESLOP/gates.py ]] || { echo "de-slop gates not found at $DESLOP" >&2; exit 1; }
+PYTHONDONTWRITEBYTECODE=1 python3 "$DESLOP/gates.py" --root .
+
 echo GATE-OK

@@ -1,0 +1,10 @@
+{
+ "clones": 7,
+ "duplicated_lines": 116,
+ "pairs": {
+  "services/install.cjs|services/install.cjs": 1,
+  "src/features/cheatsheet/Cheatsheet.module.css|src/features/settings-panel/Settings.module.css": 3,
+  "src/features/macros-editor/ColorPicker/ColorPicker.jsx|src/features/macros-editor/IconPicker/IconPicker.jsx": 1,
+  "src/features/macros-editor/ColorPicker/ColorPicker.module.css|src/features/macros-editor/IconPicker/IconPicker.module.css": 2
+ }
+}
