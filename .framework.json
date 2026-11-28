@@ -23,8 +23,7 @@
   },
   "links": {
     "skip": [
-      "docs/decisions/",
-      "docs/history/"
+      "docs/decisions/"
     ]
   }
 }

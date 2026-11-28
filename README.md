@@ -141,8 +141,8 @@ Then point any browser on your network to `http://<server-ip>:8080`.
 Host your own instance for free on GitHub — accessible from anywhere with an internet connection.
 
 1. Fork the repository
-2. Go to **Settings → Pages → Branch: `gh-pages` → Save**
-3. Your instance goes live at `https://<you>.github.io/chevron/`
+2. Go to **Settings → Pages → Source: GitHub Actions**
+3. Push to `master`; the **Deploy Pages** workflow publishes `https://<you>.github.io/chevron/`
 
 **Best for:** Access from multiple machines without running a server. Depends on your internet connection, so not ideal as a primary daily driver.
 
@@ -173,7 +173,7 @@ Click the gear icon (top-right) to configure:
 - **Weather** — API key, location, units
 
 ### Macros editor
-Open **Settings → Edit macros** to add, remove, or reorder your bookmarks. Four tabs:
+Open **Settings → Macros** to add, remove, or reorder your bookmarks. Four tabs:
 - **Macros** — name, URL, triggers, colors, icon, hotkey
 - **Commands** — URL templates with arguments (e.g. `so?{query}`)
 - **Engines** — customize search engine names, colors, and URL patterns
@@ -211,8 +211,10 @@ Export your config to carry it between machines. Import any compatible JSON file
 |---|---|---|---|
 | OpenAI | _(leave blank)_ | `gpt-4o-mini`, `gpt-3.5-turbo`, etc. | Required |
 | Ollama (local) | `http://localhost:11434` | `llama3`, `mistral`, etc. | Not needed |
-| LM Studio | `http://localhost:1234` | _(auto-detected)_ | Not needed |
-| Any OpenAI-compatible | Your endpoint URL | Your model name | If required |
+| LM Studio | `http://localhost:1234` | Your loaded model's name | Any non-empty text |
+| Any OpenAI-compatible | Your endpoint URL | Your model name | Required (any text if the server ignores it) |
+
+Pick the **OpenAI** provider for LM Studio and other OpenAI-compatible servers.
 
 Chevron never probes localhost unless you explicitly configure a local provider with both a URL and model name.
 
@@ -226,29 +228,19 @@ Chevron never probes localhost unless you explicitly configure a local provider 
 | `Enter` | Open the highlighted result, or copy an instant answer |
 | `Alt+Enter` / `Cmd+Enter` | Open in a new tab |
 | `Ctrl` + `Enter` | Force the search engine (skip macros and addresses) |
-| `Tab` / `Shift+Tab`, `↑` / `↓` | Move through suggestions |
+| `↑` / `↓`, `Shift+Tab` | Move through suggestions |
+| `Tab` | Highlight the first suggestion, or put the highlighted one in the field |
 | `Shift+Delete` | Remove the highlighted history entry |
 | `Esc` | Step back: close a panel, the AI answer, the menu filter, the menu, then clear the query |
 | Tap `Shift` | Toggle the sites menu |
 | `Space Space` | Ask AI |
 | `?` | Show all keyboard shortcuts |
 
----|---|
-| Just start typing | Search — the input always has focus |
-| `Enter` | Search or copy instant answer |
-| `Esc` | Clear query (double-tap: full reset) |
-| `Tab` / `Shift+Tab` | Cycle suggestions |
-| `↑` / `↓` | Navigate suggestions |
-| `Shift` | Toggle macro menu |
-| `Space Space` | Ask AI |
-| `?` | Show all keyboard shortcuts |
-| `Ctrl+Enter` | Force search engine (skip macros) |
-
 ---
 
 ## Building from Source
 
-Requires [Node.js](https://nodejs.org/) 18+.
+Requires [Node.js](https://nodejs.org/) 22.12+.
 
 ```bash
 npm install          # install dependencies

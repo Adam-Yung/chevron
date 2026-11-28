@@ -1,6 +1,6 @@
 # Brief
 
-> Drafted 2026-11-25 from `README.md` and `Maintainer.md` during the overnight re-architecture; **awaiting the owner's approval**.
+> Drafted 2026-11-25 from `README.md` and the since-removed maintainer notes during the overnight re-architecture; **awaiting the owner's approval**.
 > Lines marked *(inferred)* come from the owner's request that night, not from existing docs.
 
 ## Mission

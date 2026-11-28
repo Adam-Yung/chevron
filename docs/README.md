@@ -10,7 +10,6 @@
 | `docs/guides/` | How to run, test and release, with a `Verified · Sources` header |
 | `docs/code/` | One mirror per source file: why, invariants, ordering; never a restatement of the code |
 | `docs/handoff/` | Briefs for a fresh agent picking up unfinished work; deleted when done |
-| `docs/history/` | Records kept for reference, not maintained |
 
 Every page in `docs/features/` and `docs/guides/` is listed below.
 
