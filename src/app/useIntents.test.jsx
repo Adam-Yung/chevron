@@ -63,6 +63,16 @@ describe('useIntents sites menu', () => {
     expect(open.mock.calls.map(c => c[0])).toEqual(['https://alpha.test', 'https://beta.test', 'https://beta.test', 'https://alpha.test'])
   })
 
+  it('completing a suggestion puts its text in the field and drops the highlight', () => {
+    const { store, perform } = mount()
+    act(() => {
+      store.dispatch(ui.typed('al'))
+      store.dispatch(ui.selected({ suggestion: 'alpha', type: 'history' }))
+    })
+    perform({ intent: 'complete', text: 'alpha' })
+    expect(store.getState()).toMatchObject({ query: 'alpha', selection: null })
+  })
+
   it('moves the cursor over the filtered count and edits the filter', () => {
     const { store, perform, openMenu } = mount()
     openMenu()

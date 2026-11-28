@@ -47,6 +47,12 @@ function Badge({ macro, named }) {
   )
 }
 
+// Names may repeat, so a search launch takes the resolved site itself; a card only passes its name.
+function launchedMacro(name, fromSearch, destination, macros = []) {
+  if (!name) return null
+  return fromSearch ? destination?.macro : macros.find(m => m.name === name)
+}
+
 // While a same-tab navigation loads, a disc of the destination's colour grows from where it was launched until it covers the
 // screen. Purely decorative: the navigation started before this rendered.
 export default function LaunchOverlay() {
@@ -58,7 +64,7 @@ export default function LaunchOverlay() {
   const frame = useGrowingCircle(leaving, fromSearch)
 
   if (!leaving || !frame) return null
-  const macro = leaving.macro ? macros.find(m => m.name === leaving.macro) : null
+  const macro = launchedMacro(leaving.macro, fromSearch, destination, macros)
   const look = macro ?? destination ?? {}
   const t = Math.max(0, Number(settings.general.animationSpeed) || 0)
   return (

@@ -18,6 +18,9 @@ async function reopen(app, settings) {
   await app.goto()
 }
 
+const mailSite = (trigger, color) =>
+  ({ name: 'Mail', triggers: [trigger], url: `https://${trigger}.test`, bgColor: { type: 'solid', color } })
+
 export default {
   async 'searching in a new tab leaves a clean, usable start page'(app) {
     await reopen(app, NEW_TAB)
@@ -78,6 +81,18 @@ export default {
     // It grows from the blob on the left edge, not from the site's badge in the faded dock.
     const clip = await app.page.$eval('[data-launch] > div:first-child', e => e.style.clipPath)
     assert(clip.includes('at 0px'), 'disc should be centred on the left edge: ' + clip)
+  },
+
+  async 'two sites with one name each launch with their own colour'(app) {
+    const config = { macros: [mailSite('one', '#ff0000'), mailSite('two', '#0000ff')], commands: [], engines: {} }
+    await app.context.addInitScript(c => localStorage.setItem('chevron.config', JSON.stringify(c)), config)
+    await app.context.route(/two\.test/, route => route.fulfill({ status: 204 }))
+    await app.goto()
+    await app.page.keyboard.type('two')
+    await app.page.keyboard.press('Enter')
+    await app.page.waitForSelector('[data-launch]', { state: 'attached', timeout: 2000 })
+    const felt = await app.page.$eval('[data-launch] > div:first-child', e => e.style.getPropertyValue('--felt'))
+    assertEqual(felt, '#0000ff', 'launch screen colour')
   },
 
   async 'Tab puts the highlighted suggestion in the field and typing carries on'(app) {
