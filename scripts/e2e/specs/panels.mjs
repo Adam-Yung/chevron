@@ -67,10 +67,11 @@ async function openWeatherModal(own) {
 
 // ---------------------------------------------------------------- AI server
 
+const delta = text => `data: ${JSON.stringify({ choices: [{ delta: { content: text } }] })}\n\n`
+
 // A real local server, because Playwright cannot fulfil a response in timed chunks, and progressive rendering is the point.
 function startAiServer() {
   const log = { requests: [], closed: [] }
-  const delta = text => `data: ${JSON.stringify({ choices: [{ delta: { content: text } }] })}\n\n`
   const server = createServer((req, res) => {
     res.setHeader('Access-Control-Allow-Origin', '*')
     res.setHeader('Access-Control-Allow-Headers', '*')
@@ -82,7 +83,7 @@ function startAiServer() {
       const question = messages[messages.length - 1].content
       log.requests.push(question)
       res.on('close', () => log.closed.push(question))
-      respond(question, res, delta)
+      respond(question, res)
     })
   })
   return new Promise(resolve => server.listen(0, '127.0.0.1', () => {
@@ -90,7 +91,7 @@ function startAiServer() {
   }))
 }
 
-function respond(question, res, delta) {
+function respond(question, res) {
   if (question.startsWith('unauthorized')) {
     res.writeHead(401, { 'Content-Type': 'application/json' })
     return res.end(JSON.stringify({ error: { code: 'invalid_api_key', message: 'Incorrect API key provided' } }))
@@ -127,6 +128,9 @@ const withServer = async (app, settings, run) => {
     server.close()
   }
 }
+
+const HINTS = '[aria-hidden="true"][class*="overlay"]'
+const pillOpacity = page => page.$eval('[data-testid="offline-pill"]', e => getComputedStyle(e).opacity)
 
 export default {
   // ------------------------------------------------------------ weather
@@ -346,25 +350,23 @@ export default {
     const context = await app.context.browser().newContext({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true })
     await context.route(/^https?:\/\/(?!127\.0\.0\.1)/, r => r.abort())
     const page = await context.newPage()
-    const overlays = () => page.$$('[aria-hidden="true"][class*="overlay"]')
     await page.goto(app.baseUrl)
     await page.waitForSelector('textarea[role="combobox"]')
-    await page.waitForSelector('[aria-hidden="true"][class*="overlay"]', { timeout: 2000 })
+    await page.waitForSelector(HINTS, { timeout: 2000 })
     await page.keyboard.type('x')
-    await page.waitForSelector('[aria-hidden="true"][class*="overlay"]', { state: 'detached', timeout: 2000 })
+    await page.waitForSelector(HINTS, { state: 'detached', timeout: 2000 })
     assertEqual(await page.evaluate(() => localStorage.getItem('touchHintsSeen')), '1', 'seen flag')
     await page.reload()
     await page.waitForSelector('textarea[role="combobox"]')
     await page.waitForTimeout(400)
-    assertEqual((await overlays()).length, 0, 'hints after reload')
+    assertEqual((await page.$$(HINTS)).length, 0, 'hints after reload')
     await context.close()
   },
 
   // ------------------------------------------------------------ offline
   async 'offline pill appears and disappears with the connection'(app) {
     const own = await launch(app)
-    const pillOpacity = () => own.page.$eval('[data-testid="offline-pill"]', e => getComputedStyle(e).opacity)
-    assertEqual(await pillOpacity(), '0', 'hidden while online')
+    assertEqual(await pillOpacity(own.page), '0', 'hidden while online')
     await own.context.setOffline(true)
     await own.page.waitForFunction(() => /Offline/.test(document.querySelector('[data-testid="offline-pill"]')?.innerText) && getComputedStyle(document.querySelector('[data-testid="offline-pill"]')).opacity === '1')
     await own.context.setOffline(false)

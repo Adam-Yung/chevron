@@ -3,7 +3,7 @@
 | Script | What it does |
 |--------|--------------|
 | `verify.sh` | The commit gate |
-| `add-icon.mjs` | Owner-run: fetch a site's icon into `public/icons.js` |
+| `add-icon.mjs` | Owner-run: fetch a site's icon into `public/icons.js`; its parts are in `icons/` |
 | `e2e/run.mjs` | End-to-end runner; it loads every spec in `e2e/specs/` by folder |
 | `perf/load.mjs` | Load-time measurement |
 | `owner/install-deps.sh`, `owner/add-graduate-font.sh` | Downloads only the owner runs |

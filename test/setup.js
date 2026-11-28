@@ -1,9 +1,7 @@
 import '@testing-library/jest-dom/vitest'
 import { afterEach, vi } from 'vitest'
 
-// jsdom in this environment does not expose a Storage implementation, so
-// provide an in-memory localStorage/sessionStorage polyfill for the many
-// modules (Settings, History, config) that read/write it at import time.
+// This jsdom has no Storage, and many modules read or write it at import time.
 function createMemoryStorage() {
   let store = {}
   return {
@@ -23,9 +21,7 @@ if (!window.sessionStorage) {
   Object.defineProperty(window, 'sessionStorage', { value: createMemoryStorage(), configurable: true })
 }
 
-// public/config.js normally defines window.CONFIG before the app bundle
-// runs. settings/settings.js reads window.CONFIG.engines at module-eval, so
-// tests that import anything from the Settings context need this stub.
+// Stands in for public/config.js: settings/schema.js reads window.CONFIG.engines when it is imported.
 if (!window.CONFIG) {
   window.CONFIG = {
     engines: { google: { name: 'Google', url: 'https://www.google.com/search?q=' } },

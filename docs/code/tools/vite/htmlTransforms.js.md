@@ -25,3 +25,5 @@ Tests: `tools/vite/htmlTransforms.test.js`.
   `config.js`, it blocks only what follows it. The classic scripts after it wait for it, and the module only runs once parsing is done,
   so the app never mounts unstyled (an e2e spec holds the CSS back to prove it). It runs with `order: 'post'`, after Vite has
   injected the asset tags.
+
+Reviewed: ad9e2bd9

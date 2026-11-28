@@ -5,9 +5,7 @@
 // without the query, so without this rule they were never served offline.
 const IGNORED_PARAMS = [/^utm_/, /^fbclid$/, /^v$/]
 
-/**
- * @param {string} base  the deploy base path, e.g. '/chevron/' on GitHub Pages, '' for relative builds
- */
+// `base` is the deploy base path: '/chevron/' on GitHub Pages, '' for relative builds.
 export function workboxOptions(base) {
   return {
     globPatterns: ['**/*.{html,js,css,svg,png,ico,woff,woff2,json}'],

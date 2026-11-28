@@ -7,6 +7,8 @@ end-to-end suite after both builds because it loads `dist/index.html`.
   last one written.
 - `LINT_DIRS` is a ratchet while the re-architecture moves code: a directory joins once it has been rewritten to pass. The structure
   rule (depth 3, complexity 12) applies to every touched file regardless.
+- The touched files reach eslint as an array, one per line of `touched.sh`, so a name with spaces stays one argument. The list is
+  assigned first so that a failing `touched.sh` stops the gate.
 - The de-slop ratchets run last, from the skill folder (not copied: CI does not run this script). Their settings are `.deslop.json`,
   their counts `scripts/gate/baselines/`, their analyzers `scripts/gate/lint/` (eslint 9 and jscpd, apart from the app's eslint 8).
   Install them with `npm ci --prefix scripts/gate/lint`.

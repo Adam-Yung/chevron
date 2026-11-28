@@ -1,8 +1,7 @@
 {
- "clones": 4,
- "duplicated_lines": 58,
+ "clones": 3,
+ "duplicated_lines": 47,
  "pairs": {
-  "services/install.cjs|services/install.cjs": 1,
   "src/features/cheatsheet/Cheatsheet.module.css|src/features/settings-panel/Settings.module.css": 3
  }
 }

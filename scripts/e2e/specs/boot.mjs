@@ -3,6 +3,20 @@ import { pathToFileURL } from 'node:url'
 import { join } from 'node:path'
 import { assert, assertEqual } from '../lib/app.mjs'
 
+// The rightmost opaque canvas pixel on the screen's middle row.
+function rightmostOpaqueX(page) {
+  return page.evaluate(() => {
+    const canvas = document.querySelector('canvas[aria-hidden="true"]')
+    const rect = canvas.getBoundingClientRect()
+    const row = new OffscreenCanvas(window.innerWidth, 1).getContext('2d')
+    row.drawImage(canvas, rect.left, rect.top - window.innerHeight / 2, rect.width, rect.height)
+    const { data } = row.getImageData(0, 0, window.innerWidth, 1)
+    let x = window.innerWidth - 1
+    while (x >= 0 && data[x * 4 + 3] < 250) x--
+    return x
+  })
+}
+
 export default {
   async 'boots with the search field focused and no page errors'(app) {
     const focused = await app.page.evaluate(() => document.activeElement?.getAttribute('role'))
@@ -23,9 +37,10 @@ export default {
       const rect = canvas.getBoundingClientRect()
       const copy = new OffscreenCanvas(Math.round(rect.width), Math.round(rect.height)).getContext('2d')
       copy.drawImage(canvas, 0, 0, rect.width, rect.height)
-      const at = (x, y) => copy.getImageData(Math.round(x - rect.left), Math.round(y - rect.top), 1, 1).data[3]
       const reach = Math.min(window.innerHeight * 0.5, window.innerWidth)
-      return { tip: at(reach, window.innerHeight / 2), edge: at(2, window.innerHeight / 2) }
+      const middle = Math.round(window.innerHeight / 2 - rect.top)
+      const [tip, edge] = [reach, 2].map(x => copy.getImageData(Math.round(x - rect.left), middle, 1, 1).data[3])
+      return { tip, edge }
     })
     assertEqual(alpha.tip, 255, 'stripe at the tip of the blob')
     assertEqual(alpha.edge, 0, 'nothing on the left edge at mid-height')
@@ -36,22 +51,12 @@ export default {
     await app.context.addInitScript(() => localStorage.setItem('settings', '{"general":{"animationSpeed":2000}}'))
     await app.goto()
     await app.page.keyboard.type('h')
-    const rightmost = () => app.page.evaluate(() => {
-      const canvas = document.querySelector('canvas[aria-hidden="true"]')
-      const rect = canvas.getBoundingClientRect()
-      const row = new OffscreenCanvas(window.innerWidth, 1).getContext('2d')
-      row.drawImage(canvas, rect.left, rect.top - window.innerHeight / 2, rect.width, rect.height)
-      const { data } = row.getImageData(0, 0, window.innerWidth, 1)
-      let x = window.innerWidth - 1
-      while (x >= 0 && data[x * 4 + 3] < 250) x--
-      return x
-    })
     await app.settle(1650)
-    assert(await rightmost() < 40, 'a straight line on the edge between the two beats')
+    assert(await rightmostOpaqueX(app.page) < 40, 'a straight line on the edge between the two beats')
     await app.settle(1250)
-    const swung = await rightmost()
+    const swung = await rightmostOpaqueX(app.page)
     await app.settle(4000)
-    const rest = await rightmost()
+    const rest = await rightmostOpaqueX(app.page)
     assert(swung > rest + 40, `swings well past the curve: ${swung} then ${rest}`)
   },
 

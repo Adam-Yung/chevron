@@ -1,10 +1,16 @@
-const { execSync, spawnSync } = require('child_process');
+const { execSync, spawn, spawnSync } = require('child_process');
 const fs = require('fs');
 const path = require('path');
 const os = require('os');
+const { fillTemplate, unixVars, preferWindowsExecutable, platformKind } = require('./serviceFiles.cjs');
 
 const platform = process.argv[2] || process.platform;
 const projectDir = path.resolve(__dirname, '..');
+
+function fail(...lines) {
+  for (const line of lines) console.error(line);
+  process.exit(1);
+}
 
 function which(cmd) {
   try {
@@ -16,50 +22,41 @@ function which(cmd) {
 
 function whichWin(cmd) {
   try {
-    // where.exe lists all matches: POSIX shell script, .ps1, .cmd, .exe
-    // Prefer .exe then .cmd — Task Scheduler and spawn() both need a real
-    // Windows executable; bare shebang scripts (no extension) fail both.
     const results = execSync(`where.exe ${cmd}`, { encoding: 'utf8' })
       .trim().split(/\r?\n/);
-    return (
-      results.find(p => /\.exe$/i.test(p)) ||
-      results.find(p => /\.cmd$/i.test(p)) ||
-      results[0]
-    );
+    return preferWindowsExecutable(results);
   } catch {
     return null;
   }
 }
 
-function template(content, vars) {
-  return Object.entries(vars).reduce(
-    (str, [key, val]) => str.replaceAll(`{{${key}}}`, val),
-    content
-  );
+function renderTemplate(name, vars) {
+  return fillTemplate(fs.readFileSync(path.join(__dirname, name), 'utf8'), vars);
 }
 
-function installMac() {
+function renderUnixService(templateName) {
   const npxPath = which('npx');
-  if (!npxPath) {
-    console.error('Error: npx not found in PATH');
-    process.exit(1);
-  }
+  if (!npxPath) fail('Error: npx not found in PATH');
+  return renderTemplate(templateName, unixVars(projectDir, npxPath));
+}
 
-  const envPath = [path.dirname(npxPath), '/usr/local/bin', '/usr/bin', '/bin'].join(':');
-  const vars = { PROJECT_DIR: projectDir, NPX_PATH: npxPath, PATH: envPath };
-
-  const src = path.join(__dirname, 'com.chevron.preview.plist');
-  const dest = path.join(os.homedir(), 'Library', 'LaunchAgents', 'com.chevron.preview.plist');
-
-  const content = template(fs.readFileSync(src, 'utf8'), vars);
-
-  try {
-    execSync(`launchctl unload "${dest}" 2>/dev/null`, { stdio: 'ignore' });
-  } catch {}
-
+function writeServiceFile(dest, content) {
   fs.mkdirSync(path.dirname(dest), { recursive: true });
   fs.writeFileSync(dest, content);
   console.log(`Wrote ${dest}`);
+}
+
+function installMac() {
+  const content = renderUnixService('com.chevron.preview.plist');
+  const dest = path.join(os.homedir(), 'Library', 'LaunchAgents', 'com.chevron.preview.plist');
+
+  try {
+    execSync(`launchctl unload "${dest}" 2>/dev/null`, { stdio: 'ignore' });
+  } catch {
+    // not loaded yet
+  }
+
+  writeServiceFile(dest, content);
 
   execSync(`launchctl load "${dest}"`);
   console.log('Service loaded. Access at http://localhost:4173/');
@@ -69,24 +66,10 @@ function installMac() {
 }
 
 function installLinux() {
-  const npxPath = which('npx');
-  if (!npxPath) {
-    console.error('Error: npx not found in PATH');
-    process.exit(1);
-  }
+  const content = renderUnixService('chevron-preview.service');
+  const dest = path.join(os.homedir(), '.config', 'systemd', 'user', 'chevron-preview.service');
 
-  const envPath = [path.dirname(npxPath), '/usr/local/bin', '/usr/bin', '/bin'].join(':');
-  const vars = { PROJECT_DIR: projectDir, NPX_PATH: npxPath, PATH: envPath };
-
-  const src = path.join(__dirname, 'chevron-preview.service');
-  const destDir = path.join(os.homedir(), '.config', 'systemd', 'user');
-  const dest = path.join(destDir, 'chevron-preview.service');
-
-  const content = template(fs.readFileSync(src, 'utf8'), vars);
-
-  fs.mkdirSync(destDir, { recursive: true });
-  fs.writeFileSync(dest, content);
-  console.log(`Wrote ${dest}`);
+  writeServiceFile(dest, content);
 
   execSync('systemctl --user daemon-reload');
   execSync('systemctl --user enable --now chevron-preview.service');
@@ -106,45 +89,34 @@ function isAdminWindows() {
   }
 }
 
-function installWindows() {
-  if (process.platform !== 'win32') {
-    console.error('Error: install_windows_service must be run on Windows.');
-    process.exit(1);
-  }
+function requireWindowsAdmin() {
+  if (process.platform !== 'win32') fail('Error: install_windows_service must be run on Windows.');
+  if (isAdminWindows()) return;
+  fail(
+    '',
+    'ERROR: Administrator privileges are required to register a scheduled task.',
+    '',
+    'Please re-run from an elevated terminal:',
+    '  1. Search "Terminal" in Start',
+    '  2. Right-click → "Run as administrator"',
+    '  3. cd to the chevron directory and run: npm run install_windows_service',
+    ''
+  );
+}
 
-  if (!isAdminWindows()) {
-    console.error('');
-    console.error('ERROR: Administrator privileges are required to register a scheduled task.');
-    console.error('');
-    console.error('Please re-run from an elevated terminal:');
-    console.error('  1. Search "Terminal" in Start');
-    console.error('  2. Right-click → "Run as administrator"');
-    console.error('  3. cd to the chevron directory and run: npm run install_windows_service');
-    console.error('');
-    process.exit(1);
-  }
-
+// node.exe and vite's JS entry point directly, so neither the task nor the spawned server depends on npx or PATH.
+function findWindowsRuntime() {
   const nodePath = whichWin('node');
-  if (!nodePath) {
-    console.error('Error: node.exe not found in PATH. Make sure Node.js is installed.');
-    process.exit(1);
-  }
-
-  // Use node.exe + vite's JS entry point directly — no npx, no PATH dependency.
-  // This is what runs both in the scheduled task (at logon) and the immediate spawn.
+  if (!nodePath) fail('Error: node.exe not found in PATH. Make sure Node.js is installed.');
   const viteJs = path.join(projectDir, 'node_modules', 'vite', 'bin', 'vite.js');
-  if (!fs.existsSync(viteJs)) {
-    console.error(`Error: vite not found at ${viteJs}. Run npm install first.`);
-    process.exit(1);
-  }
+  if (!fs.existsSync(viteJs)) fail(`Error: vite not found at ${viteJs}. Run npm install first.`);
+  return { nodePath, viteJs };
+}
 
-  const taskName = 'ChevronPreview';
+function registerWindowsTask(taskName, { nodePath, viteJs }) {
   const vars = { PROJECT_DIR: projectDir, NODE_EXE: nodePath, VITE_JS: viteJs };
-
-  const src = path.join(__dirname, 'chevron-preview.xml');
   const tmpXml = path.join(os.tmpdir(), 'chevron-preview-task.xml');
-
-  const content = template(fs.readFileSync(src, 'utf8'), vars);
+  const content = renderTemplate('chevron-preview.xml', vars);
 
   // Task Scheduler XML must be UTF-16 LE
   fs.writeFileSync(tmpXml, '\ufeff' + content, 'utf16le');
@@ -158,22 +130,17 @@ function installWindows() {
     { encoding: 'utf8', stdio: 'pipe' }
   );
 
-  if (result.status !== 0) {
-    console.error('Failed to register scheduled task:');
-    console.error(result.stderr || result.stdout);
-    process.exit(1);
-  }
-
+  if (result.status !== 0) fail('Failed to register scheduled task:', result.stderr || result.stdout);
   console.log(`Task "${taskName}" registered successfully.`);
+}
 
-  // Kill any existing vite preview on port 4173 so we can start fresh
+// The task only fires at logon, so also start the server in this session after freeing the port.
+function restartWindowsServer({ nodePath, viteJs }) {
   spawnSync('powershell.exe', [
     '-NoProfile', '-Command',
     `$p = (Get-NetTCPConnection -LocalPort 4173 -ErrorAction SilentlyContinue).OwningProcess; if ($p) { Stop-Process -Id $p -Force -ErrorAction SilentlyContinue }`
   ], { stdio: 'ignore' });
 
-  // Spawn the server in the current interactive session so it's available immediately.
-  const { spawn } = require('child_process');
   const child = spawn(
     nodePath,
     [viteJs, 'preview', '--port', '4173', '--host', '::'],
@@ -186,6 +153,14 @@ function installWindows() {
   );
   child.unref();
   console.log(`Server started (pid ${child.pid}). Access at http://localhost:4173/`);
+}
+
+function installWindows() {
+  requireWindowsAdmin();
+  const runtime = findWindowsRuntime();
+  const taskName = 'ChevronPreview';
+  registerWindowsTask(taskName, runtime);
+  restartWindowsServer(runtime);
 
   console.log('');
   console.log(`To stop:    schtasks /End /TN ${taskName}`);
@@ -199,14 +174,7 @@ if (!fs.existsSync(dist)) {
   execSync('npm run build', { cwd: projectDir, stdio: 'inherit' });
 }
 
-if (platform === 'darwin' || platform === 'mac') {
-  installMac();
-} else if (platform === 'linux') {
-  installLinux();
-} else if (platform === 'win32' || platform === 'windows') {
-  installWindows();
-} else {
-  console.error(`Unsupported platform: ${platform}`);
-  console.error('Usage: node services/install.cjs [mac|linux|windows]');
-  process.exit(1);
-}
+const INSTALLERS = { mac: installMac, linux: installLinux, windows: installWindows };
+const kind = platformKind(platform);
+if (!kind) fail(`Unsupported platform: ${platform}`, 'Usage: node services/install.cjs [mac|linux|windows]');
+INSTALLERS[kind]();

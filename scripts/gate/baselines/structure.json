@@ -1,8 +1,5 @@
 {
  "comment-block": {
-  "scripts/add-icon.mjs": 5,
-  "scripts/owner/install-deps.sh": 1,
-  "services/install.cjs": 1,
   "src/app/LaunchOverlay.jsx": 1,
   "src/app/bootShell.js": 2,
   "src/app/useIntents.js": 1,
@@ -31,27 +28,18 @@
   "src/navigation/navigate.js": 2,
   "src/state/UiStore.jsx": 1,
   "src/state/ui.js": 1,
-  "src/storage/obfuscate.js": 1,
-  "test/setup.js": 2,
-  "tools/vite/htmlTransforms.js": 6,
-  "tools/vite/serviceWorker.js": 1
- },
- "file-lines": {
-  "scripts/add-icon.mjs": 1
+  "src/storage/obfuscate.js": 1
  },
  "js:complexity": {
   "src/features/weather/Weather.jsx": 1,
   "src/input/usePointerInput.js": 1
  },
  "js:max-lines-per-function": {
-  "services/install.cjs": 1,
   "src/features/macros/useClock.test.js": 1,
   "src/features/search/InteractiveBackground.jsx": 1,
   "src/features/weather/WeatherModal.jsx": 1
  },
  "js:no-restricted-syntax": {
-  "scripts/e2e/specs/boot.mjs": 2,
-  "scripts/e2e/specs/panels.mjs": 3,
   "src/app/LayoutButton.jsx": 1,
   "src/app/useIntents.js": 2,
   "src/features/ai/AIcompletion.jsx": 1,
@@ -82,7 +70,6 @@
   "src/navigation/useNavigationRelease.js": 3
  },
  "suppression": {
-  "scripts/verify.sh": 1,
   "src/app/ErrorBoundary.jsx": 1
  }
 }

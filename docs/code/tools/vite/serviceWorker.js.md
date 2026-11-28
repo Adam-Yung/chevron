@@ -12,3 +12,5 @@ Workbox options for the hosted profile's service worker, passed to `vite-plugin-
 - **Why `navigateFallback` uses the base:** GitHub Pages serves the app under `/chevron/`, so the shell must be looked up there.
 
 Tests: `tools/vite/serviceWorker.test.js`.
+
+Reviewed: cc14b66d

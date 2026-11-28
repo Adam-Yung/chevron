@@ -17,8 +17,10 @@ LINT_DIRS=(src tools scripts test vite.config.js .eslintrc.cjs)
 # 3. Structure ratchet: strict nesting and complexity on touched files only.
 files=$("$FW/gate/touched.sh" js jsx mjs)
 if [[ -n $files ]]; then
-  # shellcheck disable=SC2086
-  "$BIN/eslint" --no-eslintrc -c .eslintrc.cjs --rule '{"max-depth": ["error", 3], "complexity": ["error", 12]}' $files
+  # One argument per line, so a name with spaces stays one file (macOS bash 3.2 has no mapfile).
+  touched=()
+  while IFS= read -r file; do touched+=("$file"); done <<<"$files"
+  "$BIN/eslint" --no-eslintrc -c .eslintrc.cjs --rule '{"max-depth": ["error", 3], "complexity": ["error", 12]}' "${touched[@]}"
 fi
 
 # 4. Both build profiles. The static one is what the end-to-end suite loads.

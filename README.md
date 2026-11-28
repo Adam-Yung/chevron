@@ -187,16 +187,13 @@ Icons live in `public/icons.js` as a dictionary of SVG strings. The icon picker 
 
 ```bash
 # Single site with a custom name
-node scripts/add-icon.mjs freepacman.org --name pacman --write
+npm run icons -- freepacman.org --name pacman
 
 # Multiple sites at once (names derived from domain)
-node scripts/add-icon.mjs github.com reddit.com spotify.com --write
-
-# Preview without writing (prints the entry to paste manually)
-node scripts/add-icon.mjs freepacman.org --name pacman
+npm run icons -- github.com reddit.com spotify.com
 ```
 
-The script fetches the site's favicon via Google's favicon API, embeds it as a base64 PNG inside an SVG wrapper, and inserts it into `public/icons.js`. After a rebuild (or on next dev server reload), the icon appears in the picker — searchable by the name you gave it.
+The script looks for a vector icon (Simple Icons, then the site's own favicon.svg, then Google's favicon service), writes it into `public/icons.js` and rebuilds (`--no-build` skips that). The icon then appears in the picker, searchable by its name.
 
 **Manual way:** Open `public/icons.js` and add a line:
 ```javascript
