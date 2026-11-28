@@ -1,0 +1,27 @@
+docs/brief.md
+  s_21734926ab93ce::t_4888627cbd6ef1 3
+README.md
+  s_21734926ab93ce::t_f84524b418fd17 214-217
+  s_21734926ab93ce::t_83fa16b1fae7ad 176
+  s_21734926ab93ce::t_c1924f92e8da63 243
+  s_21734926ab93ce::t_82926136ac126c 144-145
+  s_21734926ab93ce::t_e2e3cd4390d8dd 231-232
+.framework.json
+  s_21734926ab93ce::t_c48cdcdb729912 26
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.24",
+  "base_commit_sha": "fd15af2d7b74a2f70a7af917b65825213fbec72e",
+  "prompts": {},
+  "sessions": {
+    "s_21734926ab93ce": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a2b063db-2489-4588-a3b5-1810c9e2d4a1",
+        "model": "claude-sonnet-5-5"
+      },
+      "human_author": "Adam Yung <adyung@paloaltonetworks.com>"
+    }
+  }
+}
