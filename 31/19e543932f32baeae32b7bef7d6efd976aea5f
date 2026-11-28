@@ -1,0 +1,34 @@
+src/features/weather/WeatherModal.jsx
+  s_21734926ab93ce::t_b0ebb1cc6ac012 16
+  s_21734926ab93ce::t_659b140b1020d3 12-13
+src/features/weather/Weather.test.jsx
+  s_21734926ab93ce::t_9893926a14f652 56
+src/features/macros-editor/useConfigDraft.js
+  s_21734926ab93ce::t_2a7390109734d0 24
+docs/code/src/features/macros-editor/useConfigDraft.js.md
+  s_21734926ab93ce::t_41d30b0fc56659 8-9
+docs/code/src/features/weather/WeatherModal.jsx.md
+  s_21734926ab93ce::t_7ec4ab48267741 10
+docs/features/macros-editor.md
+  s_21734926ab93ce::t_3eb1ba776a76e4 3
+docs/features/weather.md
+  s_21734926ab93ce::t_c1f2fc9ad14d2a 3,9
+scripts/gate/baselines/structure.json
+  s_21734926ab93ce::t_6d92e5a441c144 1
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.24",
+  "base_commit_sha": "3119e543932f32baeae32b7bef7d6efd976aea5f",
+  "prompts": {},
+  "sessions": {
+    "s_21734926ab93ce": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a2b063db-2489-4588-a3b5-1810c9e2d4a1",
+        "model": "claude-sonnet-5-5"
+      },
+      "human_author": "Adam Yung <adyung@paloaltonetworks.com>"
+    }
+  }
+}
