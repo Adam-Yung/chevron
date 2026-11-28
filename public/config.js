@@ -607,7 +607,7 @@ window.CONFIG = {
     {
       category: 'Other',
       name: 'Maps',
-      triggers: ['map', 'maps', 'gm'],
+      triggers: ['map', 'maps'],
       icon: 'maps',
       url: 'https://maps.google.com',
       normalisedURL: 'google.com/maps',
@@ -716,6 +716,91 @@ window.CONFIG = {
       bgColor: {
         type: 'solid',
         color: '#e60023'
+      },
+      textColor: '#ffffff',
+      pinned: true
+    },
+    {
+      category: 'Other',
+      name: 'FMHY',
+      triggers: ['fm', 'fmhy'],
+      key: 'KeyF',
+      icon: 'fmhy',
+      url: 'https://fmhy.net',
+      normalisedURL: 'fmhy.net',
+      bgColor: {
+        type: 'solid',
+        color: '#5b4bc4'
+      },
+      textColor: '#ffffff',
+      pinned: true
+    },
+    {
+      category: 'Productivity',
+      name: 'Google Calendar',
+      triggers: ['cal', 'gcal', 'calendar'],
+      key: 'KeyK',
+      icon: 'googleCalendar',
+      url: 'https://calendar.google.com',
+      normalisedURL: 'calendar.google.com',
+      commands: {
+        search: {
+          template: '{@}/calendar/r/search?q={$}'
+        }
+      },
+      bgColor: {
+        type: 'solid',
+        color: '#4285f4'
+      },
+      textColor: '#ffffff',
+      pinned: true
+    },
+    {
+      category: 'Productivity',
+      name: 'Google Docs',
+      triggers: ['doc', 'docs', 'gdocs'],
+      key: 'KeyO',
+      icon: 'googleDocs',
+      url: 'https://docs.google.com',
+      normalisedURL: 'docs.google.com',
+      commands: {
+        search: {
+          template: '{@}/document/?q={$}'
+        }
+      },
+      bgColor: {
+        type: 'solid',
+        color: '#2684fc'
+      },
+      textColor: '#ffffff',
+      pinned: true
+    },
+    {
+      category: 'Communication',
+      name: 'Outlook',
+      triggers: ['ol', 'outlook'],
+      key: 'KeyU',
+      icon: 'outlook',
+      url: 'https://outlook.live.com',
+      normalisedURL: 'outlook.live.com',
+      bgColor: {
+        type: 'solid',
+        color: '#0f6cbd'
+      },
+      textColor: '#ffffff',
+      pinned: true
+    },
+    {
+      category: 'Communication',
+      name: 'Proton Mail',
+      triggers: ['pm', 'proton', 'protonmail'],
+      key: 'KeyP',
+      icon: 'protonMail',
+      url: 'https://mail.proton.me',
+      normalisedURL: 'mail.proton.me',
+      bgColor: {
+        type: 'solid',
+        color: '#6d4aff'
       },
       textColor: '#ffffff',
       pinned: true

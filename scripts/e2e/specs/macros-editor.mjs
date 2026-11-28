@@ -114,9 +114,10 @@ export default {
   },
 
   async 'a macro with a forbidden URL in the form is named and not saved'(app) {
+    const position = await app.page.evaluate(() => window.CONFIG.macros.length) + 1
     await openEditor(app)
     await addMacro(app, { name: 'Bad', url: 'javascript:alert(1)', triggers: ['bad'] })
-    await app.page.getByRole('alert').getByText('Macro "Bad" (#31), URL').waitFor()
+    await app.page.getByRole('alert').getByText(`Macro "Bad" (#${position}), URL`).waitFor()
     await app.page.waitForTimeout(AUTOSAVE_WAIT)
     assertEqual(await stored(app), null, 'nothing written to storage')
   },

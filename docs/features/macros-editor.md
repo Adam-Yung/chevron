@@ -1,12 +1,12 @@
 # Macros editor
 
-> Verified: 2026-11-26 15:26 · Sources: `src/features/macros-editor/MacrosEditorBody.jsx`, `src/features/macros-editor/useConfigDraft.js`, `src/features/macros-editor/useAutosave.js`, `src/features/macros-editor/validateConfig.js`, `src/features/macros-editor/configDraft.js`, `src/storage/macrosConfig.js`, `public/config.js`, `public/icons.js`
+> Verified: 2026-11-27 23:48 · Sources: `src/features/macros-editor/MacrosEditorBody.jsx`, `src/features/macros-editor/useConfigDraft.js`, `src/features/macros-editor/useAutosave.js`, `src/features/macros-editor/validateConfig.js`, `src/features/macros-editor/configDraft.js`, `src/storage/macrosConfig.js`, `public/config.js`, `public/icons.js`
 
 Edit the macros, global commands and search engines without touching files. Open **Settings** (gear, top right, `aria-label` "Open settings"), then **Macros** in the sidebar.
 
 ## What is stored
 
-Your edits live in `localStorage["chevron.config"]` as `{ version, macros, commands, engines }` and override the bundled `public/config.js`. Saving also updates `window.CONFIG`, so a new or changed macro works on the very next query: no reload. Nothing makes a network request.
+Your edits live in `localStorage["chevron.config"]` as `{ version, macros, commands, engines }` and override the bundled `public/config.js`. Saving also updates `window.CONFIG`, so a new or changed macro works on the very next query: no reload. Nothing makes a network request. A saved override replaces the bundled lists whole, so sites added to a later release appear only after **Load bundled** (which also drops your own edits).
 
 ## Saving
 
