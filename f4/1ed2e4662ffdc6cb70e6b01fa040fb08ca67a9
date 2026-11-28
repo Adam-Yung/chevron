@@ -1,0 +1,25 @@
+src/features/cheatsheet/shortcuts.test.js
+  s_21734926ab93ce::t_c04eeb92104683 9-13
+src/features/cheatsheet/shortcuts.js
+  s_21734926ab93ce::t_3227ac7b917cf1 25
+docs/features/shortcuts.md
+  s_21734926ab93ce::t_4e5403f42873df 3,49
+docs/code/src/features/cheatsheet/shortcuts.js.md
+  s_21734926ab93ce::t_4e5403f42873df 8
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.24",
+  "base_commit_sha": "f41ed2e4662ffdc6cb70e6b01fa040fb08ca67a9",
+  "prompts": {},
+  "sessions": {
+    "s_21734926ab93ce": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a2b063db-2489-4588-a3b5-1810c9e2d4a1",
+        "model": "claude-sonnet-5-5"
+      },
+      "human_author": "Adam Yung <adyung@paloaltonetworks.com>"
+    }
+  }
+}
