@@ -1,0 +1,44 @@
+scripts/e2e/specs/stuck-states.mjs
+  s_21734926ab93ce::t_fd86d0fa451d2c 83-92
+src/app/useIntents.js
+  s_21734926ab93ce::t_c83477d2d0dfbf 106
+docs/features/sites.md
+  s_21734926ab93ce::t_8f7642118c9240 3
+src/input/keyRouter.test.js
+  s_21734926ab93ce::t_9c070256d03ec8 35-46
+docs/features/search.md
+  s_21734926ab93ce::t_598724e72bf8fa 23-25
+  s_21734926ab93ce::t_1d2e483c9b2f7c 3
+docs/features/shortcuts.md
+  s_21734926ab93ce::t_781ea02aeeee66 19-20
+  s_21734926ab93ce::t_faaaea69794518 3
+docs/decisions/search.md
+  s_21734926ab93ce::t_71805dab7bd931 1-19
+docs/code/src/input/keyRouter.js.md
+  s_21734926ab93ce::t_45ba1862aa6d29 7-8
+docs/code/src/app/useIntents.js.md
+  s_21734926ab93ce::t_6ebdc5845ffbb6 9
+src/input/keyRouter.js
+  s_21734926ab93ce::t_c9c834832a34a2 61-68,70
+  s_21734926ab93ce::t_ec0dd427a420cb 79
+src/features/cheatsheet/shortcuts.js
+  s_21734926ab93ce::t_06db0eee669b04 13-14
+docs/code/src/features/cheatsheet/shortcuts.js.md
+  s_21734926ab93ce::t_f7c8242051a3b5 7-8
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.24",
+  "base_commit_sha": "a4fec6639dfcc0ca1ce29a66eee9724eb9d4fea7",
+  "prompts": {},
+  "sessions": {
+    "s_21734926ab93ce": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a2b063db-2489-4588-a3b5-1810c9e2d4a1",
+        "model": "claude-sonnet-5-5"
+      },
+      "human_author": "Adam Yung <adyung@paloaltonetworks.com>"
+    }
+  }
+}
