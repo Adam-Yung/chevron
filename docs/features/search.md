@@ -1,6 +1,6 @@
 # Search
 
-> Verified: 2026-11-27 23:38 · Sources: `src/features/search/QueryField.jsx`, `src/features/search/Suggestions.jsx`, `src/features/search/QuickLook.jsx`, `src/search/resolve.js`, `src/search/suggestions.js`, `src/search/useSuggestions.js`, `src/search/history.js`, `src/search/autocomplete.js`, `src/app/useIntents.js`, `src/app/useLaunch.js`, `src/navigation/navigate.js`, `src/navigation/useNavigationRelease.js`
+> Verified: 2026-11-27 23:40 · Sources: `src/features/search/QueryField.jsx`, `src/features/search/Suggestions.jsx`, `src/features/search/QuickLook.jsx`, `src/search/resolve.js`, `src/search/suggestions.js`, `src/search/useSuggestions.js`, `src/search/history.js`, `src/search/autocomplete.js`, `src/app/useIntents.js`, `src/app/useLaunch.js`, `src/navigation/navigate.js`, `src/navigation/useNavigationRelease.js`
 
 ## What you can type
 Start typing anywhere: the search field always has the keyboard, even while a first visit is still loading; what you type
@@ -20,8 +20,9 @@ that the default.
 
 ## Suggestions
 Shown in this order: instant answers, the macro whose trigger you typed exactly, your history, other matching macros, then Google's
-suggestions. Tab / Shift+Tab or Up / Down move through them; moving past either end returns to what you typed. Shift+Delete removes
-the highlighted history entry. History is ranked by how often and how recently you searched; it stays in this browser and can be
+suggestions. Up / Down (or Shift+Tab) move through them; moving past either end returns to what you typed. Tab highlights the first
+one, and with a suggestion highlighted Tab puts its text in the field, ready to edit or send. Shift+Delete removes the highlighted
+history entry. History is ranked by how often and how recently you searched; it stays in this browser and can be
 turned off in Settings.
 
 Local suggestions appear on the same keystroke. Google's arrive after a short pause and are cached, so retyping or backspacing never

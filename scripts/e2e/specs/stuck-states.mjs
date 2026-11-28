@@ -80,6 +80,16 @@ export default {
     assert(clip.includes('at 0px'), 'disc should be centred on the left edge: ' + clip)
   },
 
+  async 'Tab puts the highlighted suggestion in the field and typing carries on'(app) {
+    await app.page.keyboard.type('cats')
+    await app.page.waitForSelector('[role="option"] >> text=cats one')
+    await app.page.keyboard.press('Tab')
+    await app.page.keyboard.press('Tab')
+    assertEqual(await app.query(), 'cats one', 'query after Tab, Tab')
+    await app.page.keyboard.type('!')
+    assertEqual(await app.query(), 'cats one!', 'caret should be at the end')
+  },
+
   async 'typing and clearing quickly leaves no search blob behind'(app) {
     for (let i = 0; i < 5; i++) {
       await app.page.keyboard.type('ab')

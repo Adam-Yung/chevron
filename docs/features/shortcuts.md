@@ -1,6 +1,6 @@
 # Keyboard shortcuts
 
-> Verified: 2026-11-26 00:23 · Sources: `src/features/cheatsheet/Cheatsheet.jsx`, `src/features/cheatsheet/shortcuts.js`, `src/features/cheatsheet/ShortcutTable.jsx`
+> Verified: 2026-11-27 23:40 · Sources: `src/features/cheatsheet/Cheatsheet.jsx`, `src/features/cheatsheet/shortcuts.js`, `src/features/cheatsheet/ShortcutTable.jsx`
 
 The cheatsheet is a dialog listing every shortcut. Its content is data in `src/features/cheatsheet/shortcuts.js`; the key router
 (`src/input/keyRouter.js`) decides what the keys do, and the two must be edited together.
@@ -16,7 +16,8 @@ The cheatsheet is a dialog listing every shortcut. Its content is data in `src/f
 - Enter opens the highlighted result, or copies an instant answer.
 - Alt+Enter or Cmd+Enter opens it in a new tab.
 - Ctrl+Enter forces the search engine, skipping macros.
-- Tab, Shift+Tab, Up and Down move through suggestions.
+- Up, Down and Shift+Tab move through suggestions.
+- Tab highlights the first suggestion; on a highlighted one it puts that text in the field.
 - Shift+Delete removes the highlighted history entry.
 - Esc clears the query.
 - Space Space asks the AI (`docs/features/ai.md`).

@@ -10,7 +10,8 @@ export const SHORTCUT_SECTIONS = [
       { keys: [['Enter']], label: 'Open the highlighted result, or copy an instant answer' },
       { keys: [['Alt', 'Enter'], ['Cmd', 'Enter']], label: 'Open the result in a new tab' },
       { keys: [['Ctrl', 'Enter']], label: 'Force the search engine, skipping macros' },
-      { keys: [['Tab'], ['Shift', 'Tab'], ['ArrowUp'], ['ArrowDown']], label: 'Move through suggestions' },
+      { keys: [['ArrowUp'], ['ArrowDown'], ['Shift', 'Tab']], label: 'Move through suggestions' },
+      { keys: [['Tab']], label: 'Highlight the first suggestion, or put the highlighted one in the field' },
       { keys: [['Shift', 'Delete']], label: 'Remove the highlighted history entry' },
       { keys: [['Esc']], label: 'Clear the query' },
       { keys: [['Space', 'Space']], label: 'Ask the AI' }

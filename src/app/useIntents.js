@@ -103,6 +103,7 @@ export default function useIntents() {
     ...search,
     ...menu,
     escape: () => store.dispatch(ui.escaped()),
+    complete: ({ text }) => store.dispatch(ui.typed(text)),
     toggleMacros: ({ viaKeyboard }) => store.dispatch(ui.macrosToggled(viaKeyboard)),
     openCheatsheet: () => store.dispatch(ui.overlayOpened('cheatsheet')),
     none: () => {}

@@ -58,9 +58,16 @@ function routeMacros(k, ctx) {
 
 const SUGGESTION_MOVES = { ArrowDown: 1, ArrowUp: -1 }
 
-function routeSuggestionKeys(k, ctx) {
+// Tab takes a highlighted suggestion into the field; with nothing new to take it walks the list.
+function routeTab({ selection, query }, k) {
+  if (k.shift) return intent('move', { delta: -1 })
+  if (selection && selection.suggestion !== query) return intent('complete', { text: selection.suggestion })
+  return intent('move', { delta: 1 })
+}
+
+function routeSuggestionKeys(state, k, ctx) {
   if (!ctx.hasSuggestions) return null
-  if (k.key === 'Tab') return intent('move', { delta: k.shift ? -1 : 1 })
+  if (k.key === 'Tab') return routeTab(state, k)
   if (SUGGESTION_MOVES[k.key]) return intent('move', { delta: SUGGESTION_MOVES[k.key] })
   if (k.key === 'Delete' && k.shift) return intent('removeHistory')
   return null
@@ -69,7 +76,7 @@ function routeSuggestionKeys(k, ctx) {
 function routeSearchControl(state, k, ctx) {
   if (k.key === 'Escape') return intent('escape')
   if (k.key === 'Enter') return state.query.trim() ? intent('submit', { newTab: newTab(k) }) : intent('none')
-  return routeSuggestionKeys(k, ctx)
+  return routeSuggestionKeys(state, k, ctx)
 }
 
 function isDoubleSpace(state, k, ctx) {

@@ -32,6 +32,18 @@ describe('routeKey: search', () => {
     expect(route(searching, key('Tab'), ctx({ hasSuggestions: false }))).toBeNull()
   })
 
+  it('Tab on a highlighted suggestion fills the query with it', () => {
+    const highlighted = state(ui.typed('ca'), ui.selected({ suggestion: 'cats', type: 'history' }))
+    expect(route(highlighted, key('Tab'))).toMatchObject({ intent: 'complete', text: 'cats', prevent: true })
+    expect(route(highlighted, key('Tab', { shift: true }))).toMatchObject({ intent: 'move', delta: -1 })
+    expect(route(highlighted, key('ArrowDown'))).toMatchObject({ intent: 'move', delta: 1 })
+  })
+
+  it('Tab moves on when the highlighted suggestion is already what was typed', () => {
+    const same = state(ui.typed('y'), ui.selected({ suggestion: 'y', type: 'macro' }))
+    expect(route(same, key('Tab'))).toMatchObject({ intent: 'move', delta: 1 })
+  })
+
   it('Shift+Delete removes the highlighted history entry', () => {
     expect(route(searching, key('Delete', { shift: true }))).toMatchObject({ intent: 'removeHistory' })
     expect(route(searching, key('Delete'))).toBeNull()
