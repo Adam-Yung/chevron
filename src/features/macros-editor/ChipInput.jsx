@@ -1,35 +1,33 @@
 import { memo, useState } from 'react'
 import classes from './MacrosEditor.module.css'
+import { removeAt } from './listOps'
 
 const COMMIT_KEYS = ['Enter', ',', 'Tab']
 
-/**
- * Chips for the macro triggers: comma, Enter, Tab or blur turn the text into a chip; Backspace on empty text removes the
- * last chip. Duplicates are dropped. Tab only commits when there is text, so it never traps keyboard focus.
- */
+function commitChips(raw, { list, setDraft, onChange }) {
+  const added = raw.split(',').map(part => part.trim()).filter(part => part && !list.includes(part))
+  setDraft('')
+  if (added.length) onChange([...new Set([...list, ...added])])
+}
+
+// Tab only commits when there is text, so it never traps keyboard focus.
+function handleChipKey(event, draft, chips) {
+  if (COMMIT_KEYS.includes(event.key) && draft.trim()) {
+    event.preventDefault()
+    commitChips(draft, chips)
+    return
+  }
+  if (event.key === 'Backspace' && draft === '' && chips.list.length > 0) {
+    event.preventDefault()
+    chips.onChange(removeAt(chips.list, chips.list.length - 1))
+  }
+}
+
 function ChipInput({ label, values, onChange, placeholder }) {
   const [draft, setDraft] = useState('')
   const list = Array.isArray(values) ? values : []
 
-  const commit = raw => {
-    const added = raw.split(',').map(part => part.trim()).filter(part => part && !list.includes(part))
-    setDraft('')
-    if (added.length) onChange([...new Set([...list, ...added])])
-  }
-
-  const removeAt = index => onChange(list.filter((_, i) => i !== index))
-
-  const handleKeyDown = e => {
-    if (COMMIT_KEYS.includes(e.key) && draft.trim()) {
-      e.preventDefault()
-      commit(draft)
-      return
-    }
-    if (e.key === 'Backspace' && draft === '' && list.length > 0) {
-      e.preventDefault()
-      removeAt(list.length - 1)
-    }
-  }
+  const chips = { list, setDraft, onChange }
 
   return (
     <div className={classes['field']}>
@@ -38,7 +36,7 @@ function ChipInput({ label, values, onChange, placeholder }) {
         {list.map((value, i) => (
           <span className={classes['chip']} key={`${value}-${i}`}>
             {value}
-            <button type="button" aria-label={`Remove trigger ${value}`} onClick={() => removeAt(i)}>×</button>
+            <button type="button" aria-label={`Remove trigger ${value}`} onClick={() => onChange(removeAt(list, i))}>×</button>
           </span>
         ))}
         <input
@@ -47,8 +45,8 @@ function ChipInput({ label, values, onChange, placeholder }) {
           value={draft}
           placeholder={list.length === 0 ? placeholder : ''}
           onChange={e => setDraft(e.target.value)}
-          onKeyDown={handleKeyDown}
-          onBlur={() => commit(draft)}
+          onKeyDown={e => handleChipKey(e, draft, chips)}
+          onBlur={() => commitChips(draft, chips)}
         />
       </div>
     </div>

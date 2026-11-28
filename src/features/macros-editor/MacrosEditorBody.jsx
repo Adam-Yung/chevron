@@ -6,6 +6,7 @@ import EnginesTab from './EnginesTab'
 import EditorToolbar from './EditorToolbar'
 import EditorStatus from './EditorStatus'
 import { useConfigDraft } from './useConfigDraft'
+import { exportJson, editRaw, importFile, loadBundled, reset, saveNow, selectTab, setSlice } from './draftActions'
 import { summarise } from './configDraft'
 
 const TABS = [
@@ -30,30 +31,26 @@ function RawJson({ text, valid, onChange }) {
   )
 }
 
-/**
- * Editing surface for macros, commands and engines: toolbar, tabs, the active tab's form, and validation status. It has no
- * dialog chrome of its own; the Settings modal hosts it. `revision` is bumped by the host to reload from storage, and
- * `onSaved(config)` is called after every successful save.
- */
+function saveOnShortcut(event, draft) {
+  if (!(event.ctrlKey || event.metaKey) || event.key !== 's') return
+  event.preventDefault()
+  saveNow(draft)
+}
+
+// Hosted by the Settings modal. `revision` reloads from storage; `onSaved(config)` follows every successful save.
 function MacrosEditorBody({ revision = 0, onSaved }) {
   const draft = useConfigDraft({ revision, onSaved })
   const { cfg, activeTab } = draft
 
-  const onKeyDown = e => {
-    if (!(e.ctrlKey || e.metaKey) || e.key !== 's') return
-    e.preventDefault()
-    draft.saveNow()
-  }
-
   return (
-    <div className={classes['embedded']} onKeyDown={onKeyDown}>
+    <div className={classes['embedded']} onKeyDown={e => saveOnShortcut(e, draft)}>
       <EditorToolbar
         valid={draft.valid}
-        onSave={draft.saveNow}
-        onExport={draft.exportJson}
-        onImport={draft.importFile}
-        onLoadBundled={draft.loadBundled}
-        onReset={draft.reset}
+        onSave={() => saveNow(draft)}
+        onExport={() => exportJson(draft)}
+        onImport={file => importFile(draft, file)}
+        onLoadBundled={() => loadBundled(draft)}
+        onReset={() => reset(draft)}
       />
 
       <div className={classes['tabs']} role="tablist">
@@ -64,7 +61,7 @@ function MacrosEditorBody({ revision = 0, onSaved }) {
             role="tab"
             aria-selected={activeTab === tab.id}
             className={`${classes['tab']}${activeTab === tab.id ? ' ' + classes['active'] : ''}`}
-            onClick={() => draft.selectTab(tab.id)}
+            onClick={() => selectTab(draft, tab.id)}
           >
             {tab.label}
           </button>
@@ -72,10 +69,10 @@ function MacrosEditorBody({ revision = 0, onSaved }) {
       </div>
 
       <div className={classes['scroll']}>
-        {activeTab === 'macros' && <MacrosTab macros={cfg.macros} onChange={draft.setSlice('macros')} />}
-        {activeTab === 'commands' && <CommandsTab commands={cfg.commands} onChange={draft.setSlice('commands')} />}
-        {activeTab === 'engines' && <EnginesTab engines={cfg.engines} onChange={draft.setSlice('engines')} />}
-        {activeTab === 'json' && <RawJson text={draft.rawText} valid={draft.valid} onChange={draft.editRaw} />}
+        {activeTab === 'macros' && <MacrosTab macros={cfg.macros} onChange={next => setSlice(draft, 'macros', next)} />}
+        {activeTab === 'commands' && <CommandsTab commands={cfg.commands} onChange={next => setSlice(draft, 'commands', next)} />}
+        {activeTab === 'engines' && <EnginesTab engines={cfg.engines} onChange={next => setSlice(draft, 'engines', next)} />}
+        {activeTab === 'json' && <RawJson text={draft.rawText} valid={draft.valid} onChange={text => editRaw(draft, text)} />}
       </div>
 
       <p className={classes['summary']}>{summarise(cfg)}</p>

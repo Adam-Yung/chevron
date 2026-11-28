@@ -1,6 +1,6 @@
 # Settings
 
-> Verified: 2026-11-26 15:26 · Sources: `src/features/settings-panel/Settings.jsx`, `src/features/settings-panel/SettingsPane.jsx`, `src/features/settings-panel/SettingsSidebar.jsx`, `src/features/settings-panel/GeocodeRow.jsx`, `src/settings/schema.js`, `src/settings/SettingsProvider.jsx`, `src/settings/resolveSettings.js`, `src/settings/settingsMigration.js`, `src/storage/settingsStorage.js`, `src/storage/macrosConfig.js`
+> Verified: 2026-11-28 00:02 · Sources: `src/features/settings-panel/Settings.jsx`, `src/features/settings-panel/SettingsPane.jsx`, `src/features/settings-panel/SettingsSidebar.jsx`, `src/features/settings-panel/GeocodeRow.jsx`, `src/settings/schema.js`, `src/settings/SettingsProvider.jsx`, `src/settings/resolveSettings.js`, `src/settings/settingsMigration.js`, `src/storage/settingsStorage.js`, `src/storage/macrosConfig.js`
 
 ## Using the panel
 

@@ -13,11 +13,7 @@ const template = {
       { min: 0, max: 5000, step: 50 },
       { format: '{@}ms', description: 'Speed of transitions. Lower is snappier; 0 turns animation off.' }
     ),
-    /**
-     * languages: https://serpapi.com/google-languages
-     * countries: https://serpapi.com/google-countries
-     * locale parameter is used by autocomplete engine and other components
-     */
+    // Values: https://serpapi.com/google-languages and https://serpapi.com/google-countries
     locale: new types.Input('en', '[language]-[COUNTRY]', { description: 'Locale used by autocomplete and search engines (e.g. en, en-US, ja-JP).' }),
     tabTitle: new types.Input('Chevron', undefined, { description: 'Browser tab title.' }),
     redirectTarget: new types.Switch('_self', ['_self', '_blank'], {

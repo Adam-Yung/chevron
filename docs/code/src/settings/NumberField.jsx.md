@@ -7,3 +7,5 @@ minimum of 5 would be rewritten to "5" after the first keystroke.
 
 External changes (reset, import) replace the draft only while the field is not focused; while the user types, nothing rewrites
 the text (that also keeps a trailing dot), and blur snaps it to the stored value.
+
+Reviewed: c2a238d5

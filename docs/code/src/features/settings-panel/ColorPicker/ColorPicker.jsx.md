@@ -10,3 +10,5 @@ Colour field: a swatch button opening a popover with the picker, a hex input, an
 Layout pitfall (fixed): the popover opens below the swatch, right-aligned, and scrolls itself into view. It used to open upward and was
 clipped by the category list's `overflow: hidden`, which made the confirm button unreachable. Do not put `overflow: hidden` on an
 ancestor between a swatch and the scrolling pane.
+
+`ContrastAlert`, `DependantsAlert` and `PickerCard` are presentation only; the draft and open state stay in `ColorPicker`.

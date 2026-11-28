@@ -2,9 +2,7 @@ import { memo, useMemo } from 'react'
 import classes from './MacrosEditor.module.css'
 import { bgPreviewCss } from './colorHelpers'
 
-/**
- * Collapsed summary line shared by macro and engine rows: colour swatch, title (click to expand) and a slot for row actions.
- */
+// Collapsed summary line of a macro or engine row; `children` are the row actions.
 function RowHeader({ bgColor, title, detail, isOpen, onToggle, children }) {
   const swatchStyle = useMemo(() => ({ background: bgPreviewCss(bgColor) }), [bgColor])
   return (

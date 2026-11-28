@@ -13,29 +13,28 @@ function newEngine() {
   }
 }
 
-/**
- * Editor for the engines map `{ [id]: { name, bgColor, textColor, types: { [type]: { template } } } }`. Ids are object keys
- * used by the rest of the app, so renaming rebuilds the map in place to keep the order.
- */
+function renameEngine({ engines, onChange, setOpenId }, oldId, newId) {
+  onChange(renameKey(engines, oldId, newId))
+  setOpenId(open => (open === oldId ? newId : open))
+}
+
+function removeEngine({ engines, onChange, setOpenId }, id) {
+  onChange(removeKey(engines, id))
+  setOpenId(open => (open === id ? null : open))
+}
+
+function addEngine({ engines, onChange, setOpenId }) {
+  const id = uniqueKey(engines, 'newEngine')
+  onChange({ ...engines, [id]: newEngine() })
+  setOpenId(id)
+}
+
+// The engines map `{ [id]: { name, bgColor, textColor, types: { [type]: { template } } } }`.
 function EnginesTab({ engines, onChange }) {
   const [openId, setOpenId] = useState(null)
   const ids = Object.keys(engines)
 
-  const rename = (oldId, newId) => {
-    onChange(renameKey(engines, oldId, newId))
-    setOpenId(open => (open === oldId ? newId : open))
-  }
-
-  const remove = id => {
-    onChange(removeKey(engines, id))
-    setOpenId(open => (open === id ? null : open))
-  }
-
-  const add = () => {
-    const id = uniqueKey(engines, 'newEngine')
-    onChange({ ...engines, [id]: newEngine() })
-    setOpenId(id)
-  }
+  const map = { engines, onChange, setOpenId }
 
   return (
     <div>
@@ -53,11 +52,11 @@ function EnginesTab({ engines, onChange }) {
           isOpen={openId === id}
           onToggle={() => setOpenId(open => (open === id ? null : id))}
           onUpdate={next => onChange(replaceValue(engines, id, next))}
-          onRename={next => rename(id, next)}
-          onRemove={() => remove(id)}
+          onRename={next => renameEngine(map, id, next)}
+          onRemove={() => removeEngine(map, id)}
         />
       ))}
-      <button type="button" className={classes['addBtn']} onClick={add}>+ Add engine</button>
+      <button type="button" className={classes['addBtn']} onClick={() => addEngine(map)}>+ Add engine</button>
     </div>
   )
 }

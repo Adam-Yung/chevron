@@ -1,5 +1,4 @@
-// Engines, engine query types and macro commands are all `{ [key]: body }` maps whose key order is user-visible, so every
-// edit rebuilds the object in place instead of deleting and re-adding keys (which would move the entry to the end).
+// Key order of these `{ [key]: body }` maps is user-visible: delete and re-add would move an entry, so edits rebuild in place.
 
 export function uniqueKey(record, base) {
   let key = base
@@ -9,6 +8,10 @@ export function uniqueKey(record, base) {
 
 export function replaceValue(record, key, next) {
   return Object.fromEntries(Object.entries(record).map(([k, v]) => [k, k === key ? next : v]))
+}
+
+export function patchValue(record, key, change) {
+  return replaceValue(record, key, { ...record[key], ...change })
 }
 
 export function removeKey(record, key) {

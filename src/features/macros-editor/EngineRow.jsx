@@ -3,18 +3,17 @@ import { TextField, KeyField } from './Fields'
 import ColorPicker from './ColorPicker/ColorPicker'
 import BgColorEditor from './BgColorEditor'
 import RowHeader from './RowHeader'
-import { removeKey, renameKey, replaceValue, uniqueKey } from './recordOps'
+import { patchValue, removeKey, renameKey, uniqueKey } from './recordOps'
 
 const NEW_TYPE = { template: 'https://example.com/?q={$}' }
 
 function QueryTypes({ types, onChange }) {
-  const patch = (type, body, template) => onChange(replaceValue(types, type, { ...(body || {}), template }))
   return (
     <div className={classes['commandsList']}>
       {Object.entries(types).map(([type, body]) => (
         <div key={type} className={classes['typeRow']}>
           <KeyField label="Type" value={type} isTaken={key => key in types} onCommit={next => onChange(renameKey(types, type, next))} />
-          <TextField label="Template" monospace value={body?.template} placeholder="https://...?q={$}" onChange={v => patch(type, body, v)} />
+          <TextField label="Template" monospace value={body?.template} placeholder="https://...?q={$}" onChange={template => onChange(patchValue(types, type, { template }))} />
           <button type="button" className={classes['iconBtn']} aria-label={`Remove query type ${type}`} onClick={() => onChange(removeKey(types, type))}>×</button>
         </div>
       ))}
@@ -23,10 +22,7 @@ function QueryTypes({ types, onChange }) {
   )
 }
 
-/**
- * One search engine. The id is the object key other code looks engines up by, hence KeyField and onRename rather than a
- * plain text field.
- */
+// The id is the key other code looks engines up by, hence KeyField and onRename.
 export default function EngineRow({ id, engine, isTaken, isOpen, onToggle, onUpdate, onRename, onRemove }) {
   const types = engine.types && typeof engine.types === 'object' ? engine.types : {}
   return (

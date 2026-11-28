@@ -8,8 +8,7 @@ import classes from './Settings.module.css'
 
 const NO_HIDDEN = []
 
-// Takes the keyboard on open and gives it back on close. The panel is not a global key listener: Esc is handled on the dialog, and
-// [data-keep-focus] on the backdrop tells the input router to leave typing alone while it is open.
+// Takes the keyboard on open and gives it back on close.
 function useDialogFocus() {
   const dialogRef = useRef(null)
   useEffect(() => {
@@ -37,10 +36,7 @@ function useTabs(showHidden) {
   return { tabs, activeTab, setActiveTab }
 }
 
-/**
- * Centred settings dialog: a sidebar of categories, one pane per category, and Reset / Clean history actions. Edits apply live and
- * persist through SettingsProvider, so the X is a plain close with nothing to confirm or discard.
- */
+// Edits apply live and persist through SettingsProvider, so closing has nothing to confirm or discard.
 function Settings({ onClose }) {
   const current = useContext(SettingsContext)
   const setCurrent = useContext(SetSettingsContext)

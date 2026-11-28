@@ -25,8 +25,16 @@ export const SetSettingsContext = createContext(null)
 export const ThemeContext = createContext(null)
 export const ColorSchemeContext = createContext(null)
 
-// Debounced so typing in a field or dragging does not write on every change; a pending write is flushed when the page is hidden or
-// the provider unmounts, so the last edit is never lost.
+function pageHideFlusher(timer, latest) {
+  return () => {
+    if (timer.current === null) return
+    clearTimeout(timer.current)
+    timer.current = null
+    save(latest.current)
+  }
+}
+
+// Debounced writes; a pending one is flushed on page hide and unmount so the last edit is never lost.
 function usePersistence(current) {
   const timer = useRef(null)
   const latest = useRef(current)
@@ -41,12 +49,7 @@ function usePersistence(current) {
   }, [current])
 
   useEffect(() => {
-    const flush = () => {
-      if (timer.current === null) return
-      clearTimeout(timer.current)
-      timer.current = null
-      save(latest.current)
-    }
+    const flush = pageHideFlusher(timer, latest)
     window.addEventListener('pagehide', flush)
     return () => {
       window.removeEventListener('pagehide', flush)

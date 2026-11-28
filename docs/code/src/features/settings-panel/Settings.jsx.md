@@ -11,3 +11,5 @@ colour picker and every control stay out of the boot bundle.
 - Tabs come from the schema's top-level categories plus a synthetic `macros` tab. The active tab is derived (falls back to the
   first) instead of synced by an effect, so toggling "Show advanced" cannot leave a stale tab for a frame.
 - Edits are live and persisted by the provider; there is no apply/cancel, so the X and Esc are pure closes.
+
+Reviewed: e22f444e

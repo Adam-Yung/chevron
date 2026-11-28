@@ -12,3 +12,5 @@ values).
 
 The old-look step only removes values equal to the former defaults; anything else was chosen. It shares the `< 4` gate because
 stores at version 4 already hold only changes.
+
+v2 (API keys obfuscated at rest) has no migration step: the storage class handles it.

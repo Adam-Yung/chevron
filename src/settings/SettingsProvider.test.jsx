@@ -9,15 +9,16 @@ async function load(stored, version) {
   return import('./SettingsProvider')
 }
 
+function Probe({ mod, seen }) {
+  seen.settings = useContext(mod.SettingsContext)
+  seen.set = useContext(mod.SetSettingsContext)
+  seen.theme = useContext(mod.ThemeContext)
+  return null
+}
+
 function mount(mod) {
   const seen = {}
-  function Probe() {
-    seen.settings = useContext(mod.SettingsContext)
-    seen.set = useContext(mod.SetSettingsContext)
-    seen.theme = useContext(mod.ThemeContext)
-    return null
-  }
-  const view = render(<mod.default><Probe /></mod.default>)
+  const view = render(<mod.default><Probe mod={mod} seen={seen} /></mod.default>)
   return { seen, view }
 }
 

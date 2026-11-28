@@ -14,10 +14,7 @@ function MessageList({ messages, className, role }) {
   )
 }
 
-/**
- * Validation errors (block saving) and warnings (do not) as lists naming the macro and field, then the latest action result.
- * The status line keeps a minimum height so the layout does not jump when a message appears.
- */
+// Errors block saving, warnings do not. The status line is never empty so the layout does not jump.
 export default function EditorStatus({ validation, status }) {
   return (
     <div className={classes['statusArea']}>

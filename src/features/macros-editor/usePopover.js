@@ -13,10 +13,7 @@ function placePopover(trigger, popover) {
   return { position: 'fixed', top, left }
 }
 
-/**
- * Open/close state and positioning for the colour and icon popovers. They are portaled out of the settings dialog, so the
- * backdrop closes them on an outside press and Escape closes only the popover (not the whole Settings modal).
- */
+// The popovers are portaled, so an outside press lands on their backdrop and Escape must not also close the Settings modal.
 export function usePopover() {
   const [open, setOpen] = useState(false)
   const [style, setStyle] = useState({ position: 'fixed', top: 0, left: 0 })

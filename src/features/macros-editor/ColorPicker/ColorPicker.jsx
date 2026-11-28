@@ -1,20 +1,21 @@
 import { memo, useState } from 'react'
-import { createPortal } from 'react-dom'
 import { HexColorPicker } from 'react-colorful'
 import classes from './ColorPicker.module.css'
+import shared from '../Picker.module.css'
+import PickerPopover from '../PickerPopover'
 import { usePopover } from '../usePopover'
 
 const HEX = /^#([0-9a-f]{3}|[0-9a-f]{6})$/i
 
+function editHex(text, setDraft, onChange) {
+  const hex = text.startsWith('#') ? text : `#${text}`
+  setDraft(hex)
+  if (HEX.test(hex)) onChange(hex)
+}
+
 // Typed text is a draft: a half-typed "#ff" must not be saved as the colour, so only a complete hex is passed on.
 function HexInput({ value, label, onChange }) {
   const [draft, setDraft] = useState(null)
-
-  const edit = text => {
-    const hex = text.startsWith('#') ? text : `#${text}`
-    setDraft(hex)
-    if (HEX.test(hex)) onChange(hex)
-  }
 
   return (
     <input
@@ -23,7 +24,7 @@ function HexInput({ value, label, onChange }) {
       value={draft ?? value}
       aria-label={`${label || 'Color'} hex value`}
       aria-invalid={draft !== null && !HEX.test(draft)}
-      onChange={e => edit(e.target.value)}
+      onChange={e => editHex(e.target.value, setDraft, onChange)}
       onBlur={() => setDraft(null)}
       placeholder="#000000"
       autoFocus
@@ -36,12 +37,12 @@ function ColorPicker({ label, value, onChange }) {
   const display = value || '#000000'
 
   return (
-    <div className={classes['root']}>
-      {label && <span className={classes['label']}>{label}</span>}
+    <div className={shared['root']}>
+      {label && <span className={shared['label']}>{label}</span>}
       <button
         ref={pop.triggerRef}
         type="button"
-        className={classes['trigger']}
+        className={shared['trigger']}
         onClick={pop.toggle}
         aria-expanded={pop.open}
         aria-label={`${label || 'Color'}: ${display}. Click to change.`}
@@ -50,16 +51,11 @@ function ColorPicker({ label, value, onChange }) {
         <span className={classes['hexText']}>{display}</span>
       </button>
 
-      {pop.open && createPortal(
-        <>
-          <div className={classes['backdrop']} onPointerDown={pop.onBackdropPointerDown} />
-          {/* data-keep-focus: keys typed here must not reach the page-level shortcuts (Shift opens the macros menu). */}
-          <div ref={pop.popoverRef} className={classes['popover']} style={pop.style} data-keep-focus="true" onKeyDown={pop.onKeyDown}>
-            <HexColorPicker style={{ width: '100%' }} color={display} onChange={onChange} />
-            <HexInput value={display} label={label} onChange={onChange} />
-          </div>
-        </>,
-        document.getElementById('root')
+      {pop.open && (
+        <PickerPopover pop={pop} className={classes['popover']}>
+          <HexColorPicker style={{ width: '100%' }} color={display} onChange={onChange} />
+          <HexInput value={display} label={label} onChange={onChange} />
+        </PickerPopover>
       )}
     </div>
   )

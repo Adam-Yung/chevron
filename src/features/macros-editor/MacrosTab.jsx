@@ -2,6 +2,7 @@ import { memo, useState } from 'react'
 import classes from './MacrosEditor.module.css'
 import { makeSolid } from './colorHelpers'
 import MacroRow from './MacroRow'
+import { patchAt, removeAt, swapAt } from './listOps'
 
 function emptyMacro() {
   return {
@@ -27,33 +28,28 @@ function openAfterRemove(open, removed) {
   return open !== null && open > removed ? open - 1 : open
 }
 
-/**
- * One expandable row per macro, so a list of 30+ macros stays scannable. Rows are keyed by index: macros have no stable id
- * and names may repeat, so the open row is tracked by index and adjusted on move and delete.
- */
+function removeMacro({ macros, onChange, setOpenIdx }, idx) {
+  onChange(removeAt(macros, idx))
+  setOpenIdx(open => openAfterRemove(open, idx))
+}
+
+function moveMacro({ macros, onChange, setOpenIdx }, idx, delta) {
+  const target = idx + delta
+  if (target < 0 || target >= macros.length) return
+  onChange(swapAt(macros, idx, target))
+  setOpenIdx(open => openAfterMove(open, idx, target))
+}
+
+function addMacro({ macros, onChange, setOpenIdx }) {
+  onChange([...macros, emptyMacro()])
+  setOpenIdx(macros.length)
+}
+
+// Macros have no stable id and names repeat, so rows are keyed and tracked by index.
 function MacrosTab({ macros, onChange }) {
   const [openIdx, setOpenIdx] = useState(null)
 
-  const setField = (idx, key, value) => onChange(macros.map((m, i) => (i === idx ? { ...m, [key]: value } : m)))
-
-  const remove = idx => {
-    onChange(macros.filter((_, i) => i !== idx))
-    setOpenIdx(open => openAfterRemove(open, idx))
-  }
-
-  const move = (idx, delta) => {
-    const target = idx + delta
-    if (target < 0 || target >= macros.length) return
-    const next = [...macros]
-    ;[next[idx], next[target]] = [next[target], next[idx]]
-    onChange(next)
-    setOpenIdx(open => openAfterMove(open, idx, target))
-  }
-
-  const add = () => {
-    onChange([...macros, emptyMacro()])
-    setOpenIdx(macros.length)
-  }
+  const list = { macros, onChange, setOpenIdx }
 
   return (
     <div>
@@ -67,12 +63,12 @@ function MacrosTab({ macros, onChange }) {
           isFirst={i === 0}
           isLast={i === macros.length - 1}
           onToggle={() => setOpenIdx(open => (open === i ? null : i))}
-          onSetField={(key, value) => setField(i, key, value)}
-          onRemove={() => remove(i)}
-          onMove={delta => move(i, delta)}
+          onSetField={(key, value) => onChange(patchAt(macros, i, { [key]: value }))}
+          onRemove={() => removeMacro(list, i)}
+          onMove={delta => moveMacro(list, i, delta)}
         />
       ))}
-      <button type="button" className={classes['addBtn']} onClick={add}>+ Add macro</button>
+      <button type="button" className={classes['addBtn']} onClick={() => addMacro(list)}>+ Add macro</button>
     </div>
   )
 }

@@ -9,8 +9,7 @@ function setWeather(onChange, patch) {
   onChange(prev => ({ ...prev, weather: { ...prev.weather, ...patch } }))
 }
 
-// Resolve state machine: one request at a time, an older one is aborted so a slow reply cannot overwrite a newer pick, and the
-// request is aborted when the panel closes.
+// One request at a time, aborted when superseded or when the panel closes, so a slow reply cannot overwrite a newer pick.
 function useResolve(apiKey, city) {
   const [results, setResults] = useState([])
   const [loading, setLoading] = useState(false)
@@ -46,17 +45,34 @@ function useResolve(apiKey, city) {
   return { results, setResults, loading, error, resolve }
 }
 
-// City input plus Resolve: picking a result writes city, lat and lon together and drops the cached forecast for the old place.
+// Picking a result writes city, lat and lon together and drops the cached forecast for the old place.
+function pickResult(result, { onChange, setResults }) {
+  setWeather(onChange, { city: result.name, lat: String(result.lat), lon: String(result.lon) })
+  clearWeatherCache()
+  setResults([])
+}
+
+function ResultList({ results, onSelect }) {
+  if (results.length === 0) return null
+  return (
+    <ul className={classes['results']}>
+      {results.map(r => (
+        <li key={`${r.lat},${r.lon}`}>
+          <button type="button" className={classes['result']} onClick={() => onSelect(r)}>
+            {r.name}{r.state ? `, ${r.state}` : ''}, {r.country}
+            <span className={classes['coords']}>{Number(r.lat).toFixed(4)}, {Number(r.lon).toFixed(4)}</span>
+          </button>
+        </li>
+      ))}
+    </ul>
+  )
+}
+
+// City input plus Resolve.
 export default function GeocodeRow({ current, onChange }) {
   const apiKey = current.weather?.apiKey ?? ''
   const city = current.weather?.city ?? ''
   const { results, setResults, loading, error, resolve } = useResolve(apiKey, city)
-
-  const select = result => {
-    setWeather(onChange, { city: result.name, lat: String(result.lat), lon: String(result.lon) })
-    clearWeatherCache()
-    setResults([])
-  }
 
   const { lat, lon } = current.weather ?? {}
 
@@ -79,18 +95,7 @@ export default function GeocodeRow({ current, onChange }) {
         </button>
       </div>
       {error && <p className={classes['error']}>{error}</p>}
-      {results.length > 0 && (
-        <ul className={classes['results']}>
-          {results.map(r => (
-            <li key={`${r.lat},${r.lon}`}>
-              <button type="button" className={classes['result']} onClick={() => select(r)}>
-                {r.name}{r.state ? `, ${r.state}` : ''}, {r.country}
-                <span className={classes['coords']}>{Number(r.lat).toFixed(4)}, {Number(r.lon).toFixed(4)}</span>
-              </button>
-            </li>
-          ))}
-        </ul>
-      )}
+      <ResultList results={results} onSelect={result => pickResult(result, { onChange, setResults })} />
       {lat && lon && <p className={classes['note']}>Coordinates set: {lat}, {lon}</p>}
     </div>
   )

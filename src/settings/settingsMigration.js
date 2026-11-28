@@ -1,11 +1,8 @@
-// Versioned migration of the persisted settings object. Bump SETTINGS_VERSION when the stored shape changes in a way a plain merge
-// over defaults cannot absorb, and add an idempotent step to migrateSettings.
-// Reasoning: docs/code/src/settings/settingsMigration.js.md.
+// Bump SETTINGS_VERSION only when a plain merge over defaults cannot absorb a shape change, and add an idempotent step.
 
 export const SETTINGS_VERSION = 4
 
-// The default before 2026-11-25. Every install persisted the full settings object, so a stored 400 cannot be told from a choice;
-// it is treated as the old default and replaced by the new, snappier one.
+// The default before 2026-11-25. Every install persisted it, so a stored 400 counts as the default, not a choice.
 const OLD_ANIMATION_SPEED = 400
 
 // Defaults before the Sleeve Patch look. A store from that era holds every value, so these would pin the old look as a "choice".
@@ -98,10 +95,7 @@ function migrateOldLook(stored) {
   for (const [name, old] of Object.entries(OLD_THEME)) dropOldThemeColors(stored?.appearance?.themes?.default?.[name], old)
 }
 
-/**
- * Applies every step newer than `fromVersion` to `stored` in place and returns it. Callers pass a clone.
- * v1 to v2 (API keys obfuscated at rest) needs no data change; the storage class handles it.
- */
+// Mutates and returns `stored` (callers pass a clone). v2 needed no data step: the storage class obfuscates keys.
 export function migrateSettings(stored, fromVersion) {
   const from = fromVersion ?? 0
   if (from < 3 && isObject(stored?.appearance)) migratePerformanceMode(stored.appearance)

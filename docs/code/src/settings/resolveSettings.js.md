@@ -11,3 +11,5 @@ without guards, so a hand-edited or half-written store must never reach it unrep
 - Hot path (stored version equals `SETTINGS_VERSION`) skips migration and full validation; cold path migrates a clone (the raw object
   is what gets backed up, so it must stay untouched). Both back up the raw payload when anything was dropped.
 - `pickChanged` is the inverse used when saving. Compares by JSON, so array and object values are by value.
+
+Reviewed: 69533a0a

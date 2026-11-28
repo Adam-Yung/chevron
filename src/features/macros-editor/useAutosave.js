@@ -2,12 +2,8 @@ import { useCallback, useEffect, useRef } from 'react'
 
 export const AUTOSAVE_DELAY = 800
 
-/**
- * Debounced save of `value` while `valid`. `save(value)` returns true when it persisted.
- * The pending edit is flushed on unmount and on page hide: closing the Settings modal within the debounce window used to
- * discard the last edit, because the effect cleanup only cancelled the timer.
- * `markClean(value)` tells the hook a value is already persisted (after a manual save, a reset or a reload from storage).
- */
+// Debounced `save(value)` (true when it persisted) while `valid`, flushed on unmount and page hide so no edit is lost.
+// `markClean(value)` records a value persisted by other means.
 export function useAutosave({ value, valid, save, delay = AUTOSAVE_DELAY }) {
   const timer = useRef(null)
   const baseline = useRef(value)

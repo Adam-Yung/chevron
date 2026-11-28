@@ -2,11 +2,11 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { renderHook } from '@testing-library/react'
 import { useAutosave } from './useAutosave'
 
+const render = (props, save) => renderHook(p => useAutosave({ save, ...p }), { initialProps: props })
+
 describe('useAutosave', () => {
   beforeEach(() => vi.useFakeTimers())
   afterEach(() => vi.useRealTimers())
-
-  const render = (props, save) => renderHook(p => useAutosave({ save, ...p }), { initialProps: props })
 
   it('saves after the delay, not on mount', () => {
     const save = vi.fn(() => true)

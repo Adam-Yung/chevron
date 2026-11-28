@@ -6,10 +6,103 @@ import Color from '../../../lib/color'
 import classes from './ColorPicker.module.css'
 import getContrast from '../../../lib/getContrast'
 
+function contrastLevel(value, other) {
+  try {
+    return Math.round(getContrast(value, other))
+  } catch {
+    return null
+  }
+}
+
+function ContrastAlert({ contrast, value }) {
+  if (!contrast) return null
+  const Lc = contrastLevel(value, contrast.color)
+  if (Lc === null) return null
+
+  const options = getLcAlertOptions(Lc)
+  return (
+    <div className={`${classes['alert']} ${classes['alert-' + options.color]}`}>
+      <span
+        className={classes['contrast-example']}
+        style={{ background: contrast.isBackground ? contrast.color : value }}>
+        <BsStars color={contrast.isBackground ? value : contrast.color}/>
+      </span>
+      <span className={classes['alert-text']}>
+        {options.score.charAt(0).toUpperCase() + options.score.slice(1)} contrast
+      </span>
+      <span className={classes['tooltip-trigger']} data-tip={`${contrast.isBackground ? 'This' : contrast.name} color contrasts on ${contrast.isBackground ? contrast.name : 'this'} color. Current contrast: ${Lc} Lc (${options.score}). APCA algorithm.`}>
+        <BsQuestionCircle size='1.1em'/>
+      </span>
+    </div>
+  )
+}
+
+function DependantsAlert({ dependants }) {
+  if (!dependants) return null
+  return (
+    <div className={`${classes['alert']} ${classes['alert-neutral']}`}>
+      <span className={classes['tooltip-trigger']} data-tip={`Dependants: ${dependants.join(', ')}`}>
+        <BsDiagram2Fill size='1.5em'/>
+      </span>
+      <span className={classes['alert-text']}>Dependants</span>
+      <span className={classes['tooltip-trigger']} data-tip={`Changing this color will also affect: ${dependants.join(', ')}`}>
+        <BsQuestionCircle size='1.1em'/>
+      </span>
+    </div>
+  )
+}
+
+function PickerCard({ cardRef, draft, onDraft, onCancel, onConfirm, contrast, dependants }) {
+  return (
+    <div className={classes['popover']}>
+      <div className={classes['card']} ref={cardRef}>
+        <HexColorPicker
+          style={{ width: '100%' }}
+          color={draft}
+          onChange={onDraft}/>
+        <input
+          type="text"
+          value={draft}
+          onChange={e => onDraft(e.target.value)}
+          className={classes['hex-input']}
+          placeholder="Type color in HEX format"
+        />
+        <div className={classes['btn-row']}>
+          <ButtonX className={classes['btn-half']} onClick={onCancel}/>
+          <ButtonCheck className={classes['btn-half']} onClick={onConfirm}/>
+        </div>
+        <ContrastAlert contrast={contrast} value={draft}/>
+        <DependantsAlert dependants={dependants}/>
+      </div>
+    </div>
+  )
+}
+
+function discardEdit({ value, setIsOpened, setLocalValue }) {
+  setIsOpened(false)
+  setLocalValue(value)
+}
+
+function outsidePressListener(ref, onOutside) {
+  return event => {
+    if (ref.current && !ref.current.contains(event.target)) onOutside()
+  }
+}
+
+// An unparsable draft is refused and the popover stays open.
+function confirmEdit(draft, { onChange, setIsOpened }) {
+  try {
+    Color.parse(draft)
+  } catch {
+    return
+  }
+  onChange(draft)
+  setIsOpened(false)
+}
+
 function ColorPicker({ value, contrast, dependants, onChange, fullWidth }) {
   const [isOpened, setIsOpened] = useState(false)
   const [localValue, setLocalValue] = useState(value)
-  const inputRef = useRef(null)
   const popoverRef = useRef(null)
   const cardRef = useRef(null)
 
@@ -23,62 +116,12 @@ function ColorPicker({ value, contrast, dependants, onChange, fullWidth }) {
   // A press anywhere else cancels the edit, like the cross button.
   useEffect(() => {
     if (!isOpened) return
-    const onClick = (e) => {
-      if (popoverRef.current && !popoverRef.current.contains(e.target)) {
-        setIsOpened(false)
-        setLocalValue(value)
-      }
-    }
-    document.addEventListener('mousedown', onClick)
-    return () => document.removeEventListener('mousedown', onClick)
+    const onPress = outsidePressListener(popoverRef, () => discardEdit({ value, setIsOpened, setLocalValue }))
+    document.addEventListener('mousedown', onPress)
+    return () => document.removeEventListener('mousedown', onPress)
   }, [isOpened, value])
 
-  const buttonColors = {
-    _color: new Color(value),
-    get normal() { return this._color },
-    get hover() { return this._color.set({ 'lch.l': l => l > 30 ? l-5 : l+10 }) },
-    get active() { return this._color.set({ 'lch.l': l => l > 30 ? l-10 : l+15 }) }
-  }
-
-  let contrastAlert = null
-  if (contrast) {
-    let Lc = null
-    try {
-      Lc = Math.round(getContrast(localValue, contrast.color))
-    } catch (error) {/* pass */}
-
-    if (Lc !== null) {
-      const options = getLcAlertOptions(Lc)
-      contrastAlert =
-        <div className={`${classes['alert']} ${classes['alert-' + options.color]}`}>
-          <span
-            className={classes['contrast-example']}
-            style={{ background: contrast.isBackground ? contrast.color : localValue }}>
-            <BsStars color={contrast.isBackground ? localValue : contrast.color}/>
-          </span>
-          <span className={classes['alert-text']}>
-            {options.score.charAt(0).toUpperCase() + options.score.slice(1)} contrast
-          </span>
-          <span className={classes['tooltip-trigger']} data-tip={`${contrast.isBackground ? 'This' : contrast.name} color contrasts on ${contrast.isBackground ? contrast.name : 'this'} color. Current contrast: ${Lc} Lc (${options.score}). APCA algorithm.`}>
-            <BsQuestionCircle size='1.1em'/>
-          </span>
-        </div>
-    }
-  }
-
-  let dependantsAlert = null
-  if (dependants) {
-    dependantsAlert =
-      <div className={`${classes['alert']} ${classes['alert-neutral']}`}>
-        <span className={classes['tooltip-trigger']} data-tip={`Dependants: ${dependants.join(', ')}`}>
-          <BsDiagram2Fill size='1.5em'/>
-        </span>
-        <span className={classes['alert-text']}>Dependants</span>
-        <span className={classes['tooltip-trigger']} data-tip={`Changing this color will also affect: ${dependants.join(', ')}`}>
-          <BsQuestionCircle size='1.1em'/>
-        </span>
-      </div>
-  }
+  const swatch = new Color(value)
 
   return (
     <div className={classes['picker-container']} ref={popoverRef}>
@@ -86,8 +129,8 @@ function ColorPicker({ value, contrast, dependants, onChange, fullWidth }) {
         type="button"
         className={classes['trigger-btn']}
         style={{
-          background: colorToString(buttonColors.normal),
-          color: getFontColor(buttonColors.normal),
+          background: colorToString(swatch),
+          color: getFontColor(swatch),
           width: fullWidth ? '100%' : undefined,
         }}
         onClick={() => setIsOpened(o => !o)}>
@@ -95,45 +138,14 @@ function ColorPicker({ value, contrast, dependants, onChange, fullWidth }) {
       </button>
 
       {isOpened && (
-        <div className={classes['popover']}>
-          <div className={classes['card']} ref={cardRef}>
-            <HexColorPicker
-              style={{ width: '100%' }}
-              color={localValue}
-              onChange={setLocalValue}/>
-            <input
-              ref={inputRef}
-              type="text"
-              value={localValue}
-              onChange={e => setLocalValue(e.target.value)}
-              className={classes['hex-input']}
-              placeholder="Type color in HEX format"
-            />
-            <div className={classes['btn-row']}>
-              <ButtonX
-                className={classes['btn-half']}
-                onClick={() => {
-                  setIsOpened(false)
-                  setLocalValue(value)
-                }}/>
-              <ButtonCheck
-                className={classes['btn-half']}
-                onClick={() => {
-                  let newValue = false
-                  try {
-                    newValue = Color.parse(localValue)
-                  } catch (error) {/* pass */}
-
-                  if (newValue) {
-                    onChange(localValue)
-                    setIsOpened(false)
-                  }
-                }}/>
-            </div>
-            { contrastAlert }
-            { dependantsAlert }
-          </div>
-        </div>
+        <PickerCard
+          cardRef={cardRef}
+          draft={localValue}
+          onDraft={setLocalValue}
+          onCancel={() => discardEdit({ value, setIsOpened, setLocalValue })}
+          onConfirm={() => confirmEdit(localValue, { onChange, setIsOpened })}
+          contrast={contrast}
+          dependants={dependants}/>
       )}
     </div>
   )

@@ -76,9 +76,9 @@ describe('resolveSettings', () => {
   })
 })
 
-describe('corrupt or wrong-shaped payloads', () => {
-  const run = raw => resolveSettings(raw, SETTINGS_VERSION, defaults)
+const run = raw => resolveSettings(raw, SETTINGS_VERSION, defaults)
 
+describe('corrupt or wrong-shaped payloads', () => {
   it.each([null, 'text', 42, [], [1, 2]])('falls back to defaults for a %j root', raw => {
     const { settings } = run(raw)
     expect(settings.general).toEqual(defaults.general)

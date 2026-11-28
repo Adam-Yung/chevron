@@ -9,3 +9,5 @@ and calls the subclass's `display`.
   Hidden fields are still rendered (display none) so dependants receive propagated changes.
 - `dependants`: changing a parent colour (primary) calls the dependants' own `onChange` so derived colours follow.
 - `_parent_.x` paths resolve relative to the setting being drawn, which lets a theme colour name its sibling for contrast checks.
+
+Reviewed: 5a14a048

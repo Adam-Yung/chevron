@@ -13,8 +13,7 @@ function sameKind(want, got) {
   return typeof want === typeof got
 }
 
-// Layers `source` over `target`. A stored value whose type disagrees with the default is dropped (default wins) and its path is
-// recorded in `issues`; keys the defaults do not know (user-made themes) pass through.
+// A value whose type disagrees with the default is dropped and its path recorded in `issues`; unknown keys pass through.
 function mergeChecked(target, source, issues, path) {
   const result = { ...target }
   for (const key of Object.keys(source)) {
@@ -30,9 +29,7 @@ function mergeChecked(target, source, issues, path) {
   return result
 }
 
-/**
- * Pure deep merge of `source` over `target`; objects recurse, arrays and primitives from source win, wrong-typed values are dropped.
- */
+// Pure: objects recurse, arrays and primitives from `source` win, wrong-typed values are dropped.
 export function deepMerge(target, source) {
   return mergeChecked(target, isPlain(source) ? source : {}, [], '')
 }
@@ -63,9 +60,7 @@ function mergeOntoDefaults(raw, defaults) {
   return { settings: repairAppearance(merged, defaults), issues }
 }
 
-/**
- * What differs from `defaults`. Persisting only this lets a changed default reach every user who never touched that setting.
- */
+// Persisting only what differs lets a changed default reach every user who never touched that setting.
 export function pickChanged(defaults, current) {
   const out = {}
   for (const key of Object.keys(current)) {
@@ -81,14 +76,8 @@ export function pickChanged(defaults, current) {
   return out
 }
 
-/**
- * Resolves the effective settings from a stored payload. Never throws, whatever the payload looks like.
- *
- * Hot path (version current): merge only. It runs on every load, so no migration walk or full validation.
- * Cold path (older or unstamped store): migrate, validate, merge. Either path backs the raw payload up when anything was dropped.
- *
- * @returns {{ settings: object, needsVersionWrite: boolean }}
- */
+// Never throws, whatever the stored payload looks like. Returns `{ settings, needsVersionWrite }`.
+// A current version only merges (this runs on every load); an older or unstamped one is migrated and validated first.
 export function resolveSettings(raw, storedVersion, defaults) {
   if (storedVersion === SETTINGS_VERSION) {
     const { settings, issues } = mergeOntoDefaults(raw, defaults)

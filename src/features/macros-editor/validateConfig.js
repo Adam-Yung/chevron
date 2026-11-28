@@ -69,9 +69,7 @@ function duplicateTriggerWarnings(macros) {
   return warnings
 }
 
-/**
- * Blocking errors stop a save; warnings are shown but never block. Every message names the macro, command or engine and the field.
- */
+// Errors block a save, warnings never do.
 export function validateConfig(config) {
   const cfg = normaliseConfig(config)
   const errors = [

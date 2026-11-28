@@ -48,10 +48,7 @@ function GradientFields({ value, onChange }) {
   )
 }
 
-/**
- * Edits a `bgColor` object, either `{ type: 'solid', color }` or a gradient with kind, optional angle and colour stops. Plain
- * native controls plus the shared ColorPicker; no colour library beyond react-colorful.
- */
+// `bgColor` is `{ type: 'solid', color }` or a gradient with kind, optional angle and colour stops.
 function BgColorEditor({ value, onChange }) {
   const safe = value && typeof value === 'object' ? value : makeSolid()
   const isGradient = safe.type === 'gradient'

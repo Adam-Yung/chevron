@@ -1,10 +1,7 @@
 import { getPropertyByPath } from '../lib/propertyByPath'
 import styles from './controlStyles'
 
-/**
- * Base of every schema entry: holds the default, the display options and the change plumbing, and renders itself through
- * `display()`, which subclasses override. `dependants` are other entries that follow this one's value (derived theme colours).
- */
+// Base of every schema entry; subclasses override `display()`. `dependants` follow this value (derived theme colours).
 export class SettingType {
   _dependants = null
 

@@ -13,3 +13,5 @@ Owns the settings state and the four contexts the app reads (`SettingsContext`, 
 - The setter is React's own `setState`, so updaters must be pure and return a new object.
 - Known cost: the context value changes on every edit, so every consumer re-renders. Edits are rare (panel only) and path copies
   keep untouched branches identical, so consumers that memoise on a sub-object skip work.
+
+Reviewed: 25f34540

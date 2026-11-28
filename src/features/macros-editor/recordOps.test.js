@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { uniqueKey, replaceValue, removeKey, renameKey } from './recordOps'
+import { uniqueKey, replaceValue, patchValue, removeKey, renameKey } from './recordOps'
 
 describe('recordOps', () => {
   it('uniqueKey appends a counter until free', () => {
@@ -15,6 +15,11 @@ describe('recordOps', () => {
     const record = { a: 1, b: 2 }
     expect(renameKey(record, 'a', '')).toBe(record)
     expect(renameKey(record, 'a', 'b')).toBe(record)
+  })
+
+  it('patchValue merges into one body, even a missing one', () => {
+    expect(patchValue({ a: { x: 1 }, b: null }, 'a', { y: 2 })).toEqual({ a: { x: 1, y: 2 }, b: null })
+    expect(patchValue({ b: null }, 'b', { y: 2 })).toEqual({ b: { y: 2 } })
   })
 
   it('replaceValue and removeKey keep the other entries in place', () => {

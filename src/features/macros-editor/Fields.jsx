@@ -3,7 +3,7 @@ import classes from './MacrosEditor.module.css'
 
 const MONO = { fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace' }
 
-// A real <label for> so each input has an accessible name (screen readers, and tests that find fields by label).
+// A real <label for>: screen readers and tests find each input by its label.
 function Field({ label, children }) {
   const id = useId()
   return (
@@ -71,21 +71,12 @@ export const CheckboxField = memo(function CheckboxField({ label, checked, onCha
   )
 })
 
-/**
- * Edits an object key (engine id, query type, command type). Keys cannot be committed per keystroke: an empty or duplicate
- * key is invalid mid-edit, and applying it would delete the entry or clobber a sibling. So the text is a local draft that is
- * committed on blur or Enter, and reverted if it is not usable.
- */
+// An object key cannot be committed per keystroke: an empty or duplicate one would delete the entry or clobber a sibling.
 export const KeyField = memo(function KeyField({ label, value, onCommit, isTaken, monospace }) {
   const [draft, setDraft] = useState(null)
   const shown = draft ?? value
   const trimmed = shown.trim()
   const invalid = draft !== null && (trimmed === '' || (trimmed !== value && isTaken(trimmed)))
-
-  const finish = () => {
-    if (draft !== null && !invalid) onCommit(trimmed)
-    setDraft(null)
-  }
 
   return (
     <Field label={label}>
@@ -97,7 +88,10 @@ export const KeyField = memo(function KeyField({ label, value, onCommit, isTaken
           aria-invalid={invalid}
           title={invalid ? 'Must be non-empty and not used by another entry' : undefined}
           onChange={e => setDraft(e.target.value)}
-          onBlur={finish}
+          onBlur={() => {
+            if (draft !== null && !invalid) onCommit(trimmed)
+            setDraft(null)
+          }}
           onKeyDown={e => e.key === 'Enter' && e.currentTarget.blur()}
           style={monospace ? MONO : undefined}
         />

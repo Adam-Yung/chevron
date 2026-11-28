@@ -10,3 +10,5 @@ renders from `template`; `defaults` seeds the store; `hidden` lists paths shown 
 - Adding a setting: add it here with a description, then read it where used. A persisted store without it falls back to the default.
 
 - The default theme names its own `chevron` colour, which stops it following `primary` (a dependant only inherits when unset).
+
+`general.locale` takes a SerpApi style `language-COUNTRY` value; autocomplete and other components read it.
