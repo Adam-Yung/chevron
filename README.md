@@ -55,7 +55,7 @@ new tab.
 Double-tap Space to stream an answer from ChatGPT, Ollama, LM Studio, or any OpenAI-compatible endpoint. The response appears right above the search bar — no context switching.
 
 ### See the weather at a glance
-A minimal weather chip shows current conditions. Hover for a 5-day forecast. Powered by OpenWeatherMap (free tier).
+A minimal weather chip shows current conditions. Click it for a 5-day forecast. Powered by OpenWeatherMap (free tier).
 
 ### Browse your macros visually
 Your pinned sites sit in a dock at the bottom of the start screen. Tap Shift (or right-click, or scroll up) to open the full card

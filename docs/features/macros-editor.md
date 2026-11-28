@@ -1,6 +1,8 @@
 # Macros editor
 
-> Verified: 2026-11-28 00:06 · Sources: `src/features/macros-editor/MacrosEditorBody.jsx`, `src/features/macros-editor/useConfigDraft.js`, `src/features/macros-editor/draftActions.js`, `src/features/macros-editor/useAutosave.js`, `src/features/macros-editor/validateConfig.js`, `src/features/macros-editor/configDraft.js`, `src/storage/macrosConfig.js`, `public/config.js`, `public/icons.js`
+> Verified: 2026-11-28 00:12 · Sources: `src/features/macros-editor/MacrosEditorBody.jsx`, `src/features/macros-editor/useConfigDraft.js`, `src/features/macros-editor/draftActions.js`, `src/features/macros-editor/useAutosave.js`, `src/features/macros-editor/validateConfig.js`, `src/features/macros-editor/configDraft.js`, `src/storage/macrosConfig.js`, `public/config.js`, `public/icons.js`
+> Serves: `own-your-setup`
+> Owns: `src/features/macros-editor/**`, `src/storage/macrosConfig.js`, `src/storage/applyConfig.js`, `scripts/add-icon.mjs`, `scripts/icons/**`
 
 Edit the macros, global commands and search engines without touching files. Open **Settings** (gear, top right, `aria-label` "Open settings"), then **Macros** in the sidebar.
 
@@ -40,4 +42,7 @@ Errors block saving and name the macro (name and position) and field, for exampl
 ## Limits
 
 - No undo and no Cancel; changes are always persisted.
+- A new engine appears in the default-engine list of Settings only after a reload.
+- The text colour of macros and engines is stored but nothing on screen uses it.
+- The hint inside the icon picker names an old command; use `npm run icons -- <domain>`.
 - Typing inside the editor never reaches the search field and Shift does not open the macros menu there (the dialog and its popovers are marked `data-keep-focus`).

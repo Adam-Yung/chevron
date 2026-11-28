@@ -5,8 +5,8 @@ end-to-end suite after both builds because it loads `dist/index.html`.
 
 - The hosted build goes to `dist-hosted/` so the static build in `dist/` (what the end-to-end suite and `file://` users load) is the
   last one written.
-- `LINT_DIRS` is a ratchet while the re-architecture moves code: a directory joins once it has been rewritten to pass. The structure
-  rule (depth 3, complexity 12) applies to every touched file regardless.
+- `LINT_DIRS` lists what is linted as a whole; `services/` is not in it. The structure rule (depth 3, complexity 12) applies to every
+  touched `js`, `jsx` and `mjs` file regardless.
 - The touched files reach eslint as an array, one per line of `touched.sh`, so a name with spaces stays one argument. The list is
   assigned first so that a failing `touched.sh` stops the gate.
 - The de-slop ratchets run last, from the skill folder (not copied: CI does not run this script). Their settings are `.deslop.json`,

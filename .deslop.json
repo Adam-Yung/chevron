@@ -1,5 +1,5 @@
 {
   "exclude": ["dist", "dist-hosted", "public", "package-lock.json", "scripts/gate/lint/package*.json", "scripts/gate/baselines"],
   "node_bin": ["scripts/gate/lint/node_modules/.bin"],
-  "gates": ["structure", "duplication", "deadcode", "mirror-fresh", "doc-size", "expiry", "growth"]
+  "gates": ["structure", "duplication", "deadcode", "mirror-fresh", "features", "doc-size", "expiry", "growth"]
 }

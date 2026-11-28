@@ -1,5 +1,7 @@
 # scripts/owner/install-deps.sh
 
+Already applied: `package.json` pins the one and no longer lists the other three, so a rerun changes nothing.
+
 Agents may not install packages (owner rule after a flagged-download incident). Anything the project needs is listed here, pinned,
 with lifecycle scripts off, and the owner runs it. Dry run by default so reading it is safe; `--run` executes.
 

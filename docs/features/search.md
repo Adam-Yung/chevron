@@ -1,6 +1,8 @@
 # Search
 
-> Verified: 2026-11-28 00:04 · Sources: `src/features/search/QueryField.jsx`, `src/features/search/Suggestions.jsx`, `src/features/search/QuickLook.jsx`, `src/search/resolve.js`, `src/search/suggestions.js`, `src/search/useSuggestions.js`, `src/search/history.js`, `src/search/autocomplete.js`, `src/app/useIntents.js`, `src/app/useLaunch.js`, `src/navigation/navigate.js`, `src/navigation/useNavigationRelease.js`
+> Verified: 2026-11-28 00:12 · Sources: `src/features/search/QueryField.jsx`, `src/features/search/Suggestions.jsx`, `src/features/search/QuickLook.jsx`, `src/search/resolve.js`, `src/search/suggestions.js`, `src/search/useSuggestions.js`, `src/search/history.js`, `src/search/autocomplete.js`, `src/app/useIntents.js`, `src/app/useLaunch.js`, `src/navigation/navigate.js`, `src/navigation/useNavigationRelease.js`
+> Serves: `search-and-go`, `fast-launch`, `never-stuck`
+> Owns: `src/search/**`, `src/features/search/**`, `src/navigation/**`, `src/app/useIntents*`, `src/app/useLaunch.js`, `src/app/IntentsContext.js`, `src/app/LaunchOverlay.*`, `src/app/copyText.js`, `src/lib/isValidURL.js`, `src/lib/normaliseURL.js`, `src/lib/ensureProtocol.js`, `src/lib/randomHSLColor.js`, `src/lib/pseudoHash.js`, `src/lib/fetchFromScriptTag.js`
 
 ## What you can type
 Start typing anywhere: the search field always has the keyboard, even while a first visit is still loading; what you type
@@ -14,7 +16,7 @@ before the page is ready is kept (Enter only counts once it is). What Enter does
 | Math, units, currency, time zones | Copies the answer (see `docs/features/instant-answers.md`) |
 | Anything else | Searches with the engine chosen in Settings |
 
-Hold Ctrl while pressing Enter to search even a trigger or an address. Alt+Enter or Cmd+Enter (or a middle click) opens the result
+Hold Ctrl while pressing Enter to search even a trigger or an address (setting `query.forceSearchEngineOnCtrl`, on by default). Alt+Enter or Cmd+Enter (or a middle click) opens the result
 in a new tab; the start page clears itself at once, so it is blank when you come back. The setting "Open results in a new tab" makes
 that the default.
 

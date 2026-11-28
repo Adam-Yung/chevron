@@ -1,6 +1,6 @@
 # src/storage/localStorageObject.js
 
-Base for objects mirrored in `localStorage` (settings, search history, weather cache).
+Base of the settings store; the weather cache uses only its static `read` and `write`. Search history has its own storage code.
 
 - Loading never throws. Invalid JSON is parked under `chevron.corrupt.<name>.<ms>` and the default takes over, so a damaged entry
   can no longer stop the app booting (it used to throw at import time). A storage that throws on read (blocked cookies) yields the

@@ -14,15 +14,20 @@
 Every page in `docs/features/` and `docs/guides/` is listed below.
 
 ## Features
+- `docs/features/README.md`: the feature index, grouped by objective
 - `docs/features/search.md`: typing, Enter, suggestions, history, opening in a new tab
 - `docs/features/instant-answers.md`: math, units, percentages, bases, currency, time zones
 - `docs/features/sites.md`: the sites menu and the dock
 - `docs/features/macros-editor.md`: editing macros, commands and engines
 - `docs/features/settings.md`: the settings panel and persistence
-- `docs/features/shortcuts.md`: every key, and the cheatsheet
-- `docs/features/weather.md`: the weather chip and forecast
+- `docs/features/shortcuts.md`: keys, mouse, touch and the cheatsheet
+- `docs/features/weather.md`: the clock, weather chip and forecast
 - `docs/features/ai.md`: asking an AI from the search field
 - `docs/features/offline.md`: what works without a network
+- `docs/features/look.md`: the chevron and the stage
+- `docs/features/shell.md`: first paint, UI state, layout
+- `docs/features/builds.md`: static and hosted builds, preview service
+- `docs/features/tooling.md`: the gate and the scripts
 
 ## Guides
 - `docs/guides/development.md`: run, build, test, the gate, where code lives

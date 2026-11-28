@@ -1,6 +1,8 @@
 # Settings
 
-> Verified: 2026-11-28 00:02 · Sources: `src/features/settings-panel/Settings.jsx`, `src/features/settings-panel/SettingsPane.jsx`, `src/features/settings-panel/SettingsSidebar.jsx`, `src/features/settings-panel/GeocodeRow.jsx`, `src/settings/schema.js`, `src/settings/SettingsProvider.jsx`, `src/settings/resolveSettings.js`, `src/settings/settingsMigration.js`, `src/storage/settingsStorage.js`, `src/storage/macrosConfig.js`
+> Verified: 2026-11-28 00:12 · Sources: `src/features/settings-panel/Settings.jsx`, `src/features/settings-panel/SettingsPane.jsx`, `src/features/settings-panel/SettingsSidebar.jsx`, `src/features/settings-panel/GeocodeRow.jsx`, `src/settings/schema.js`, `src/settings/SettingsProvider.jsx`, `src/settings/resolveSettings.js`, `src/settings/settingsMigration.js`, `src/storage/settingsStorage.js`, `src/storage/macrosConfig.js`
+> Serves: `own-your-setup`
+> Owns: `src/settings/**`, `src/features/settings-panel/**`, `src/storage/localStorageObject.js`, `src/storage/settingsStorage.js`, `src/storage/obfuscate.js`, `src/app/useDocumentTheme.js`, `src/lib/camelCaseToTitle.js`, `src/lib/color.js`, `src/lib/getContrast.js`, `src/lib/propertyByPath.js`
 
 ## Using the panel
 
@@ -15,7 +17,7 @@ curvature, weather coordinates). "Reset settings" and "Clean history" ask first,
 
 | Category | Holds |
 | --- | --- |
-| General | Default search engine, search history on/off, quick redirect, open results in a new tab, animation speed (ms; 0 turns animation off; default 250), locale, tab title |
+| General | Default search engine, search history on/off, open results in a new tab, animation speed (ms; 0 turns animation off; default 250), locale, tab title |
 | Appearance | Colour scheme (auto, light, dark), active theme and its colours, show the pinned-sites dock, blur behind suggestions, arrows and weather, swipe and trackpad gestures |
 | Chevron | Stroke thickness and size of the chevron, quick-look marquee and macro labels |
 | Query | Search field and suggestion font sizes and limits, caret, Ctrl-forces-search-engine, and the AI block (provider, endpoint, model, key, temperature, language) |
@@ -53,3 +55,4 @@ the browser's storage to move them.
 
 - Reset and Clean history reload the page.
 - Settings are per browser profile and per origin; there is no sync.
+- "Notify about forced search engine" (Query) is shown in the panel but nothing reads it.

@@ -7,8 +7,9 @@ renders from `template`; `defaults` seeds the store; `hidden` lists paths shown 
 - `hidden` is computed once so its identity is stable for the panel's memoisation. It always includes the derived theme colours;
   only primary, secondary and accent are edited, the rest follow through `dependants`.
 - Search engines are read from `window.CONFIG` at import, so `config.js` must load first (it does in both builds).
+- `query.notifyAboutForcedSearchEngine` and `appearance.style` are declared but nothing reads them.
 - Adding a setting: add it here with a description, then read it where used. A persisted store without it falls back to the default.
 
 - The default theme names its own `chevron` colour, which stops it following `primary` (a dependant only inherits when unset).
 
-`general.locale` takes a SerpApi style `language-COUNTRY` value; autocomplete and other components read it.
+`general.locale` takes a SerpApi style `language-COUNTRY` value; only autocomplete reads it.

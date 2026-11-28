@@ -1,8 +1,15 @@
-# Weather
+# Clock and weather
 
-> Verified: 2026-11-28 00:06 · Sources: `src/features/weather/Weather.jsx`, `src/features/weather/useWeather.js`, `src/features/weather/openWeather.js`, `src/features/weather/weatherCache.js`, `src/features/weather/WeatherModal.jsx`, `src/features/weather/forecast.js`
+> Verified: 2026-11-28 00:12 · Sources: `src/features/weather/Weather.jsx`, `src/features/weather/useWeather.js`, `src/features/weather/openWeather.js`, `src/features/weather/weatherCache.js`, `src/features/weather/WeatherModal.jsx`, `src/features/weather/forecast.js`
+> Serves: `glance`
+> Owns: `src/features/weather/**`, `src/features/macros/ChevronTop.*`, `src/features/macros/Time.*`, `src/features/macros/useClock.js`, `src/lib/formatDate.js`
 
-An optional temperature chip next to the clock, with a forecast dialog behind it. Off until the user supplies an OpenWeatherMap key and a place.
+A clock above the sites menu, and an optional temperature chip next to it with a forecast dialog behind it. Weather is off until
+the user supplies an OpenWeatherMap key and a place.
+
+## Clock
+Shown at the top of the sites menu. Its format and size are `menu.time.format` and `menu.time.fontSize`; it ticks on the second and
+stops while the tab is hidden (`src/features/macros/useClock.js`, `src/lib/formatDate.js`).
 
 ## What the user sees
 - The top row shows the clock; with weather configured and data available it becomes `clock · 14°C [icon]`, one button.

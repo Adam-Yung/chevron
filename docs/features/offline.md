@@ -1,9 +1,11 @@
 # Offline behaviour
 
-> Verified: 2026-11-28 00:04 · Sources: `src/features/status/OfflineIndicator.jsx`, `src/features/status/useOnlineStatus.js`, `src/features/weather/useWeather.js`
+> Verified: 2026-11-28 00:12 · Sources: `src/features/status/OfflineIndicator.jsx`, `src/features/status/useOnlineStatus.js`, `src/features/weather/useWeather.js`
+> Serves: `runs-anywhere`, `never-stuck`
+> Owns: `src/features/status/**`
 
 ## The indicator
-A small pill at the bottom left reads "Offline" while the browser reports no connection and fades out when it returns. It never
+A small pill at the bottom left reads "Offline — search will retry when you reconnect" while the browser reports no connection and fades out when it returns. It never
 takes clicks or focus, and screen readers hear the change through a polite live region.
 
 The browser's flag is trusted when it says offline; "online" only means a network adapter exists, so every feature below also copes
@@ -19,3 +21,8 @@ with requests that fail.
   "Could not reach" message.
 - The hosted build (`npm run build:hosted`) registers a service worker so the page loads offline; the single-file build is a local
   file and always loads.
+
+## Limits
+- Despite the pill's wording, no search or suggestion is retried on reconnect; only weather refreshes by itself.
+
+The two builds are described in `docs/features/builds.md`.

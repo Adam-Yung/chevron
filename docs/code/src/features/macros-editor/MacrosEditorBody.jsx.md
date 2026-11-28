@@ -1,6 +1,6 @@
 # src/features/macros-editor/MacrosEditorBody.jsx
 
-Composition root of the editor, embedded by the Settings modal (`src/features/settings-panel/Settings.jsx` imports its default export; keep the path and the `revision` / `onSaved` props).
+Composition root of the editor, embedded by the Settings modal: `src/features/settings-panel/SettingsPane.jsx` imports its default export and passes no props. `revision` and `onSaved` are exercised only by tests.
 
 - All state lives in `useConfigDraft`; this file only lays out the toolbar, the four tabs, the active form and the status.
 - Ctrl/Cmd+S is handled with a React `onKeyDown` on the wrapper, so it also catches keys typed inside the portaled colour and icon popovers.

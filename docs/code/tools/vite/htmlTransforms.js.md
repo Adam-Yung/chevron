@@ -15,7 +15,7 @@ HTML rewrites applied at build time by `vite.config.js`: the static-profile ones
 
 Tests: `tools/vite/htmlTransforms.test.js`.
 - **Why inline the font (`inlineFonts`):** a `file://` page may not fetch font files (CORS), so the release zip showed a fallback
-  font. The static build now carries Onest as a data URL (about 35 KB); comments in `public/font.css` are stripped first so the
+  font. The static build carries every face `public/font.css` declares (Onest and Graduate) as data URLs; comments in `public/font.css` are stripped first so the
   commented-out CJK example is never read as a real font.
 - **Why inline only the font CSS in the hosted build (`inlineFontCss`):** `font.css` is 2 KB of `@font-face`, but a stylesheet link
   blocks first paint until it arrives, one extra round-trip on GitHub Pages. Inlining it removes that wait; the woff2 stays a
