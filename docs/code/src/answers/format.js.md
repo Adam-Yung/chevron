@@ -6,3 +6,5 @@ One number formatter for every answer so results look alike and never show float
 - Everything else goes through `toPrecision(12)` first to erase binary noise (0.1 + 0.2), then to the family's own significant digits (8 for conversions, 10 for the calculator).
 - No thousands separators: answers are copied on Enter and pasted into other tools.
 - Values at or above 1e15 or below 1e-6 fall back to JavaScript exponent notation.
+
+Reviewed: 1f1057ff

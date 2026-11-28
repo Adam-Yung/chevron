@@ -192,14 +192,7 @@ class Parser {
   }
 }
 
-/**
- * Evaluates a math expression without eval or Function.
- * Returns null unless the text is clearly math: it needs an operator, function call or
- * factorial, so a bare number or constant (`42`, `pi`) never produces an answer.
- * Division by zero, domain errors and overflow also give null, never NaN or Infinity.
- * @param {string} expr
- * @returns {number|null}
- */
+/** Evaluates math without eval or Function; null unless the text is clearly math with a finite result. */
 export function calculate(expr) {
   const text = String(expr).trim().toLowerCase()
   if (!text || DATE_OR_ID_LIKE.test(text) || BASE_PREFIX.test(text)) return null

@@ -10,3 +10,5 @@ A bare `3 london to tokyo` is refused because `3` is not clearly a clock time. P
 "Today" means today in the source place (not in the viewer's zone). The wall time is turned into an instant with two offset passes so a DST boundary on that date is honoured;
 the day shift is reported as `(next day)` / `(previous day)`. Output is 24-hour when the input was 24-hour without am/pm, otherwise 12-hour.
 Date arithmetic is on UTC fields only, so the machine's own zone never leaks into the result. `now` is injectable for tests.
+
+Reviewed: ed7e216a

@@ -66,6 +66,13 @@ describe('resolveDestination', () => {
 })
 
 describe('findMacro', () => {
+  it('returns the command and its arguments, the bare macro, or null', () => {
+    expect(findMacro('yt?x', config)).toMatchObject({ command: { type: 'search', args: 'x' } })
+    expect(findMacro('yt', config).command).toBeNull()
+    expect(findMacro('nothing here', config)).toBeNull()
+    expect(findMacro('yt?x', undefined)).toBeNull()
+  })
+
   it('prefers the longest trigger when several prefix the query', () => {
     expect(findMacro('yt?x', config).macro.name).toBe('YouTube')
   })

@@ -6,3 +6,5 @@ Small replacement for colorjs.io (about 25 KB saved). It supports exactly what C
 - Named colours are resolved by the browser via a throwaway element; in non-DOM environments they return null.
 - `contrast(other)` is APCA only; the algorithm argument is accepted and ignored for call-site compatibility.
 - `new Color` and `Color.parse` throw on bad input, which the ColorPicker relies on for validation.
+- Only `set({ 'lch.l': number or function })` is supported.
+- APCA is the simplified sRGB path of the public-domain reference (https://github.com/Myndex/SAPC-APCA); the value is signed by polarity.

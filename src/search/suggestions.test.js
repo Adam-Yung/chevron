@@ -15,16 +15,16 @@ describe('macroSuggestions', () => {
   })
 })
 
-describe('mergeSuggestions', () => {
-  const isAnswer = t => t === 'calculator'
+const isCalculator = t => t === 'calculator'
 
+describe('mergeSuggestions', () => {
   it('orders answers, exact macros, history, other macros, then autocomplete', () => {
     const list = mergeSuggestions([
       [{ suggestion: 'gh pages', type: 'autocomplete', relevance: 900 }],
       [{ suggestion: 'gh stars', type: 'history', relevance: 30 }],
       macroSuggestions('g', macros),
       [{ suggestion: '42', type: 'calculator', relevance: 5000 }]
-    ], isAnswer)
+    ], isCalculator)
     expect(list.map(s => s.suggestion)).toEqual(['42', 'g', 'gh stars', 'gm', 'gh pages'])
   })
 
@@ -66,20 +66,19 @@ describe('stepSelection', () => {
 })
 
 describe('submitTarget', () => {
-  const isAnswer = t => t === 'calculator'
   const answer = { suggestion: '4', type: 'calculator' }
   const other = { suggestion: '2+2 meaning', type: 'autocomplete' }
 
   it('prefers the highlighted suggestion', () => {
-    expect(submitTarget('2+2', other, [answer, other], isAnswer)).toBe(other)
+    expect(submitTarget('2+2', other, [answer, other], isCalculator)).toBe(other)
   })
 
   it('takes a top instant answer when nothing is highlighted', () => {
-    expect(submitTarget('2+2', null, [answer, other], isAnswer)).toEqual(answer)
+    expect(submitTarget('2+2', null, [answer, other], isCalculator)).toEqual(answer)
   })
 
   it('otherwise uses the typed text', () => {
-    expect(submitTarget('cats', null, [other], isAnswer)).toEqual({ suggestion: 'cats' })
-    expect(submitTarget('cats', null, [], isAnswer)).toEqual({ suggestion: 'cats' })
+    expect(submitTarget('cats', null, [other], isCalculator)).toEqual({ suggestion: 'cats' })
+    expect(submitTarget('cats', null, [], isCalculator)).toEqual({ suggestion: 'cats' })
   })
 })

@@ -8,3 +8,5 @@ Live currency conversion, the only answer family that touches the network (`http
   The 5 second timeout deliberately yields null, not an error, so a slow API cannot look like a cancelled search.
 - Amounts show two decimals; sub-unit results (1 yen in USD) keep three significant digits.
 - `clearCurrencyCache` exists for tests only. `fetchImpl` is injectable for the same reason.
+- `withDeadline` owns the abort plumbing: the caller's signal is forwarded with an explicit `undefined` reason, because passing the abort event
+  through would make it the reason and the request would no longer reject with AbortError.

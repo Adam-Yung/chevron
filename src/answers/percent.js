@@ -16,11 +16,7 @@ const RULES = [
   { re: WHAT_PERCENT_IS, label: (a, b) => `${b} of ${a}`, value: (a, b) => (b / a) * 100, unit: '%' },
 ]
 
-/**
- * Percent phrases the calculator cannot express: `15% of 80`, `20% off 80`,
- * `20 is what percent of 80`, `what percent of 80 is 20`. `80 + 15%` lives in calculator.js.
- * @returns {import('./index').Answer|null}
- */
+/** Percent phrases that need words (`15% of 80`); `80 + 15%` is the calculator's. @returns {import('./index').Answer|null} */
 export function percentAnswer(query) {
   const q = normaliseQuery(query)
   for (const rule of RULES) {

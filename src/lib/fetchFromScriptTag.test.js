@@ -3,16 +3,16 @@ import fetchFromScriptTag from './fetchFromScriptTag'
 
 const scripts = () => document.head.querySelectorAll('script')
 
-describe('fetchFromScriptTag', () => {
-  beforeEach(() => {
-    vi.useFakeTimers()
-    document.head.innerHTML = ''
-  })
+beforeEach(() => {
+  vi.useFakeTimers()
+  document.head.innerHTML = ''
+})
 
-  afterEach(() => {
-    vi.useRealTimers()
-  })
+afterEach(() => {
+  vi.useRealTimers()
+})
 
+describe('fetchFromScriptTag: one request', () => {
   it('resolves with the callback payload and cleans up', async () => {
     const pending = fetchFromScriptTag('https://x.test/a', 'cbA')
     expect(scripts()).toHaveLength(1)
@@ -21,6 +21,13 @@ describe('fetchFromScriptTag', () => {
     await expect(pending).resolves.toEqual(['ok'])
     expect(scripts()).toHaveLength(0)
     expect('cbA' in window).toBe(false)
+  })
+
+  it('cleans up before the caller resumes', () => {
+    fetchFromScriptTag('https://x.test/sync', 'cbSync')
+    window.cbSync([])
+    expect(scripts()).toHaveLength(0)
+    expect('cbSync' in window).toBe(false)
   })
 
   it('rejects and cleans up when the script fails to load', async () => {
@@ -64,7 +71,9 @@ describe('fetchFromScriptTag', () => {
     await pending
     expect(vi.getTimerCount()).toBe(0)
   })
+})
 
+describe('fetchFromScriptTag: many requests', () => {
   it('keeps two in-flight requests apart', async () => {
     const first = fetchFromScriptTag('https://x.test/1', 'cb1')
     const second = fetchFromScriptTag('https://x.test/2', 'cb2')

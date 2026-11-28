@@ -5,3 +5,5 @@ Search history with frecency ranking. Entries `{ q, n, t }` (text, uses, last us
 - Re-searching moves an entry to the front instead of duplicating it; matching ignores case.
 - The old `[{ id }]` format (MiniSearch era) is migrated on read; the MiniSearch dependency is no longer used here.
 - Another tab's write invalidates the cache through the `storage` event.
+- `createHistory` returns a `HistoryStore`. `snapshot` and `subscribe` are arrow fields because `useSyncExternalStore` calls them unbound;
+  the other methods are called on the store.

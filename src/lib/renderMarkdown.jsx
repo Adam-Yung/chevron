@@ -1,29 +1,5 @@
-/* Tiny streaming-friendly Markdown renderer.
- *
- * Why: this app shows Markdown in exactly one place (AI completions).
- * Pulling in `react-markdown` + `mdast-util-from-markdown` + `unified`
- * costs ~25 KB gzipped — overkill for the small subset we actually need.
- *
- * Supported syntax (intentionally tiny):
- *   - ATX headings: `#` … `######`
- *   - Fenced code blocks: ```lang \n code \n ```
- *   - Unordered lists: lines starting with `- ` or `* `
- *   - Ordered lists: lines starting with `<digit>. `
- *   - Inline code:    `code`
- *   - Bold:           **text**
- *   - Italic:         *text*  /  _text_
- *   - Links:          [label](https://…)  (only http/https/mailto allowed)
- *   - Hard line break (two trailing spaces) and blank-line paragraphs.
- *
- * Streaming: an unterminated fenced code block is still rendered as
- * `<pre><code>` with whatever content has arrived so far, so a partial
- * AI response doesn't blow up the UI.
- *
- * Safety: HTML in the input is escaped (we only use `children` props,
- * never `dangerouslySetInnerHTML`). Link URLs are filtered through an
- * allow-list of safe schemes so a hallucinated `javascript:` URL can't
- * be clicked into existence.
- */
+// Tiny streaming-safe Markdown renderer for AI answers: React children only, link schemes allow-listed.
+// Supported syntax and the reasons: docs/code/src/lib/renderMarkdown.jsx.md.
 
 import { Fragment } from 'react'
 
@@ -31,9 +7,7 @@ const SAFE_URL = /^(https?:|mailto:|\/|#)/i
 
 const WORD_CHAR = /[A-Za-z0-9]/
 
-// Index of the closing marker for an emphasis opened at `start`, or -1. A marker needs a
-// non-space neighbour inside (so `5 * 3` stays literal) and `_` must not sit inside a word,
-// otherwise identifiers such as snake_case_name turn into italics in AI answers.
+// Closing marker of an emphasis opened at `start`, or -1. The checks keep `5 * 3` and snake_case_name literal.
 function findItalicEnd(text, start, ch) {
   const next = text[start + 1]
   if (!next || next === ' ' || next === ch) return -1
@@ -85,12 +59,16 @@ function readInline(text, i, key) {
   return null
 }
 
+function keySequence(prefix) {
+  let n = 0
+  return () => prefix + ':' + (n++)
+}
+
 function renderInline(text, keyPrefix) {
   if (!text) return null
   const out = []
   let buf = ''
-  let n = 0
-  const key = () => keyPrefix + ':' + (n++)
+  const key = keySequence(keyPrefix)
   for (let i = 0; i < text.length;) {
     const token = readInline(text, i, key)
     if (!token) {

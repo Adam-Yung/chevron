@@ -43,7 +43,7 @@ describe('Color.set (OKLCH lightness)', () => {
 
   it('keeps white and black fixed under no-op adjustment', () => {
     expect(new Color('#ffffff').set({ 'lch.l': l => l }).toString({ format: 'hex' })).toBe('#ffffff')
-    expect(new Color('#000000').set({ 'oklch.l': l => l }).toString({ format: 'hex' })).toBe('#000000')
+    expect(new Color('#000000').set({ 'lch.l': l => l }).toString({ format: 'hex' })).toBe('#000000')
   })
 })
 

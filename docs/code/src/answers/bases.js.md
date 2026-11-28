@@ -7,3 +7,4 @@ Integer base conversion with BigInt, so long values (a 128-bit hex id) stay exac
 - Hex, binary and octal results keep their prefix (`0xff`) so the pasted value is unambiguous; decimal and other bases have none.
 - A conversion to the base the value is already in returns null (it would show the query back to the user).
 - Sources over 40 digits are ignored to bound BigInt work on pasted text.
+- The label names the source base (`0xff (hex)`).

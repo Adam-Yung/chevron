@@ -1,11 +1,13 @@
-/**
- * JSONP-style fetch via an injected <script>. The caller supplies a callback name that is
- * unique per call (a shared name would let one response resolve another request), so a name
- * already in use rejects instead of clobbering the request that owns it.
- *
- * Every path (response, load error, timeout, failed insert) removes both the global
- * callback and the script node; offline typing would otherwise leak both per keystroke.
- */
+function once(fn) {
+  let done = false
+  return (...args) => {
+    if (done) return
+    done = true
+    fn(...args)
+  }
+}
+
+/** JSONP through an injected <script>. `callbackName` must be unique per call; every outcome removes it and the node. */
 export default function fetchFromScriptTag(url, callbackName, { timeoutMs = 5000 } = {}) {
   return new Promise((resolve, reject) => {
     if (Object.hasOwn(window, callbackName)) {
@@ -14,16 +16,14 @@ export default function fetchFromScriptTag(url, callbackName, { timeoutMs = 5000
     }
 
     const script = document.createElement('script')
-    let settled = false
 
-    const settle = (finish, value) => {
-      if (settled) return
-      settled = true
+    // Response, load error, timeout and failed insert: whichever comes first cleans up for all of them.
+    const settle = once((finish, value) => {
       clearTimeout(timeoutId)
       delete window[callbackName]
       script.remove()
       finish(value)
-    }
+    })
     const timeoutId = setTimeout(
       () => settle(reject, new Error(`fetchFromScriptTag: timeout after ${timeoutMs}ms (${url})`)),
       timeoutMs,

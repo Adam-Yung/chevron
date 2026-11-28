@@ -25,9 +25,7 @@ function getCssGradient(options) {
   }
 }
 
-/**
- * The one flat colour a badge or blob is cut from: a solid colour, or a gradient's first stop. Undefined lets CSS fall back.
- */
+/** The flat colour badges and the blob are cut from (solid, or a gradient's first stop); undefined lets CSS fall back. */
 export function feltColor(options) {
   if (typeof options === 'string') return options.includes('gradient(') ? undefined : options
   if (options?.type === 'solid') return options.color

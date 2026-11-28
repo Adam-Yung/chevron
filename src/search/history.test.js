@@ -12,7 +12,7 @@ const now = () => clock
 
 beforeEach(() => { clock = 1_000_000_000_000 })
 
-describe('history', () => {
+describe('history suggestions', () => {
   it('suggests prefix matches before word and substring matches, and never the exact query', () => {
     const h = createHistory({ storage: memoryStorage(), now })
     for (const q of ['react hooks', 'learn react', 'preact', 'react']) h.add(q)
@@ -35,7 +35,9 @@ describe('history', () => {
     h.add('cats video'); h.add('cats video')
     expect(h.suggest('cats')[0].suggestion).toBe('cats video')
   })
+})
 
+describe('history storage', () => {
   it('re-searching moves an entry to the front instead of duplicating it, ignoring case', () => {
     const storage = memoryStorage()
     const h = createHistory({ storage, now })
@@ -89,5 +91,29 @@ describe('history', () => {
     expect(h.snapshot()).not.toBe(before)
     h.remove('a')
     expect(listener).toHaveBeenCalledTimes(2)
+  })
+})
+
+describe('history as an external store', () => {
+  it('serves subscribe and snapshot unbound, as useSyncExternalStore calls them', () => {
+    const { subscribe, snapshot } = createHistory({ storage: memoryStorage([{ q: 'a', n: 1, t: 0 }]), now })
+    const unsubscribe = subscribe(() => {})
+    expect(snapshot()).toEqual([{ q: 'a', n: 1, t: 0 }])
+    expect(snapshot()).toBe(snapshot())
+    unsubscribe()
+  })
+
+  it('invalidate re-reads storage and notifies until unsubscribed', () => {
+    const storage = memoryStorage()
+    const h = createHistory({ storage, now })
+    expect(h.snapshot()).toEqual([])
+    const listener = vi.fn()
+    const unsubscribe = h.subscribe(listener)
+    storage.setItem(HISTORY_KEY, JSON.stringify([{ q: 'other tab', n: 1, t: 0 }]))
+    h.invalidate()
+    expect(h.snapshot().map(e => e.q)).toEqual(['other tab'])
+    unsubscribe()
+    h.invalidate()
+    expect(listener).toHaveBeenCalledTimes(1)
   })
 })

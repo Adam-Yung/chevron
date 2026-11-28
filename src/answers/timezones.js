@@ -144,15 +144,7 @@ function convertTime(match, now) {
   }
 }
 
-/**
- * Offline time zone answers through Intl: `time in tokyo`, `tokyo time`,
- * `3pm london to new york`, `15:00 utc in jst`, `noon pst to est`, `time in utc+5:30`.
- * Places come from a built-in table, IANA names and unambiguous abbreviations;
- * anything unknown gives no answer.
- * @param {string} query
- * @param {{ now?: () => number }} [options] clock injection for tests
- * @returns {import('./index').Answer|null}
- */
+/** Offline time zone answers (`tokyo time`, `3pm london to new york`); `now` is injectable. @returns {import('./index').Answer|null} */
 export function timezoneAnswer(query, { now = Date.now } = {}) {
   const q = normaliseQuery(query)
   const lead = NOW_IN.exec(q) ?? PLACE_TIME.exec(q)

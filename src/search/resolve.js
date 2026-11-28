@@ -26,25 +26,24 @@ function findCommand(rest, commands) {
   return best && { type: best.type, args: rest.slice(best.trigger.length) }
 }
 
-/**
- * The macro a query names, with its command if the query continues with a command trigger and the macro supports it.
- * @param {string} text
- * @param {{ macros?: object[], commands?: object[] }} config
- */
-export function findMacro(text, config) {
-  const macros = config?.macros ?? []
-  const exact = macros.find(m => m.triggers?.includes(text))
-  if (exact) return { macro: exact, command: null }
-
+// The longest macro trigger followed by a command trigger that macro defines.
+function findMacroCommand(text, macros, commands) {
   let best = null
   for (const macro of macros) {
     for (const trigger of macro.triggers ?? []) {
       if (!text.startsWith(trigger) || (best && trigger.length <= best.trigger.length)) continue
-      const command = findCommand(text.slice(trigger.length), config.commands)
+      const command = findCommand(text.slice(trigger.length), commands)
       if (command && macro.commands?.[command.type]) best = { macro, command, trigger }
     }
   }
   return best && { macro: best.macro, command: best.command }
+}
+
+/** The macro a query names, plus its command when the query continues with a command trigger that macro defines. */
+export function findMacro(text, config) {
+  const macros = config?.macros ?? []
+  const exact = macros.find(m => m.triggers?.includes(text))
+  return exact ? { macro: exact, command: null } : findMacroCommand(text, macros, config?.commands)
 }
 
 function fill(template, at, dollar) {
@@ -91,17 +90,7 @@ function urlDestination(text, config, colorScheme) {
   }
 }
 
-/**
- * @param {string} text the typed query, or the selected suggestion's text
- * @param {object} options
- * @param {string} [options.type] the selected suggestion's type, if any
- * @param {string} [options.origin] the typed query when `text` is a suggestion (engine templates may use either)
- * @param {object} [options.config] window.CONFIG: { macros, commands, engines }
- * @param {object} [options.engine] the active search engine entry
- * @param {boolean} [options.forceEngine] skip macros and URLs: always search
- * @param {string} [options.colorScheme] 'light' | 'dark'
- * @param {(type: string) => boolean} [options.isAnswer] whether `type` is an instant answer (copied, not opened)
- */
+/** `text` is the query or the selected suggestion (then `origin` is the query); `forceEngine` skips macros and URLs. */
 export function resolveDestination(text, options = {}) {
   const { type, config, forceEngine, colorScheme, isAnswer = () => false } = options
   const engine = options.engine ?? NO_ENGINE

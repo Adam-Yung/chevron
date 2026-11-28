@@ -91,3 +91,15 @@ describe('renderMarkdown: safety', () => {
     expect(html('# <u>x</u>')).toBe('<div><h1>&lt;u&gt;x&lt;/u&gt;</h1></div>')
   })
 })
+
+const keysOf = node => {
+  if (Array.isArray(node)) return node.flatMap(keysOf)
+  if (!node?.props) return []
+  return [node.key, ...keysOf(node.props.children)]
+}
+
+describe('renderMarkdown: element keys', () => {
+  it('keys inline elements by block and position, so streaming updates reuse them', () => {
+    expect(keysOf(renderMarkdown('a **b** `c` [d](https://x.com) _e_'))).toEqual(['b0', 'l0', 'b0l0:1', 'b0l0:2', 'b0l0:4', 'b0l0:6'])
+  })
+})

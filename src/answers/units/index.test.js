@@ -83,8 +83,7 @@ describe('unitAnswer: must not answer', () => {
 describe('convertUnits', () => {
   it('reports the family so wrappers can restrict it', () => {
     expect(convertUnits('1 kg in g').family).toBe('weight')
-    expect(convertUnits('1 kg in g', ['duration'])).toBeNull()
-    expect(convertUnits('1 h in min', ['duration']).family).toBe('duration')
+    expect(convertUnits('1 h in min').family).toBe('duration')
   })
 
   it('resolves an alias to the family both sides share', () => {

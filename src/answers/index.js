@@ -4,13 +4,7 @@ import { percentAnswer } from './percent'
 import { timezoneAnswer } from './timezones'
 import { unitAnswer } from './units'
 
-/**
- * @typedef {object} Answer
- * @property {string} suggestion shown, and copied on Enter
- * @property {string} type one of ANSWER_TYPES
- * @property {number} relevance 5000 for exact answers
- * @property {string} [label] short caption, e.g. `1 EUR = 1.0834 USD`
- */
+/** @typedef {{ suggestion: string, type: string, relevance: number, label?: string }} Answer */
 
 export { currencyAnswer, looksLikeCurrency } from './currency'
 
@@ -20,14 +14,7 @@ export const ANSWER_TYPES = ['calculator', 'percent', 'unit', 'base', 'timezone'
 // Order only matters for display when two families match one query, which the grammars avoid.
 const FAMILIES = [percentAnswer, baseAnswer, unitAnswer, timezoneAnswer, calculatorAnswer]
 
-/**
- * Every offline answer for a query: calculator, percent, units, number bases, time zones.
- * Synchronous and pure (time zones read the clock); never throws.
- * Currency needs the network, see `currencyAnswer`.
- * @param {string} query
- * @param {{ now?: () => number }} [options]
- * @returns {Answer[]}
- */
+/** Every offline answer for a query. Synchronous and never throws; currency needs the network, see `currencyAnswer`. */
 export function instantAnswers(query, options) {
   const answers = []
   for (const family of FAMILIES) {

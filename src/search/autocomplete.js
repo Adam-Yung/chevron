@@ -16,10 +16,7 @@ export function peekAutocomplete(query, locale) {
   return cache.get(keyOf(query, locale)) ?? null
 }
 
-/**
- * While the request for a longer query is in flight, the cached answer for its longest typed prefix, narrowed to entries that
- * still match, keeps the list stable instead of blinking.
- */
+/** The longest cached prefix, narrowed to what still matches: keeps the list from blinking while a request is in flight. */
 export function prefixFallback(query, locale) {
   const lower = query.toLowerCase()
   for (let end = query.length - 1; end > 0; end--) {

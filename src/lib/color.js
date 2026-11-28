@@ -1,20 +1,5 @@
-/* Tiny color helper — replaces `colorjs.io` (~25 KB).
- *
- * Supports the very narrow set of operations Chevron needs:
- *   - parse / serialize CSS hex (3, 4, 6, 8 digit) and rgb/rgba()
- *   - APCA (SAPC) contrast value, used by Settings ColorPicker
- *   - lighten / darken via OKLCH lightness adjust (matches the
- *     intent of the previous `lch.l` tweak; OKLCH is perceptually
- *     uniform like LCH but cheaper to compute and well-supported in
- *     CSS now)
- *   - Color.parse() throws on bad input, which ColorPicker uses for validation
- *
- * The APCA implementation follows the public reference from the
- * SAPC-APCA repository, simplified for sRGB inputs only:
- *   https://github.com/Myndex/SAPC-APCA
- */
+// The few colorjs.io operations Chevron uses: hex/rgb parsing, APCA contrast, OKLCH lightness. Details in docs/code.
 
-// ---------------------------------------------------------------------------
 // hex / rgb parsing
 
 function parseHex(str) {
@@ -74,9 +59,7 @@ function toHex({ r, g, b }) {
   return '#' + pad2(clamp01(r)) + pad2(clamp01(g)) + pad2(clamp01(b))
 }
 
-// ---------------------------------------------------------------------------
-// sRGB <-> linear sRGB <-> OKLab <-> OKLCH
-// (formulas from Björn Ottosson's OKLab post, unchanged)
+// sRGB <-> linear sRGB <-> OKLab <-> OKLCH (Björn Ottosson's OKLab formulas, unchanged)
 
 function sRGBtoLin(v) { return v <= 0.04045 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4) }
 function linTosRGB(v) { return v <= 0.0031308 ? 12.92 * v : 1.055 * Math.pow(v, 1 / 2.4) - 0.055 }
@@ -119,12 +102,7 @@ function oklchToOklab({ L, C, h }) {
   return { L, a: C * Math.cos(r), b: C * Math.sin(r) }
 }
 
-// ---------------------------------------------------------------------------
-// APCA (SAPC) contrast.
-// Reference: https://github.com/Myndex/SAPC-APCA — public-domain math.
-//
-// We implement the simplified sRGB path. Returns the signed Lc value;
-// callers usually take Math.abs of it.
+// APCA contrast, simplified sRGB path (public-domain math: https://github.com/Myndex/SAPC-APCA).
 
 const APCA_MAIN_TRC = 2.4
 const APCA_REVERSE_BG = 0.56
@@ -171,8 +149,7 @@ export function apcaContrast(textColor, bgColor) {
   return outputContrast
 }
 
-// ---------------------------------------------------------------------------
-// Public Color class — drop-in for the operations the app actually uses.
+// Public Color class
 
 export default class Color {
   constructor(input) {
@@ -183,22 +160,14 @@ export default class Color {
   }
 
   static parse(input) {
-    const rgb = parseColor(input)
-    if (!rgb) throw new Error('Could not parse color: ' + input)
     return new Color(input)
   }
 
-  // Supports the single shape we use: { 'lch.l': lightnessOrFunction }
-  // Adjustments are made in OKLCH space (perceptually uniform, matches
-  // what the previous LCH-based code was approximating). Lightness in
-  // OKLCH is 0..1; the previous code expected 0..100, so we accept both.
+  // Only { 'lch.l': number or function } is supported: OKLCH lightness on colorjs.io's 0..100 scale.
   set(spec) {
     let lab = oklabToOklch(rgbToOklab(this._rgb))
-    if ('lch.l' in spec || 'oklch.l' in spec) {
-      const fn = spec['lch.l'] != null ? spec['lch.l'] : spec['oklch.l']
-      // Convert to a 0..100 scale to match the original colorjs.io API,
-      // then back. This keeps the existing call sites
-      // (`l => l > 30 ? l - 5 : l + 10`) working unchanged.
+    if ('lch.l' in spec) {
+      const fn = spec['lch.l']
       const l100 = lab.L * 100
       const next = typeof fn === 'function' ? fn(l100) : fn
       lab = { ...lab, L: clamp01(next / 100) }
@@ -207,9 +176,7 @@ export default class Color {
     return new Color(toHex(newRgb))
   }
 
-  // Mirrors colorjs.io's `bg.contrast(other, 'APCA')`; APCA is the only algorithm Chevron uses,
-  // so `algo` is accepted for call-site compatibility and ignored. The value is signed by
-  // polarity; callers take Math.abs.
+  // APCA only: the algorithm name callers still pass is ignored. Signed by polarity.
   contrast(other) {
     const otherColor = other instanceof Color ? other : new Color(other)
     return apcaContrast(otherColor._rgb, this._rgb)

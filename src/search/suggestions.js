@@ -3,12 +3,7 @@
 const TIER = { answer: 0, macroExact: 1, history: 2, macro: 3, autocomplete: 4 }
 const RELEVANCE_TOP = 5000
 
-/**
- * Macros whose triggers start with the query, one entry per macro, using the shortest matching trigger as the text so that
- * selecting the suggestion resolves to that macro.
- * @param {string} query
- * @param {object[]} macros
- */
+/** One entry per matching macro, its shortest matching trigger as the text so that selecting it resolves to that macro. */
 export function macroSuggestions(query, macros) {
   if (!query) return []
   const results = []
@@ -28,11 +23,7 @@ function tierOf(item, isAnswer) {
   return TIER.autocomplete
 }
 
-/**
- * Merge suggestion groups: one entry per text (case-insensitive), the better tier wins, ordered by tier then relevance.
- * @param {object[][]} groups
- * @param {(type: string) => boolean} isAnswer
- */
+/** One entry per text (case-insensitive), the better tier winning, ordered by tier then relevance. */
 export function mergeSuggestions(groups, isAnswer = () => false) {
   const byText = new Map()
   for (const item of groups.flat()) {
@@ -48,11 +39,7 @@ export function mergeSuggestions(groups, isAnswer = () => false) {
 /** Identity of a suggestion across renders: lists are rebuilt on every keystroke, so object identity cannot be used. */
 export const sameSuggestion = (a, b) => Boolean(a && b && a.suggestion === b.suggestion && a.type === b.type)
 
-/**
- * What Enter acts on: the highlighted suggestion; else an instant answer at the top of the list (typing `2+2` then Enter copies 4);
- * else the typed text.
- * @returns {{ suggestion: string, type?: string }}
- */
+/** What Enter acts on: the highlighted suggestion, else a top instant answer (`2+2` copies 4), else the typed text. */
 export function submitTarget(query, selection, list, isAnswer) {
   if (selection) return selection
   const top = list[0]
@@ -60,12 +47,7 @@ export function submitTarget(query, selection, list, isAnswer) {
   return { suggestion: query.trim() }
 }
 
-/**
- * The suggestion `delta` steps from the current selection; past either end returns null, which means "the typed text".
- * @param {object[]} list
- * @param {{ suggestion: string, type: string } | null} selection
- * @param {1 | -1} delta
- */
+/** The suggestion `delta` (1 or -1) steps away; past either end is null, meaning the typed text. */
 export function stepSelection(list, selection, delta) {
   if (!list.length) return null
   const current = list.findIndex(s => sameSuggestion(s, selection))

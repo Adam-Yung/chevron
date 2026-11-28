@@ -22,12 +22,7 @@ function render(value, base) {
   return sign + (PREFIX[base] ?? '') + digits
 }
 
-/**
- * Integer base conversion: `255 in hex`, `0xff to decimal`, `0b1010 in dec`, `255 to base 7`.
- * Plain digits are always read as decimal (never guessing that `ff` is hex).
- * Hex, binary and octal results carry their 0x / 0b / 0o prefix so they stay unambiguous when pasted.
- * @returns {import('./index').Answer|null}
- */
+/** Integer base conversion (`255 in hex`, `0xff to decimal`). @returns {import('./index').Answer|null} */
 export function baseAnswer(query) {
   const m = BASE_RE.exec(normaliseQuery(query))
   if (!m) return null

@@ -1,6 +1,6 @@
 # Instant answers
 
-> Verified: 2026-11-26 00:24 · Sources: `src/answers/index.js`, `src/answers/calculator.js`, `src/answers/percent.js`, `src/answers/bases.js`, `src/answers/units/index.js`, `src/answers/units/tables.js`, `src/answers/timezones.js`, `src/answers/cityZones.js`, `src/answers/currency.js`, `src/answers/query.js`, `src/answers/format.js`
+> Verified: 2026-11-28 00:00 · Sources: `src/answers/index.js`, `src/answers/calculator.js`, `src/answers/percent.js`, `src/answers/bases.js`, `src/answers/units/index.js`, `src/answers/units/tables.js`, `src/answers/timezones.js`, `src/answers/cityZones.js`, `src/answers/currency.js`, `src/answers/query.js`, `src/answers/format.js`
 
 Type a question into the search box and Chevron answers it directly as the top suggestion. Pressing Enter copies the answer instead of searching.
 Everything works offline except currency, which asks `open.er-api.com` for rates (cached for 5 minutes per base currency).

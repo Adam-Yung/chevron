@@ -17,4 +17,4 @@ spell them with spaces (`9 / 11`) to calculate. `0xff` style literals are left f
 - Factorial accepts integers 0..170 (171! overflows a double).
 - Division by zero, domain errors (`sqrt(-1)`, `ln(0)`) and overflow throw an internal `CalcError`, caught in `calculate`, giving null: never NaN or Infinity.
 - Nesting is capped at depth 40; deeper input (or a stack overflow) is null.
-- `calculate` and `formatCalcResult` keep their old signatures for `src/search/useSuggestions.js`.
+- `calculate` returns a number or null; `formatCalcResult` renders it with 10 significant digits.

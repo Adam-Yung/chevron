@@ -5,3 +5,5 @@ Percent phrases that need words, which the calculator cannot express: `15% of 80
 
 Rules are a small table of regex + formula; the two "what percent" rules divide, so a zero divisor returns null instead of Infinity.
 The filler "what is" is removed earlier by `normaliseQuery`. `%`, `percent` and `pct` are interchangeable.
+
+Reviewed: f5448ce3

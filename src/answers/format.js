@@ -2,13 +2,7 @@
 // 0.30000000000000004 without losing exact integers up to ~1e15.
 const NOISE_DIGITS = 12
 
-/**
- * Formats a number for display: no float noise, no thousands separators (answers are
- * copied on Enter and pasted into other tools), no trailing zeros.
- * @param {number} value
- * @param {number} [significant] significant digits for non-integers
- * @returns {string} '' for NaN and Infinity
- */
+/** Display form: no float noise, separators or trailing zeros; '' for NaN and Infinity. */
 export function formatNumber(value, significant = 8) {
   if (!Number.isFinite(value)) return ''
   if (Number.isInteger(value) && Math.abs(value) < 1e15) return String(value)

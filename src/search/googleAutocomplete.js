@@ -17,10 +17,6 @@ export function parseGoogleSuggestions(res) {
     .map(s => ({ ...s, type: 'autocomplete', navigation: s.type === 'navigation' }))
 }
 
-/**
- * @param {string} query
- * @param {string} locale
- */
 export default async function googleAutocomplete(query, locale) {
   // Unique per call: two requests in the same millisecond must not share a global callback.
   const callback = `chevronSuggest${Date.now().toString(36)}${(calls++).toString(36)}`

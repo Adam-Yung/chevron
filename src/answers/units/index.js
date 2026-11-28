@@ -30,26 +30,21 @@ function fromBase(unit, value) {
   return unit.factor === undefined ? unit.fromBase(value) : value / unit.factor
 }
 
-function resolvePair(fromText, toText, families) {
+function resolvePair(fromText, toText) {
   const fromHits = ALIASES.get(normaliseUnit(fromText)) ?? []
   const toHits = ALIASES.get(normaliseUnit(toText)) ?? []
   for (const from of fromHits) {
-    if (families && !families.includes(from.family)) continue
     const to = toHits.find(hit => hit.family === from.family)
     if (to) return { family: from.family, from: from.key, to: to.key }
   }
   return null
 }
 
-/**
- * Parses `<amount> <unit> in|to <unit>` and converts within one family.
- * `families` limits the search (the legacy weight and time wrappers use it).
- * @returns {{ result: number, amount: number, family: string, fromUnit: string, toUnit: string }|null}
- */
-export function convertUnits(query, families) {
+/** Parses `<amount> <unit> in|to <unit>` and converts within one family; null when it cannot. */
+export function convertUnits(query) {
   const m = CONVERT_RE.exec(normaliseQuery(query))
   if (!m) return null
-  const pair = resolvePair(m[2], m[3], families)
+  const pair = resolvePair(m[2], m[3])
   const amount = parseAmount(m[1])
   if (!pair || !Number.isFinite(amount)) return null
   const { units } = FAMILIES[pair.family]
@@ -60,11 +55,7 @@ export function convertUnits(query, families) {
   return { result, amount, family: pair.family, fromUnit: pair.from, toUnit: pair.to }
 }
 
-/**
- * Unit conversions across length, weight, duration, temperature, volume, area, speed and data.
- * A query without a target unit (`5 ft`) gets no answer: guessing one would be wrong as often as right.
- * @returns {import('../index').Answer|null}
- */
+/** The unit answer card; a query without a target unit gets none. @returns {import('../index').Answer|null} */
 export function unitAnswer(query) {
   const c = convertUnits(query)
   if (!c) return null

@@ -52,10 +52,7 @@ function parseCurrency(query) {
   return { from, to, amount: left[2] ? parseAmount(left[2]) : 1 }
 }
 
-/**
- * Cheap synchronous gate: true only when the query names two known currencies, so callers
- * can skip scheduling a network request for ordinary searches.
- */
+/** Synchronous gate (two known currencies), so ordinary searches never schedule a request. */
 export function looksLikeCurrency(query) {
   return parseCurrency(query) !== null
 }
@@ -79,40 +76,47 @@ function toAnswer({ from, to, amount }, rate) {
   }
 }
 
-async function loadRates(from, signal, fetchImpl) {
+function freshRates(from) {
   const cached = rateCache.get(from)
-  if (cached && Date.now() - cached.fetchedAt < CACHE_TTL_MS) return cached.rates
+  return cached && Date.now() - cached.fetchedAt < CACHE_TTL_MS ? cached.rates : null
+}
 
-  signal?.throwIfAborted()
+// Runs a request that the caller's signal or our own timeout can abort. Our timeout and any failure are just "no answer".
+async function withDeadline(caller, request) {
   const controller = new AbortController()
   let timedOut = false
   const timer = setTimeout(() => { timedOut = true; controller.abort() }, TIMEOUT_MS)
-  const onAbort = () => controller.abort()
-  signal?.addEventListener('abort', onAbort, { once: true })
+  // The explicit undefined keeps the abort event from becoming the abort reason.
+  const forwardAbort = controller.abort.bind(controller, undefined)
+  caller?.addEventListener('abort', forwardAbort, { once: true })
   try {
-    const response = await fetchImpl(RATES_URL + from, { signal: controller.signal })
-    const data = await response.json()
-    if (data?.result !== 'success' || !data.rates) return null
-    rateCache.set(from, { rates: data.rates, fetchedAt: Date.now() })
-    return data.rates
+    return await request(controller.signal)
   } catch (err) {
-    // A caller abort must propagate so stale lookups are dropped; our own timeout is just "no answer".
+    // A caller abort must propagate so stale lookups are dropped.
     if (err?.name === 'AbortError' && !timedOut) throw err
     return null
   } finally {
     clearTimeout(timer)
-    signal?.removeEventListener('abort', onAbort)
+    caller?.removeEventListener('abort', forwardAbort)
   }
 }
 
-/**
- * Live currency conversion (`100 usd to eur`, `$5 in yen`, `euro to bucks`).
- * Resolves to null for non-currency queries, network failures and unknown targets;
- * rejects only with AbortError when the caller's signal aborts.
- * @param {string} query
- * @param {{ signal?: AbortSignal, fetchImpl?: typeof fetch }} [options]
- * @returns {Promise<import('./index').Answer|null>}
- */
+async function requestRates(from, fetchImpl, signal) {
+  const response = await fetchImpl(RATES_URL + from, { signal })
+  const data = await response.json()
+  if (data?.result !== 'success' || !data.rates) return null
+  rateCache.set(from, { rates: data.rates, fetchedAt: Date.now() })
+  return data.rates
+}
+
+async function loadRates(from, signal, fetchImpl) {
+  const cached = freshRates(from)
+  if (cached) return cached
+  signal?.throwIfAborted()
+  return withDeadline(signal, requestSignal => requestRates(from, fetchImpl, requestSignal))
+}
+
+/** Live conversion (`100 usd to eur`, `$5 in yen`): null when unanswerable, rejects only with AbortError on caller abort. */
 export async function currencyAnswer(query, { signal, fetchImpl = fetch } = {}) {
   const parsed = parseCurrency(query)
   if (!parsed) return null

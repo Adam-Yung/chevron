@@ -20,10 +20,7 @@ export function useResolver() {
   )
 }
 
-/**
- * Where Enter would go right now: the highlighted suggestion, else the typed query. While the query empties (leaving search),
- * the last destination is kept so the closing animation does not flash to a blank state.
- */
+/** Where Enter would go now. While the query empties, the last destination is kept so the closing animation does not blank. */
 export default function useDestination() {
   const query = useUi(s => s.query)
   const selection = useUi(s => s.selection)

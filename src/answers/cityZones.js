@@ -80,11 +80,9 @@ const ROWS = [
   ['Auckland', 'Pacific/Auckland', 'new zealand', 'wellington'],
 ]
 
-// Abbreviations map to the region's civil zone, so `pst` in July shows daylight time.
-// CST, BST-as-Bangladesh, IST-as-Israel/Ireland and the like are left out as ambiguous;
-// IST is read as India because that is how it is overwhelmingly typed.
+// Abbreviations map to the region's civil zone (`pst` in July shows daylight time); ambiguous ones such as CST are left out.
 const ABBREVIATIONS = {
-  utc: 'UTC', gmt: 'UTC', z: null,
+  utc: 'UTC', gmt: 'UTC',
   pst: 'America/Los_Angeles', pdt: 'America/Los_Angeles', pt: 'America/Los_Angeles',
   mst: 'America/Denver', mdt: 'America/Denver', mt: 'America/Denver',
   est: 'America/New_York', edt: 'America/New_York', et: 'America/New_York',
@@ -103,5 +101,5 @@ for (const [name, zone, ...extra] of ROWS) {
   for (const spelling of [name, ...extra]) PLACES.set(spelling.toLowerCase(), { name, zone })
 }
 for (const [abbr, zone] of Object.entries(ABBREVIATIONS)) {
-  if (zone) PLACES.set(abbr, { name: abbr.toUpperCase(), zone })
+  PLACES.set(abbr, { name: abbr.toUpperCase(), zone })
 }

@@ -24,22 +24,32 @@ function useLocalSuggestions(query) {
   }, [query, config, entries, historyOn, historyLimit])
 }
 
+const noRemote = query => ({ query, autocomplete: [], currency: null })
+
+// Remote sources arrive one by one; an aborted lookup writes nothing.
+function settleRemote(setRemote, query, signal, patch) {
+  if (!signal.aborted) setRemote(r => ({ ...(r.query === query ? r : noRemote(query)), ...patch }))
+}
+
+function requestRemote({ query, locale, limit, signal, setRemote }) {
+  const settle = settleRemote.bind(null, setRemote, query, signal)
+  if (limit > 0) fetchAutocomplete(query, locale).then(items => settle({ autocomplete: items }), () => settle({}))
+  if (looksLikeCurrency(query)) currencyAnswer(query, { signal }).then(a => settle({ currency: a }), () => {})
+}
+
 function useRemoteSuggestions(query) {
   const settings = useContext(SettingsContext)
   const locale = settings.general.locale
   const limit = settings.query.suggestions.autocompleteLimit
-  const [remote, setRemote] = useState({ query: '', autocomplete: [], currency: null })
+  const [remote, setRemote] = useState(noRemote(''))
 
   useEffect(() => {
     if (!query) return undefined
     const controller = new AbortController()
-    const settle = patch => {
-      if (!controller.signal.aborted) setRemote(r => ({ ...(r.query === query ? r : { query, autocomplete: [], currency: null }), ...patch }))
-    }
-    const timer = setTimeout(() => {
-      if (limit > 0) fetchAutocomplete(query, locale).then(items => settle({ autocomplete: items }), () => settle({}))
-      if (looksLikeCurrency(query)) currencyAnswer(query, { signal: controller.signal }).then(a => settle({ currency: a }), () => {})
-    }, peekAutocomplete(query, locale) ? 0 : NETWORK_DEBOUNCE_MS)
+    const timer = setTimeout(
+      () => requestRemote({ query, locale, limit, signal: controller.signal, setRemote }),
+      peekAutocomplete(query, locale) ? 0 : NETWORK_DEBOUNCE_MS
+    )
     return () => {
       clearTimeout(timer)
       controller.abort()
@@ -52,11 +62,7 @@ function useRemoteSuggestions(query) {
   }, [remote, query, locale, limit])
 }
 
-/**
- * Every suggestion for the query, merged and ordered (see suggestions.js). Local sources answer on the same render; remote ones
- * are added when they arrive, and only if the query has not changed meanwhile.
- * @param {string} query
- */
+/** Merged, ordered suggestions: local sources answer on the same render, remote ones only while the query is still current. */
 export default function useSuggestions(query) {
   const local = useLocalSuggestions(query)
   const remote = useRemoteSuggestions(query)

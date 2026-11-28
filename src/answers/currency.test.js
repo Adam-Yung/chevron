@@ -25,18 +25,18 @@ describe('looksLikeCurrency', () => {
   })
 })
 
-describe('currencyAnswer', () => {
-  let fetchImpl
+let fetchImpl
 
-  beforeEach(() => {
-    clearCurrencyCache()
-    fetchImpl = vi.fn(async () => ratesResponse(USD_RATES))
-  })
+beforeEach(() => {
+  clearCurrencyCache()
+  fetchImpl = vi.fn(async () => ratesResponse(USD_RATES))
+})
 
-  afterEach(() => {
-    vi.useRealTimers()
-  })
+afterEach(() => {
+  vi.useRealTimers()
+})
 
+describe('currencyAnswer: conversion', () => {
   it('converts using the rate for the base currency', async () => {
     const answer = await currencyAnswer('100 usd to eur', { fetchImpl })
     expect(answer).toEqual({ suggestion: '90.00 EUR', type: 'currency', relevance: 5000, label: '1 USD = 0.9 EUR' })
@@ -56,7 +56,9 @@ describe('currencyAnswer', () => {
     await currencyAnswer('5 yen to usd', { fetchImpl })
     expect(fetchImpl.mock.calls[0][0]).toBe('https://open.er-api.com/v6/latest/JPY')
   })
+})
 
+describe('currencyAnswer: rate cache and network use', () => {
   it('caches rates per base currency for five minutes', async () => {
     vi.useFakeTimers()
     await currencyAnswer('1 usd to eur', { fetchImpl })
@@ -77,7 +79,9 @@ describe('currencyAnswer', () => {
     expect(await currencyAnswer('5 km to mi', { fetchImpl })).toBeNull()
     expect(fetchImpl).not.toHaveBeenCalled()
   })
+})
 
+describe('currencyAnswer: failures', () => {
   it('returns null when the target has no rate', async () => {
     expect(await currencyAnswer('1 usd to zwl', { fetchImpl })).toBeNull()
   })
@@ -96,7 +100,9 @@ describe('currencyAnswer', () => {
     await currencyAnswer('1 usd to eur', { fetchImpl })
     expect((await currencyAnswer('1 usd to eur', { fetchImpl })).suggestion).toBe('0.90 EUR')
   })
+})
 
+describe('currencyAnswer: aborts and timeouts', () => {
   it('rejects with AbortError when the caller aborts mid-flight', async () => {
     const controller = new AbortController()
     fetchImpl = vi.fn((url, { signal }) => new Promise((resolve, reject) => {
@@ -105,6 +111,19 @@ describe('currencyAnswer', () => {
     const pending = currencyAnswer('1 usd to eur', { signal: controller.signal, fetchImpl })
     controller.abort()
     await expect(pending).rejects.toMatchObject({ name: 'AbortError' })
+  })
+
+  it('passes the caller abort to the request as a plain AbortError, not the abort event', async () => {
+    const controller = new AbortController()
+    let requestSignal
+    fetchImpl = vi.fn((url, { signal }) => new Promise((resolve, reject) => {
+      requestSignal = signal
+      signal.addEventListener('abort', () => reject(signal.reason))
+    }))
+    const pending = currencyAnswer('1 usd to eur', { signal: controller.signal, fetchImpl })
+    controller.abort()
+    await expect(pending).rejects.toMatchObject({ name: 'AbortError' })
+    expect(requestSignal.reason.name).toBe('AbortError')
   })
 
   it('rejects at once when the signal is already aborted', async () => {
