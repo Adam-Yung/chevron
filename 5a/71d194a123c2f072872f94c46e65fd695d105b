@@ -1,0 +1,104 @@
+docs/features/shell.md
+  s_21734926ab93ce::t_380e80b0c5a375 1-2,4-23
+  s_21734926ab93ce::t_cb8e94ecc2f00f 3
+  s_21734926ab93ce::t_71ca76f06968a3 24
+docs/code/src/settings/schema.js.md
+  s_21734926ab93ce::t_b9650955db9b20 10,15
+.deslop.json
+  s_21734926ab93ce::t_380e80b0c5a375 4
+docs/code/src/input/usePointerInput.js.md
+  s_21734926ab93ce::t_b9650955db9b20 3
+docs/code/tools/vite/htmlTransforms.js.md
+  s_21734926ab93ce::t_b9650955db9b20 18
+docs/code/src/features/macros-editor/MacrosEditorBody.jsx.md
+  s_21734926ab93ce::t_b9650955db9b20 3
+docs/code/src/features/search/InteractiveBackground.jsx.md
+  s_21734926ab93ce::t_b9650955db9b20 3
+docs/code/scripts/verify.sh.md
+  s_21734926ab93ce::t_b9650955db9b20 8-9
+docs/code/src/storage/macrosConfig.js.md
+  s_21734926ab93ce::t_b9650955db9b20 6-7
+docs/features/shortcuts.md
+  s_21734926ab93ce::t_380e80b0c5a375 1,4-5,11,29-31,38-50
+  s_21734926ab93ce::t_cb8e94ecc2f00f 3
+docs/code/src/features/settings-panel/Settings.jsx.md
+  s_21734926ab93ce::t_b9650955db9b20 6,9-10
+docs/features/look.md
+  s_21734926ab93ce::t_380e80b0c5a375 1-2,4-25
+  s_21734926ab93ce::t_cb8e94ecc2f00f 3
+docs/code/src/features/macros/ChevronTop.jsx.md
+  s_21734926ab93ce::t_b9650955db9b20 3
+docs/code/src/features/macros/useClock.js.md
+  s_21734926ab93ce::t_b9650955db9b20 3
+docs/code/src/features/ai/useCompletion.js.md
+  s_21734926ab93ce::t_b9650955db9b20 8-9
+README.md
+  s_21734926ab93ce::t_8f03653e82b280 58
+docs/code/src/features/chevron/drawChevron.js.md
+  s_21734926ab93ce::t_b9650955db9b20 6
+docs/features/macros-editor.md
+  s_21734926ab93ce::t_380e80b0c5a375 4-5,45-47
+  s_21734926ab93ce::t_cb8e94ecc2f00f 3
+docs/features/offline.md
+  s_21734926ab93ce::t_cb8e94ecc2f00f 3
+  s_21734926ab93ce::t_380e80b0c5a375 4-5,8,24-28
+docs/features/sites.md
+  s_21734926ab93ce::t_cb8e94ecc2f00f 3
+  s_21734926ab93ce::t_380e80b0c5a375 4-5,10-11,21
+docs/code/src/features/chevron/parseStages.js.md
+  s_21734926ab93ce::t_b9650955db9b20 3,8
+  s_21734926ab93ce::t_7cbb49fa6846f8 9
+docs/features/README.md
+  s_21734926ab93ce::t_380e80b0c5a375 1-2,4-58
+  s_21734926ab93ce::t_cb8e94ecc2f00f 3
+docs/features/settings.md
+  s_21734926ab93ce::t_380e80b0c5a375 4-5,20,58
+  s_21734926ab93ce::t_cb8e94ecc2f00f 3
+docs/features/tooling.md
+  s_21734926ab93ce::t_380e80b0c5a375 1-2,4-18
+  s_21734926ab93ce::t_cb8e94ecc2f00f 3
+docs/features/builds.md
+  s_21734926ab93ce::t_380e80b0c5a375 1-2,4,6-24
+  s_21734926ab93ce::t_cb8e94ecc2f00f 3
+  s_21734926ab93ce::t_71ca76f06968a3 5,25
+docs/README.md
+  s_21734926ab93ce::t_380e80b0c5a375 17,23-24,27-30
+docs/features/weather.md
+  s_21734926ab93ce::t_380e80b0c5a375 1,4-5,7-12
+  s_21734926ab93ce::t_cb8e94ecc2f00f 3
+docs/code/src/storage/localStorageObject.js.md
+  s_21734926ab93ce::t_b9650955db9b20 3
+docs/features/search.md
+  s_21734926ab93ce::t_cb8e94ecc2f00f 3
+  s_21734926ab93ce::t_380e80b0c5a375 4-5,19
+docs/features/instant-answers.md
+  s_21734926ab93ce::t_cb8e94ecc2f00f 3
+  s_21734926ab93ce::t_380e80b0c5a375 4-5
+docs/code/src/state/ui.js.md
+  s_21734926ab93ce::t_b9650955db9b20 7
+docs/features/ai.md
+  s_21734926ab93ce::t_380e80b0c5a375 4-5,14-15,20,24-28
+  s_21734926ab93ce::t_cb8e94ecc2f00f 3
+docs/code/src/lib/ensureProtocol.js.md
+  s_21734926ab93ce::t_b9650955db9b20 3
+docs/code/scripts/owner/add-graduate-font.sh.md
+  s_21734926ab93ce::t_b9650955db9b20 3-5
+docs/code/scripts/owner/install-deps.sh.md
+  s_21734926ab93ce::t_b9650955db9b20 3-4
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.24",
+  "base_commit_sha": "5a71d194a123c2f072872f94c46e65fd695d105b",
+  "prompts": {},
+  "sessions": {
+    "s_21734926ab93ce": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a2b063db-2489-4588-a3b5-1810c9e2d4a1",
+        "model": "claude-sonnet-5-5"
+      },
+      "human_author": "Adam Yung <adyung@paloaltonetworks.com>"
+    }
+  }
+}
