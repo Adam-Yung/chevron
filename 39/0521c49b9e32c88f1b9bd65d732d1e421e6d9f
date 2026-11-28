@@ -1,0 +1,268 @@
+docs/code/src/features/chevron/parseStages.js.md
+  s_21734926ab93ce::t_191a13f058ffa0 9-11
+docs/code/src/features/ai/sse.js.md
+  s_21734926ab93ce::t_191a13f058ffa0 8-9
+src/features/macros/useGridShape.js
+  s_21734926ab93ce::t_191a13f058ffa0 1,4,6
+src/features/search/useViewportSize.test.jsx
+  s_21734926ab93ce::t_191a13f058ffa0 17-42
+docs/features/ai.md
+  s_21734926ab93ce::t_d63b94c66b15d9 3
+docs/code/src/input/useTouchGestures.js.md
+  s_21734926ab93ce::t_191a13f058ffa0 4-6
+src/features/search/useAdaptiveFontSize.test.jsx
+  s_21734926ab93ce::t_191a13f058ffa0 1-45
+docs/code/src/state/UiStore.jsx.md
+  s_21734926ab93ce::t_191a13f058ffa0 4-5
+docs/code/src/storage/obfuscate.js.md
+  s_21734926ab93ce::t_191a13f058ffa0 6-7
+docs/code/src/features/macros/useGridShape.js.md
+  s_21734926ab93ce::t_191a13f058ffa0 4-5
+src/input/usePointerInput.test.jsx
+  s_21734926ab93ce::t_191a13f058ffa0 1-105
+src/app/bootShell.js
+  s_21734926ab93ce::t_191a13f058ffa0 5-6,15-16
+src/features/macros/useClock.test.js
+  s_21734926ab93ce::t_191a13f058ffa0 5,20-23,44-47
+src/features/weather/forecast.test.js
+  s_21734926ab93ce::t_191a13f058ffa0 25,27
+docs/code/src/app/dialogEvents.js.md
+  s_21734926ab93ce::t_191a13f058ffa0 1-5
+src/input/usePointerInput.js
+  s_21734926ab93ce::t_191a13f058ffa0 4-5,10-34,37-38,48-74,79-80,84
+src/navigation/navigate.test.js
+  s_21734926ab93ce::t_191a13f058ffa0 24,26
+docs/features/shortcuts.md
+  s_21734926ab93ce::t_d63b94c66b15d9 3
+docs/code/src/features/ai/useCompletion.js.md
+  s_21734926ab93ce::t_191a13f058ffa0 10-11
+docs/code/src/input/swipe.js.md
+  s_21734926ab93ce::t_191a13f058ffa0 4-5
+src/app/LayoutButton.jsx
+  s_21734926ab93ce::t_191a13f058ffa0 4-8,17
+src/features/ai/AIcompletion.jsx
+  s_21734926ab93ce::t_191a13f058ffa0 1,11-21,25
+src/navigation/navigate.js
+  s_21734926ab93ce::t_191a13f058ffa0 9,17
+src/features/chevron/useChevronPainter.test.js
+  s_21734926ab93ce::t_191a13f058ffa0 1-2,21-49
+  s_21734926ab93ce::t_db23ba2d62d676 50-51
+src/app/useLaunch.js
+  s_21734926ab93ce::t_191a13f058ffa0 7-8
+docs/code/src/app/LayoutButton.jsx.md
+  s_21734926ab93ce::t_191a13f058ffa0 4-5
+docs/code/src/features/ai/createCompletion.js.md
+  s_21734926ab93ce::t_191a13f058ffa0 13-14
+src/input/wheelAccumulator.js
+  s_21734926ab93ce::t_191a13f058ffa0 1-15
+docs/code/src/input/wheelAccumulator.js.md
+  s_21734926ab93ce::t_191a13f058ffa0 1-6
+src/state/UiStore.jsx
+  s_21734926ab93ce::t_191a13f058ffa0 22-23
+docs/code/src/features/search/useViewportSize.js.md
+  s_21734926ab93ce::t_191a13f058ffa0 6-7
+docs/code/src/features/chevron/drawChevron.js.md
+  s_21734926ab93ce::t_191a13f058ffa0 13-15
+src/input/useTouchGestures.js
+  s_21734926ab93ce::t_191a13f058ffa0 6,10-14,17-44,52-55
+src/features/search/queryFieldId.js
+  s_21734926ab93ce::t_191a13f058ffa0 2
+src/input/keyRouter.js
+  s_21734926ab93ce::t_191a13f058ffa0 73
+docs/code/src/app/useLaunch.js.md
+  s_21734926ab93ce::t_191a13f058ffa0 8-9
+docs/code/src/features/search/useAdaptiveFontSize.js.md
+  s_21734926ab93ce::t_191a13f058ffa0 6-7
+docs/code/src/features/search/InteractiveBackground.jsx.md
+  s_21734926ab93ce::t_191a13f058ffa0 4-8
+docs/code/src/app/useIntents.js.md
+  s_21734926ab93ce::t_191a13f058ffa0 12-13
+docs/code/src/app/whenTabVisible.js.md
+  s_21734926ab93ce::t_191a13f058ffa0 1-4
+docs/code/src/state/ui.js.md
+  s_21734926ab93ce::t_191a13f058ffa0 10-11
+src/features/search/blobPath.js
+  s_21734926ab93ce::t_191a13f058ffa0 26-30,35-36
+src/app/useIntents.test.jsx
+  s_21734926ab93ce::t_191a13f058ffa0 1-77
+docs/code/src/features/macros/useClock.js.md
+  s_21734926ab93ce::t_191a13f058ffa0 4-6
+docs/features/weather.md
+  s_21734926ab93ce::t_d63b94c66b15d9 3
+docs/code/src/features/search/blobPath.js.md
+  s_21734926ab93ce::t_191a13f058ffa0 6-7
+src/features/chevron/drawChevron.test.js
+  s_21734926ab93ce::t_191a13f058ffa0 80-101
+src/storage/obfuscate.js
+  s_21734926ab93ce::t_191a13f058ffa0 1-2,30,38
+src/features/weather/Weather.test.jsx
+  s_21734926ab93ce::t_191a13f058ffa0 1-103
+docs/code/src/storage/localStorageObject.js.md
+  s_21734926ab93ce::t_191a13f058ffa0 9-10
+scripts/gate/baselines/structure.json
+  s_21734926ab93ce::t_b77f06bb7ac431 3
+docs/code/src/app/App.jsx.md
+  s_21734926ab93ce::t_191a13f058ffa0 11-12
+docs/code/src/app/LaunchOverlay.jsx.md
+  s_21734926ab93ce::t_191a13f058ffa0 12-13
+docs/code/src/input/usePointerInput.js.md
+  s_21734926ab93ce::t_191a13f058ffa0 6-7
+src/features/search/QuickLook.jsx
+  s_21734926ab93ce::t_191a13f058ffa0 22-23
+src/features/weather/Weather.jsx
+  s_21734926ab93ce::t_191a13f058ffa0 12-13,17,24-48,55,62
+docs/code/src/features/weather/Weather.jsx.md
+  s_21734926ab93ce::t_191a13f058ffa0 9-10
+src/app/App.jsx
+  s_21734926ab93ce::t_191a13f058ffa0 13,69
+docs/code/src/features/ai/AIcompletion.jsx.md
+  s_21734926ab93ce::t_191a13f058ffa0 10-11
+src/features/chevron/chevronPainter.test.js
+  s_21734926ab93ce::t_191a13f058ffa0 4-5
+src/features/chevron/drawChevron.js
+  s_21734926ab93ce::t_191a13f058ffa0 1-30,32,37-38,42-44
+src/features/macros/MacrosMenu.test.jsx
+  s_21734926ab93ce::t_191a13f058ffa0 1-56
+docs/code/src/features/stage/Stage.jsx.md
+  s_21734926ab93ce::t_191a13f058ffa0 6-7
+src/features/weather/useWeather.js
+  s_21734926ab93ce::t_191a13f058ffa0 2,29-36,48,51
+docs/code/src/features/chevron/chevronPainter.js.md
+  s_21734926ab93ce::t_191a13f058ffa0 4-5
+docs/code/src/features/macros/MacrosLayer.jsx.md
+  s_21734926ab93ce::t_191a13f058ffa0 6-7
+test/setup.js
+  s_21734926ab93ce::t_191a13f058ffa0 33
+docs/code/src/input/keyRouter.js.md
+  s_21734926ab93ce::t_191a13f058ffa0 11-21
+docs/code/src/features/cheatsheet/Cheatsheet.jsx.md
+  s_21734926ab93ce::t_191a13f058ffa0 3,5
+docs/code/src/features/chevron/morph.js.md
+  s_21734926ab93ce::t_191a13f058ffa0 10-12
+docs/code/src/features/search/QueryField.jsx.md
+  s_21734926ab93ce::t_191a13f058ffa0 9-10
+docs/code/src/features/search/queryFieldId.js.md
+  s_21734926ab93ce::t_191a13f058ffa0 4-5
+docs/code/src/navigation/useNavigationRelease.js.md
+  s_21734926ab93ce::t_191a13f058ffa0 6-7
+src/app/useMediaQuery.js
+  s_21734926ab93ce::t_191a13f058ffa0 1-13
+src/features/chevron/parseStages.js
+  s_21734926ab93ce::t_191a13f058ffa0 8,54-55
+src/features/chevron/useChevronPainter.js
+  s_21734926ab93ce::t_191a13f058ffa0 44-45,57-58
+src/features/chevron/morph.js
+  s_21734926ab93ce::t_191a13f058ffa0 1-2,10,13-20,22-33,35-40,46-49,52-56,59-60,62
+docs/code/src/features/weather/useWeather.js.md
+  s_21734926ab93ce::t_191a13f058ffa0 11-12
+src/features/search/InteractiveBackground.test.jsx
+  s_21734926ab93ce::t_191a13f058ffa0 38-63
+src/features/stage/useReducedMotion.js
+  s_21734926ab93ce::t_191a13f058ffa0 1,5
+docs/code/src/features/weather/openWeather.js.md
+  s_21734926ab93ce::t_191a13f058ffa0 11-12
+src/input/useTouchGestures.test.jsx
+  s_21734926ab93ce::t_191a13f058ffa0 1-77
+src/features/search/QueryField.jsx
+  s_21734926ab93ce::t_191a13f058ffa0 11,20
+src/navigation/useNavigationRelease.js
+  s_21734926ab93ce::t_191a13f058ffa0 4,10-29,35-39,45
+src/features/ai/AIcompletion.test.jsx
+  s_21734926ab93ce::t_191a13f058ffa0 1-27
+src/features/ai/useCompletion.js
+  s_21734926ab93ce::t_191a13f058ffa0 10-11
+docs/features/offline.md
+  s_21734926ab93ce::t_d63b94c66b15d9 3
+src/input/useKeyboard.test.jsx
+  s_21734926ab93ce::t_191a13f058ffa0 1-91
+src/features/search/InteractiveBackground.jsx
+  s_21734926ab93ce::t_191a13f058ffa0 6-36,40,43,49-51,53,56,58-59,61,64-66,74
+src/features/stage/Stage.jsx
+  s_21734926ab93ce::t_191a13f058ffa0 9-10
+docs/code/src/features/weather/WeatherModal.jsx.md
+  s_21734926ab93ce::t_191a13f058ffa0 5
+src/features/ai/createCompletion.js
+  s_21734926ab93ce::t_191a13f058ffa0 56-57
+src/features/ai/sse.js
+  s_21734926ab93ce::t_191a13f058ffa0 3-9,16,19
+src/features/cheatsheet/Cheatsheet.test.jsx
+  s_21734926ab93ce::t_191a13f058ffa0 1-25
+src/features/search/useViewportSize.js
+  s_21734926ab93ce::t_191a13f058ffa0 12-19,21-22,30
+src/features/weather/openWeather.js
+  s_21734926ab93ce::t_191a13f058ffa0 5-6,11
+docs/features/search.md
+  s_21734926ab93ce::t_d63b94c66b15d9 3
+docs/features/sites.md
+  s_21734926ab93ce::t_d63b94c66b15d9 3
+docs/code/src/input/useKeyboard.js.md
+  s_21734926ab93ce::t_191a13f058ffa0 8-10
+docs/code/src/navigation/navigate.js.md
+  s_21734926ab93ce::t_191a13f058ffa0 6-7
+docs/code/src/features/macros/MacrosMenu.jsx.md
+  s_21734926ab93ce::t_191a13f058ffa0 8-9
+src/features/cheatsheet/Cheatsheet.jsx
+  s_21734926ab93ce::t_191a13f058ffa0 3,38-40,50-51
+src/features/weather/WeatherModal.jsx
+  s_21734926ab93ce::t_191a13f058ffa0 4,20-72,108-109,115,118-119
+src/features/chevron/chevronPainter.js
+  s_21734926ab93ce::t_191a13f058ffa0 5-8,14
+src/app/useIntents.js
+  s_21734926ab93ce::t_191a13f058ffa0 12,48,53-58,62,65,68,78,82-83
+src/features/macros/MacrosLayer.jsx
+  s_21734926ab93ce::t_191a13f058ffa0 13-14
+src/features/macros/useClock.js
+  s_21734926ab93ce::t_191a13f058ffa0 3-9,11-14,16-20,22-24,26-31,34-35
+src/features/search/useAdaptiveFontSize.js
+  s_21734926ab93ce::t_191a13f058ffa0 13-25,32-33
+docs/code/src/app/useMediaQuery.js.md
+  s_21734926ab93ce::t_191a13f058ffa0 1-4
+src/input/swipe.js
+  s_21734926ab93ce::t_191a13f058ffa0 5-6
+docs/code/src/features/stage/useReducedMotion.js.md
+  s_21734926ab93ce::t_191a13f058ffa0 5-6
+src/app/LayoutButton.test.jsx
+  s_21734926ab93ce::t_191a13f058ffa0 1-13
+src/input/useKeyboard.js
+  s_21734926ab93ce::t_191a13f058ffa0 25-60,67-70
+src/features/ai/createCompletion.test.js
+  s_21734926ab93ce::t_191a13f058ffa0 16-17
+src/features/macros/MacrosMenu.jsx
+  s_21734926ab93ce::t_191a13f058ffa0 8,19-27,32-33,37,42-46,50
+src/app/whenTabVisible.js
+  s_21734926ab93ce::t_191a13f058ffa0 1-4
+src/features/chevron/morph.test.js
+  s_21734926ab93ce::t_191a13f058ffa0 4-9,11-12,18,20
+docs/code/src/features/search/QuickLook.jsx.md
+  s_21734926ab93ce::t_191a13f058ffa0 8-9
+docs/growth-log.md
+  s_21734926ab93ce::t_d63b94c66b15d9 7-8
+docs/code/src/app/ErrorBoundary.jsx.md
+  s_21734926ab93ce::t_191a13f058ffa0 4-5
+src/app/LaunchOverlay.jsx
+  s_21734926ab93ce::t_191a13f058ffa0 50-51
+docs/code/src/features/chevron/useChevronPainter.js.md
+  s_21734926ab93ce::t_191a13f058ffa0 13-14
+src/features/macros/useGridShape.test.jsx
+  s_21734926ab93ce::t_191a13f058ffa0 1-55
+docs/code/src/app/bootShell.js.md
+  s_21734926ab93ce::t_191a13f058ffa0 32-33
+src/app/dialogEvents.js
+  s_21734926ab93ce::t_191a13f058ffa0 1-16
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.24",
+  "base_commit_sha": "390521c49b9e32c88f1b9bd65d732d1e421e6d9f",
+  "prompts": {},
+  "sessions": {
+    "s_21734926ab93ce": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a2b063db-2489-4588-a3b5-1810c9e2d4a1",
+        "model": "claude-sonnet-5-5"
+      },
+      "human_author": "Adam Yung <adyung@paloaltonetworks.com>"
+    }
+  }
+}
