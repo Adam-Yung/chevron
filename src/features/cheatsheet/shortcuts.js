@@ -22,7 +22,7 @@ export const SHORTCUT_SECTIONS = [
     rows: [
       { keys: [['Shift'], ['Right-click'], ['Scroll up']], label: 'Open the menu' },
       { keys: [['type anywhere']], label: 'Filter the cards by name' },
-      { keys: [['<letter>']], label: "Open the card showing that letter" },
+      { keys: [['Shift', '<letter>']], label: "Open the card showing that letter" },
       { keys: [['Esc'], ['Shift']], label: 'Close the menu' }
     ]
   },

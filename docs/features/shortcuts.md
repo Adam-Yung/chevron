@@ -1,6 +1,6 @@
 # Keys, mouse and touch
 
-> Verified: 2026-11-28 00:12 · Sources: `src/features/cheatsheet/Cheatsheet.jsx`, `src/features/cheatsheet/shortcuts.js`, `src/features/cheatsheet/ShortcutTable.jsx`
+> Verified: 2026-11-28 00:14 · Sources: `src/features/cheatsheet/Cheatsheet.jsx`, `src/features/cheatsheet/shortcuts.js`, `src/features/cheatsheet/ShortcutTable.jsx`
 > Serves: `search-and-go`, `never-stuck`, `runs-anywhere`
 > Owns: `src/input/**`, `src/features/cheatsheet/**`, `src/features/onboarding/**`, `src/app/Corners.jsx`, `src/app/LayoutButton*`, `src/app/dialogEvents.js`
 
@@ -46,5 +46,4 @@ pressed inside them.
 - The corner buttons (shortcuts, settings, sites menu) fade after first use where the pointer can hover.
 
 ## Limits
-- The cheatsheet shows the card shortcut as the letter alone and omits arrows, Tab and Enter in the sites menu. The letter alone
-  filters; opening needs Shift.
+- The cheatsheet omits arrows, Tab and Enter in the sites menu.
