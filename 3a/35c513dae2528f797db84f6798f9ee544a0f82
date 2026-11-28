@@ -1,0 +1,31 @@
+scripts/e2e/specs/stuck-states.mjs
+  s_21734926ab93ce::t_33ca7634d326dd 86,88-97
+  s_21734926ab93ce::t_897fe02f96b7c6 21-23,87
+src/app/useIntents.test.jsx
+  s_21734926ab93ce::t_e83443e5abe0da 66-75
+docs/todo.md
+  s_21734926ab93ce::t_9416cd21760c17 5-16
+src/app/LaunchOverlay.jsx
+  s_21734926ab93ce::t_d1f311fda97ead 67
+  s_21734926ab93ce::t_9db3b609ec34a0 50-55
+docs/code/src/app/LaunchOverlay.jsx.md
+  s_21734926ab93ce::t_740fd91544f75a 6-7
+docs/status.md
+  s_21734926ab93ce::t_9416cd21760c17 6,13-14,19
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.24",
+  "base_commit_sha": "3a35c513dae2528f797db84f6798f9ee544a0f82",
+  "prompts": {},
+  "sessions": {
+    "s_21734926ab93ce": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a2b063db-2489-4588-a3b5-1810c9e2d4a1",
+        "model": "claude-sonnet-5-5"
+      },
+      "human_author": "Adam Yung <adyung@paloaltonetworks.com>"
+    }
+  }
+}
