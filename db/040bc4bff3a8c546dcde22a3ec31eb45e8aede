@@ -1,0 +1,35 @@
+src/app/LaunchOverlay.jsx
+  s_21734926ab93ce::t_3ee362193621af 5,8,19-23,26,33-34,37-40,50-60,63,67-73
+  s_21734926ab93ce::t_b545608a8cf1c8 41-49
+  s_21734926ab93ce::t_9c58c191943e3a 74
+docs/code/src/app/LaunchOverlay.jsx.md
+  s_21734926ab93ce::t_eab30a9beb1ae1 6-10
+docs/features/search.md
+  s_21734926ab93ce::t_d644210cccc04b 3
+  s_21734926ab93ce::t_04e18aeb41746d 33-35
+src/app/useIntents.js
+  s_21734926ab93ce::t_82489761ec24e4 29
+src/app/LaunchOverlay.module.css
+  s_21734926ab93ce::t_c72b070f4c43c0 9,11-12,14,18-21,24-28,34-40
+scripts/e2e/specs/stuck-states.mjs
+  s_21734926ab93ce::t_041bdb5e7ceef2 70-74,81-82
+  s_21734926ab93ce::t_b317eb3c46e5f7 69,75-80
+docs/code/src/app/useIntents.js.md
+  s_21734926ab93ce::t_6a654573f85383 8
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.24",
+  "base_commit_sha": "db040bc4bff3a8c546dcde22a3ec31eb45e8aede",
+  "prompts": {},
+  "sessions": {
+    "s_21734926ab93ce": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a2b063db-2489-4588-a3b5-1810c9e2d4a1",
+        "model": "claude-sonnet-5-5"
+      },
+      "human_author": "Adam Yung <adyung@paloaltonetworks.com>"
+    }
+  }
+}
