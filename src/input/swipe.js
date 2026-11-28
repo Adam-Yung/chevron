@@ -2,10 +2,8 @@
 
 export const SWIPE = { threshold: 40, velocity: 0.3, timeLimit: 600, deadZone: 8 }
 
-/**
- * @param {{ dx: number, dy: number, dt: number }} move  finger travel in px and duration in ms
- * @returns {'up' | 'down' | 'left' | 'right' | null}
- */
+// `move` is the finger's travel in px and its duration in ms.
+/** @returns {'up' | 'down' | 'left' | 'right' | null} */
 export function classifySwipe({ dx, dy, dt }, cfg = SWIPE) {
   const vertical = Math.abs(dy) > Math.abs(dx)
   const dist = vertical ? Math.abs(dy) : Math.abs(dx)

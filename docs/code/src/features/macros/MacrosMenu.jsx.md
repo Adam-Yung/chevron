@@ -5,3 +5,5 @@ The grid of pinned sites. All key handling lives in the key router; this only re
 - Splide's own keyboard and wheel are off: arrows belong to the router, horizontal trackpad scroll is accumulated here so one swipe
   is one page, and on touch the app's swipe handler pages instead of Splide's drag.
 - The grid is rebuilt (keyed) when the filter changes so the cards' entrance stagger replays and paging restarts at page one.
+
+Scroll deltas are accumulated by `src/input/wheelAccumulator.js`.

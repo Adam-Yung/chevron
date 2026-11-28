@@ -7,3 +7,6 @@ bent chevron left on screen after a fast Escape). Tests: `morph.test.js`.
 `easeInOut` is the cubic form of the stage's `--ease-move`, so a bend stays in step with the CSS travel beside it.
 
 A morph can carry further steps (`then`); any new morph or snap drops them, so an interrupted sequence never resumes.
+
+Each morph keeps its state in one `shape` object that `aim` (retarget) and `step` (one frame) work on. Easing names are
+`spring`, `linear` and `easeInOut` (the default).

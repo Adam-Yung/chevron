@@ -13,6 +13,8 @@ function streamOf(chunks) {
   })
 }
 
+const delta = t => `data: ${JSON.stringify({ choices: [{ delta: { content: t } }] })}\n\n`
+
 const run = (overrides = {}) => createCompletion({
   messages: [], temperature: 0.4, config, signal: new AbortController().signal, onText: () => {}, ...overrides
 })
@@ -21,7 +23,6 @@ afterEach(() => vi.unstubAllGlobals())
 
 describe('createCompletion', () => {
   it('streams progressively and survives a chunk split mid-payload', async () => {
-    const delta = t => `data: ${JSON.stringify({ choices: [{ delta: { content: t } }] })}\n\n`
     const full = delta('Hel') + delta('lo') + 'data: [DONE]\n\n'
     const cut = full.indexOf('lo') + 3
     vi.stubGlobal('fetch', async () => ({ ok: true, body: streamOf([full.slice(0, cut), full.slice(cut)]) }))

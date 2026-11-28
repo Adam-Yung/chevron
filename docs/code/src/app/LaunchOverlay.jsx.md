@@ -9,3 +9,5 @@ the card (or from the search blob) costs no latency; it only fills the time the 
 - The disc is a full-screen layer revealed by an animated `clip-path` circle, not a scaled circle, so the banner inside it is never
   stretched. Two rAFs separate the first paint at the origin from the grown state so the transition always runs.
 - When `leaving` clears (page restored, timeout, user typing) it unmounts immediately.
+
+Reviewed: b61aca4f

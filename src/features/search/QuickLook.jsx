@@ -19,10 +19,8 @@ function useLabel(destination) {
   return isMacro ? destination.label : destination.label ?? 'search'
 }
 
-/**
- * The blob on the left while searching: where Enter will go, in that destination's colours. Only the fill and label are here; the
- * curve around them is the chevron itself (Chevron.jsx), so this springs out with the line, on the same curve, once the chevron has become one.
- */
+// The blob on the left while searching: where Enter will go, in that destination's colours. Only the fill and label are here;
+// the curve around them is the chevron itself (Chevron.jsx).
 function QuickLook({ view }) {
   const settings = useContext(SettingsContext)
   const destination = useDestination()

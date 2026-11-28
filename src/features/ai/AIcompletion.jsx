@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from 'react'
+import { useCallback, useContext, useEffect, useState } from 'react'
 import { FiX } from 'react-icons/fi'
 import { SettingsContext } from '../../settings/SettingsProvider'
 import renderMarkdown from '../../lib/renderMarkdown'
@@ -8,22 +8,25 @@ import classes from './AIcompletion.module.css'
 
 const stopClick = e => e.stopPropagation()
 
+function useDismissal(query, onClose) {
+  const [dismissed, setDismissed] = useState(false)
+  // A new query reopens a panel the user closed.
+  useEffect(() => setDismissed(false), [query])
+  const close = useCallback(() => {
+    setDismissed(true)
+    onClose?.()
+  }, [onClose])
+  return { dismissed, close }
+}
+
 /** Streamed answer panel for the query field. Renders nothing until there is something to say. */
 export default function AIcompletion({ query, className, onClose }) {
   const { query: { AI: ai } } = useContext(SettingsContext)
-  const [dismissed, setDismissed] = useState(false)
+  const { dismissed, close } = useDismissal(query, onClose)
   // Closing mid-stream must also stop the request, so a dismissed panel is the same as an empty query.
   const { text, error, waiting } = useCompletion(dismissed ? '' : query, ai)
 
-  // A new query reopens a panel the user closed.
-  useEffect(() => setDismissed(false), [query])
-
   if (!ai.enabled || dismissed || !(text || error || waiting)) return null
-
-  const close = () => {
-    setDismissed(true)
-    onClose?.()
-  }
 
   return <>
     <Icon className={classes['icon']} onClick={stopClick} />

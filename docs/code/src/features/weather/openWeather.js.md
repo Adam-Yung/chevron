@@ -8,3 +8,5 @@ deliberately unused.
 - The caller's abort is forwarded and the listener removed afterwards, so a long-lived signal does not accumulate listeners.
 - Errors are plain `Error`s with the HTTP status in the message; callers swallow them (weather is decoration) except the settings
   geocoder, which shows the message.
+
+Reviewed: 3da66c42

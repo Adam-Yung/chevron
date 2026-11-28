@@ -8,3 +8,5 @@ navigation release; `useIntents` carries out what they decide. `data-view` on th
   every first visit, competing with the app's own files on slow networks; the service worker precaches it after boot anyway.
 - Closing any overlay refocuses the search field, so typing works again without a click.
 - Decision record: `docs/decisions/architecture.md`.
+
+Reviewed: 2ba8e23c

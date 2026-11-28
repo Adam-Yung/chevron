@@ -10,23 +10,27 @@ function textWidth(text, px, family) {
   return measureCtx.measureText(text.toUpperCase()).width
 }
 
-/**
- * The largest font size (in em of the container) at which `text` fits one line, between `max` and a readable floor; past the floor
- * the field wraps. Computed during render, not in an effect, so a keystroke never paints one frame at the old size.
- * @returns {[(el: HTMLElement | null) => void, number]} a ref callback for the container, and the size in em
- */
+function boxMetrics(el) {
+  const style = getComputedStyle(el)
+  return {
+    width: el.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight),
+    basePx: parseFloat(style.fontSize) || 16,
+    family: style.getPropertyValue('--font-display').trim() || style.fontFamily || 'sans-serif'
+  }
+}
+
+const measureBox = (el, setBox) => setBox(b => ({ ...b, ...boxMetrics(el) }))
+
+// The largest size (em of the container) at which `text` fits one line, down to a floor; computed during render, so no keystroke
+// paints one frame at the old size. Returns a ref callback for the container, and the size.
 export default function useAdaptiveFontSize(text, max) {
   const [box, setBox] = useState({ el: null, width: 0, basePx: 16, family: 'sans-serif' })
 
   useLayoutEffect(() => {
     const el = box.el
     if (!el) return undefined
-    const read = () => {
-      const style = getComputedStyle(el)
-      setBox(b => ({ ...b, width: el.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight), basePx: parseFloat(style.fontSize) || 16, family: style.getPropertyValue('--font-display').trim() || style.fontFamily || 'sans-serif' }))
-    }
-    read()
-    const observer = new ResizeObserver(read)
+    measureBox(el, setBox)
+    const observer = new ResizeObserver(() => measureBox(el, setBox))
     observer.observe(el)
     return () => observer.disconnect()
   }, [box.el])

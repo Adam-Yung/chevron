@@ -7,3 +7,5 @@ The only UI state and the only way to change it (decision: `docs/decisions/archi
 - `leaving` never blocks anything, and any user action cancels it;
 - Escape always makes progress: overlay, then AI panel, then menu filter, then menu, then query (tested from every state).
 `reset` keeps the current notice and bumps `epoch`.
+
+Reviewed: 2b95c133

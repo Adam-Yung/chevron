@@ -7,3 +7,5 @@ Answer panel next to the search field. Props: `query` (the text to ask; empty cl
   the hook, which aborts the request. A new query reopens the panel.
 - Errors render in a `role="alert"` element, not Markdown: error text may contain backticks that break a code fence.
 - Clicks stop propagating so selecting text does not trigger the page's click handlers.
+
+`useDismissal` holds the closed state and reopens it when the query changes.

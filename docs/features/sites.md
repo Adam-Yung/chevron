@@ -1,6 +1,6 @@
 # Sites menu and dock
 
-> Verified: 2026-11-27 23:41 · Sources: `src/features/macros/MacrosMenu.jsx`, `src/features/macros/MacrosLayer.jsx`, `src/features/macros/Card.jsx`, `src/features/macros/Dock.jsx`, `src/features/macros/filterMacros.js`, `src/input/keyRouter.js`, `src/input/usePointerInput.js`, `src/input/useTouchGestures.js`
+> Verified: 2026-11-28 00:04 · Sources: `src/features/macros/MacrosMenu.jsx`, `src/features/macros/MacrosLayer.jsx`, `src/features/macros/Card.jsx`, `src/features/macros/Dock.jsx`, `src/features/macros/filterMacros.js`, `src/input/keyRouter.js`, `src/input/usePointerInput.js`, `src/input/useTouchGestures.js`
 
 Pinned macros appear in two places. Each site is a round sewn badge cut from the first colour of its background, with its icon
 stitched in the theme's thread colour; the macro's text colour and gradient are not shown.

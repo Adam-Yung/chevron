@@ -23,17 +23,16 @@ export function blobReach(width, height) {
 // a canvas of exactly one height would cut the stripe flat there; the bounce swings further still. Chevron.module.css repeats the number.
 export const CANVAS_OVERHANG = 1.4
 
-/**
- * The same curve as morph points, so the chevron can become it: two cubic arms from the tip, down then up. Units are canvas sides,
- * x from the screen edge (the canvas centre while searching) and y from the canvas top.
- * @returns {number[]} tip, then two control points and an end for each arm
- */
+// A viewport height fraction as a canvas fraction.
+const toCanvasY = v => 0.5 + (v - 0.5) / CANVAS_OVERHANG
+
+// The same curve as morph points, so the chevron can become it: tip, then two controls and an end per arm, down then up. Units
+// are canvas sides, x from the screen edge (the canvas centre while searching) and y from the canvas top.
 export function blobPoints({ reach, height, top, bottom }) {
   const x = reach / (height * CANVAS_OVERHANG)
-  const y = v => 0.5 + (v - 0.5) / CANVAS_OVERHANG
   return [
     x, 0.5,
-    x, y(1 - top), 0, y(1 - bottom), 0, y(1),
-    x, y(top), 0, y(bottom), 0, y(0)
+    x, toCanvasY(1 - top), 0, toCanvasY(1 - bottom), 0, toCanvasY(1),
+    x, toCanvasY(top), 0, toCanvasY(bottom), 0, toCanvasY(0)
   ]
 }

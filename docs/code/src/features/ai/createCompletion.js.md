@@ -10,3 +10,5 @@ Streaming client for any OpenAI-compatible `/v1/chat/completions` endpoint (Open
   blank panel.
 - `onText` is not called once the signal aborted, so a superseded stream cannot write into the next answer.
 - No Authorization header without a key: local servers do not need one.
+
+`onText` receives the whole answer so far, not the latest piece.

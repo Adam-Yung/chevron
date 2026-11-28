@@ -1,18 +1,23 @@
 import { describe, it, expect } from 'vitest'
 import { createMorph } from './morph'
 
+// Moves the fake clock on and runs the one pending frame.
+function tickFrame(clock, ms) {
+  clock.t += ms
+  clock.frames.shift()?.()
+}
+
 function harness() {
-  let t = 0
-  const frames = []
+  const clock = { t: 0, frames: [] }
+  const { frames } = clock
   const drawn = []
   const morph = createMorph({
     stages: [[0, 0], [10, 10], [20, 0]],
     draw: p => drawn.push(Array.from(p)),
     raf: cb => frames.push(cb),
-    now: () => t
+    now: () => clock.t
   })
-  const tick = ms => { t += ms; const cb = frames.shift(); cb?.() }
-  return { morph, tick, drawn, frames }
+  return { morph, tick: tickFrame.bind(null, clock), drawn, frames }
 }
 
 describe('createMorph', () => {

@@ -1,23 +1,22 @@
 // Server-sent-event plumbing for OpenAI-style streams.
 
-/**
- * Line-buffered SSE reader. Network chunks end anywhere, including mid-line, so only complete lines are parsed and the
- * remainder waits for the next chunk; parsing each chunk on its own drops tokens whenever a boundary splits a JSON payload.
- */
+function feedLine(line, onData) {
+  const trimmed = line.trim()
+  if (trimmed.startsWith('data:')) onData(trimmed.slice(5).trim())
+}
+
+// Network chunks end anywhere, so only complete lines are parsed and the rest waits: parsing each chunk on its own drops tokens
+// whenever a boundary splits a JSON payload.
 export function createSseReader(onData) {
   let buffer = ''
-  const feed = line => {
-    const trimmed = line.trim()
-    if (trimmed.startsWith('data:')) onData(trimmed.slice(5).trim())
-  }
   return {
     push(chunk) {
       const lines = (buffer + chunk).split('\n')
       buffer = lines.pop()
-      lines.forEach(feed)
+      for (const line of lines) feedLine(line, onData)
     },
     end() {
-      feed(buffer)
+      feedLine(buffer, onData)
       buffer = ''
     }
   }

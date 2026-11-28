@@ -1,6 +1,6 @@
 # Offline behaviour
 
-> Verified: 2026-11-26 00:23 · Sources: `src/features/status/OfflineIndicator.jsx`, `src/features/status/useOnlineStatus.js`, `src/features/weather/useWeather.js`
+> Verified: 2026-11-28 00:04 · Sources: `src/features/status/OfflineIndicator.jsx`, `src/features/status/useOnlineStatus.js`, `src/features/weather/useWeather.js`
 
 ## The indicator
 A small pill at the bottom left reads "Offline" while the browser reports no connection and fades out when it returns. It never

@@ -41,12 +41,8 @@ function startPainter(canvas, init, onFirstFrame) {
   return painter
 }
 
-/**
- * Mounts a canvas into `hostRef` and returns `post(message)` for morph/snap/style messages (see chevronPainter.js). `onFirstFrame`
- * runs once the first drawing is on screen.
- * The canvas is created here, not rendered by React: a transferred canvas cannot be transferred again, and React's StrictMode
- * mounts effects twice on the same element.
- */
+// Mounts a canvas into `hostRef` and returns `post(message)` for morph, snap and style messages (see chevronPainter.js). The
+// canvas is created here, not rendered by React: a transferred one cannot be transferred again by StrictMode's second effect.
 export default function useChevronPainter(hostRef, { stages, stage, color, thread, thickness, viewport, onFirstFrame }) {
   const painterRef = useRef(null)
   const latest = useRef({ stages, stage, color, thread, thickness })
@@ -58,8 +54,8 @@ export default function useChevronPainter(hostRef, { stages, stage, color, threa
     canvas.setAttribute('aria-hidden', 'true')
     host.appendChild(canvas)
     const { stages: s, stage: initialStage, color: c, thread: th, thickness: t } = latest.current
-    const firstFrame = () => latest.current.onFirstFrame?.()
-    const painter = startPainter(canvas, { ...measure(host, t), stages: s.map(a => Array.from(a)), stage: initialStage, color: c, thread: th }, firstFrame)
+    const init = { ...measure(host, t), stages: s.map(a => Array.from(a)), stage: initialStage, color: c, thread: th }
+    const painter = startPainter(canvas, init, () => latest.current.onFirstFrame?.())
     painterRef.current = painter
 
     return () => {

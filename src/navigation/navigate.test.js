@@ -21,9 +21,9 @@ describe('toHref', () => {
     })
 })
 
-describe('openDestination', () => {
-  const fakeWindow = () => ({ open: vi.fn(() => null), location: { assign: vi.fn() } })
+const fakeWindow = () => ({ open: vi.fn(() => null), location: { assign: vi.fn() } })
 
+describe('openDestination', () => {
   it('same tab assigns location and reports leaving', () => {
     const win = fakeWindow()
     expect(openDestination('example.com', { win })).toBe('leaving')

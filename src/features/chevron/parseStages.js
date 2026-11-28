@@ -5,10 +5,7 @@ const stretchMultiplier = 8
 // The blob's piping is half the chevron's thickness (QuickLook); the stripe narrows to it as it becomes the blob's edge.
 const SEARCH_WIDTH = 0.5
 
-/**
- * @param {number} size the chevron's size as a fraction of the canvas
- * @param {number[]} search the search stage: blobPoints() for the current viewport
- */
+// `size` is the chevron's size as a fraction of the canvas; `search` is blobPoints() for the current viewport.
 export default function parseStages(size, search = blobPoints({ reach: 0.5, height: 1, top: 0.3, bottom: 0.4 })) {
   const s = size
   const startX = 0.5 * s
@@ -54,11 +51,8 @@ export default function parseStages(size, search = blobPoints({ reach: 0.5, heig
   ]
 }
 
-/**
- * The stages for a viewport. The chevron keeps its size as a fraction of 2 x blobReach while the canvas is sized off the height.
- * A page that has no size yet (a tab loading in the background) gets the default shapes, never NaN points.
- * @param {{ width: number, height: number, size: number, top: number, bottom: number }} view
- */
+// The chevron keeps its size relative to the blob while the canvas is sized off the height. A page with no size yet (a tab
+// loading in the background) gets the default shapes, never NaN points.
 export function stagesFor({ width, height, size, top, bottom }) {
   if (!width || !height) return parseStages(size / CANVAS_OVERHANG)
   const reach = blobReach(width, height)

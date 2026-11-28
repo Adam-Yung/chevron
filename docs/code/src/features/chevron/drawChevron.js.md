@@ -10,3 +10,6 @@ The thin-stripe cut-off is judged in CSS pixels (`scale`), or a dense screen wou
 
 Each arm is stroked as its own path, never as two subpaths of one: Firefox with GPU rendering drops the round cap at the end of a
 subpath that another follows, which left one arm cut square. Headless browsers render in software and do not show it.
+
+`thickness` is already in canvas pixels; `scale` is canvas pixels per CSS pixel. `ARMS` lists, per arm, the point indices of its
+two controls and its end.

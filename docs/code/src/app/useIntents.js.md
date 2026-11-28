@@ -9,3 +9,5 @@ every render, so handlers are never stale and the global listeners are bound onc
 - `complete` (Tab on a suggestion) is a plain `typed`: the selection clears and the list is rebuilt for the new text.
 - Sites menu: the cursor indexes the filtered list; with no cursor, Enter opens the first match.
 - Removing history needs a highlighted history entry; anything else is ignored rather than guessed.
+
+Reviewed: a888089b

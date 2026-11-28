@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { whenTabVisible } from '../../app/whenTabVisible'
 import { fetchCurrentWeather, fetchForecast } from './openWeather'
 import {
   getCachedCurrent, getCachedForecast,
@@ -25,10 +26,14 @@ async function refresh(source, { lat, lon, units, apiKey, place }, signal, onDat
   } catch { /* offline, quota, timeout: the cached value (if any) stays on screen */ }
 }
 
-/**
- * Current weather and forecast for the configured place. Reads the cache synchronously so the chip renders without a
- * network round trip, and fetches in an effect, after first paint, so it can never hold up boot.
- */
+// `params` is what both sources fetch with; each reports to its own setter.
+function refreshBoth(params, signal, onCurrent, onForecast) {
+  refresh(SOURCES[0], params, signal, onCurrent)
+  refresh(SOURCES[1], params, signal, onForecast)
+}
+
+// Current weather and forecast for the configured place. The cache is read synchronously so the chip renders with no round trip,
+// and the fetch runs in an effect, after first paint, so it can never hold up boot.
 export default function useWeather({ apiKey, lat, lon, units, online }) {
   const place = `${lat},${lon},${units}`
   const [current, setCurrent] = useState(() => getCachedCurrent(place))
@@ -40,13 +45,10 @@ export default function useWeather({ apiKey, lat, lon, units, online }) {
     if (!online || !lat || !lon || !OWM_KEY_RE.test(apiKey)) return
     const controller = new AbortController()
     const params = { lat, lon, units, apiKey, place }
-    const run = () => {
-      refresh(SOURCES[0], params, controller.signal, setCurrent)
-      refresh(SOURCES[1], params, controller.signal, setForecast)
-    }
+    const run = refreshBoth.bind(null, params, controller.signal, setCurrent, setForecast)
     run()
     // A start page can stay open for days; catch up when the tab is looked at again.
-    const onVisible = () => { if (document.visibilityState === 'visible') run() }
+    const onVisible = whenTabVisible(run)
     document.addEventListener('visibilitychange', onVisible)
     return () => {
       controller.abort()

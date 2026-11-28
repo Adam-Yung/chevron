@@ -7,10 +7,8 @@ const MAX_HISTORY = 12
 
 const IDLE = { text: '', error: null, waiting: false }
 
-/**
- * Runs one completion per `query` and exposes `{ text, error, waiting }`. A new query (or unmount) aborts the previous
- * stream first, and results of an aborted stream are never applied, so answers cannot interleave.
- */
+// One completion per `query`, as `{ text, error, waiting }`. A new query (or unmount) aborts the previous stream first, and an
+// aborted stream's results are never applied, so answers cannot interleave.
 export default function useCompletion(query, ai) {
   const { enabled, provider, baseURL, model, apiKey, temperature, language } = ai
   const { config, missing } = useMemo(

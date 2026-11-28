@@ -6,10 +6,8 @@ import MacrosLayer from '../macros/MacrosLayer'
 import useReducedMotion from './useReducedMotion'
 import classes from './Stage.module.css'
 
-/**
- * The animated backdrop. Every layer is a function of `view` and animates toward it with CSS transitions, which the browser
- * retargets when the view changes mid-way: nothing here waits for an animation to end.
- */
+// The animated backdrop. Every layer is a function of `view` and animates toward it with CSS transitions, which the browser
+// retargets when the view changes mid-way: nothing here waits for an animation to end.
 export default function Stage({ view, onOpenMacro }) {
   const settings = useContext(SettingsContext)
   const reduced = useReducedMotion()

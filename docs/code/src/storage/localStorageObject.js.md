@@ -6,3 +6,5 @@ Base for objects mirrored in `localStorage` (settings, search history, weather c
   can no longer stop the app booting (it used to throw at import time). A storage that throws on read (blocked cookies) yields the
   default in memory.
 - `write` and `read` stay raw and can throw; callers on a timer must catch (settings storage does).
+
+Reviewed: e4c07d4f

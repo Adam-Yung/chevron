@@ -1,6 +1,6 @@
 # Search
 
-> Verified: 2026-11-28 00:00 · Sources: `src/features/search/QueryField.jsx`, `src/features/search/Suggestions.jsx`, `src/features/search/QuickLook.jsx`, `src/search/resolve.js`, `src/search/suggestions.js`, `src/search/useSuggestions.js`, `src/search/history.js`, `src/search/autocomplete.js`, `src/app/useIntents.js`, `src/app/useLaunch.js`, `src/navigation/navigate.js`, `src/navigation/useNavigationRelease.js`
+> Verified: 2026-11-28 00:04 · Sources: `src/features/search/QueryField.jsx`, `src/features/search/Suggestions.jsx`, `src/features/search/QuickLook.jsx`, `src/search/resolve.js`, `src/search/suggestions.js`, `src/search/useSuggestions.js`, `src/search/history.js`, `src/search/autocomplete.js`, `src/app/useIntents.js`, `src/app/useLaunch.js`, `src/navigation/navigate.js`, `src/navigation/useNavigationRelease.js`
 
 ## What you can type
 Start typing anywhere: the search field always has the keyboard, even while a first visit is still loading; what you type

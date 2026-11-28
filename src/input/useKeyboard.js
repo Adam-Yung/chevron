@@ -22,45 +22,52 @@ const toKeyInput = e => ({
   type: 'keydown', key: e.key, code: e.code, shift: e.shiftKey, ctrl: e.ctrlKey, meta: e.metaKey, alt: e.altKey, repeat: e.repeat
 })
 
-/**
- * The single global keyboard listener. It asks the key router what a key means and hands the intent to `perform`.
- * @param {{ perform: (intent: object) => void, hotkeys: Set<string>, hasSuggestions: () => boolean }} options
- */
+function setForceEngine(store, on) {
+  if (store.getState().forceEngine !== on) store.dispatch(ui.forceEngineChanged(on))
+}
+
+// A `session` is what one set of listeners knows: the store, the latest options (`live`) and the last Shift and Space presses.
+function route({ store, live, lastSpaceAt }, input, e) {
+  const ctx = { ...focusContext(), hasSuggestions: live.current.hasSuggestions(), hotkeys: live.current.hotkeys, sinceSpace: Date.now() - lastSpaceAt }
+  const intent = routeKey(store.getState(), input, ctx)
+  if (!intent) return
+  if (intent.prevent && e) e.preventDefault()
+  live.current.perform(intent)
+}
+
+const keyDownHandler = session => e => {
+  if (e.key === 'Control') setForceEngine(session.store, true)
+  session.shiftDownAt = e.key === 'Shift' && !e.repeat ? Date.now() : 0
+  if (e.key === 'Shift' || e.isComposing) return
+  route(session, toKeyInput(e), e)
+  if (e.key === ' ' && focusContext().inQuery) session.lastSpaceAt = Date.now()
+}
+
+const keyUpHandler = session => e => {
+  if (e.key === 'Control') setForceEngine(session.store, false)
+  const { shiftDownAt } = session
+  const tapped = e.key === 'Shift' && shiftDownAt && Date.now() - shiftDownAt < SHIFT_TAP_MS && !e.ctrlKey && !e.metaKey && !e.altKey
+  session.shiftDownAt = 0
+  if (tapped) route(session, { type: 'shiftTap' }, null)
+}
+
+const blurHandler = session => () => {
+  session.shiftDownAt = 0
+  setForceEngine(session.store, false)
+}
+
+// The single global keyboard listener. It asks the key router what a key means and hands the intent to `perform`.
+/** @param {{ perform: (intent: object) => void, hotkeys: Set<string>, hasSuggestions: () => boolean }} options */
 export default function useKeyboard({ perform, hotkeys, hasSuggestions }) {
   const store = useUiStore()
   const live = useRef({ perform, hotkeys, hasSuggestions })
   live.current = { perform, hotkeys, hasSuggestions }
 
   useEffect(() => {
-    let shiftDownAt = 0
-    let lastSpaceAt = 0
-    const setCtrl = on => { if (store.getState().forceEngine !== on) store.dispatch(ui.forceEngineChanged(on)) }
-
-    const route = (input, e) => {
-      const ctx = { ...focusContext(), hasSuggestions: live.current.hasSuggestions(), hotkeys: live.current.hotkeys, sinceSpace: Date.now() - lastSpaceAt }
-      const intent = routeKey(store.getState(), input, ctx)
-      if (!intent) return
-      if (intent.prevent && e) e.preventDefault()
-      live.current.perform(intent)
-    }
-
-    const onKeyDown = e => {
-      if (e.key === 'Control') setCtrl(true)
-      shiftDownAt = e.key === 'Shift' && !e.repeat ? Date.now() : 0
-      if (e.key === 'Shift' || e.isComposing) return
-      route(toKeyInput(e), e)
-      if (e.key === ' ' && focusContext().inQuery) lastSpaceAt = Date.now()
-    }
-    const onKeyUp = e => {
-      if (e.key === 'Control') setCtrl(false)
-      const tapped = e.key === 'Shift' && shiftDownAt && Date.now() - shiftDownAt < SHIFT_TAP_MS && !e.ctrlKey && !e.metaKey && !e.altKey
-      shiftDownAt = 0
-      if (tapped) route({ type: 'shiftTap' }, null)
-    }
-    const onBlur = () => {
-      shiftDownAt = 0
-      setCtrl(false)
-    }
+    const session = { store, live, shiftDownAt: 0, lastSpaceAt: 0 }
+    const onKeyDown = keyDownHandler(session)
+    const onKeyUp = keyUpHandler(session)
+    const onBlur = blurHandler(session)
 
     // Capture phase: the router decides before any panel or field sees the key, and panels opt out with [data-keep-focus].
     window.addEventListener('keydown', onKeyDown, true)

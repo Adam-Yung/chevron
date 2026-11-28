@@ -9,14 +9,17 @@ function read() {
   return true
 }
 
+// At most one read per frame, however many events arrive; `pending.frame` is the one requested.
+function readNextFrame(pending, onChange) {
+  cancelAnimationFrame(pending.frame)
+  pending.frame = requestAnimationFrame(() => {
+    if (read()) onChange()
+  })
+}
+
 function subscribe(onChange) {
-  let frame = 0
-  const onResize = () => {
-    cancelAnimationFrame(frame)
-    frame = requestAnimationFrame(() => {
-      if (read()) onChange()
-    })
-  }
+  const pending = { frame: 0 }
+  const onResize = readNextFrame.bind(null, pending, onChange)
   // The size may have changed (from zero, in a tab loaded in the background) before anything was listening.
   if (read()) onChange()
   document.addEventListener('visibilitychange', onResize)
@@ -24,7 +27,7 @@ function subscribe(onChange) {
   // Some Android browsers fire resize late or never on rotation.
   window.addEventListener('orientationchange', onResize)
   return () => {
-    cancelAnimationFrame(frame)
+    cancelAnimationFrame(pending.frame)
     document.removeEventListener('visibilitychange', onResize)
     window.removeEventListener('resize', onResize)
     window.removeEventListener('orientationchange', onResize)

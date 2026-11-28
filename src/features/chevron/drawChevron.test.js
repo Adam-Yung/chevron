@@ -77,3 +77,25 @@ describe('stages before the page has a size', () => {
     expect(stages[0][0]).toBeGreaterThan(0)
   })
 })
+
+describe('the exact canvas calls', () => {
+  it('maps x from the canvas centre and sews each arm from the tip, pass by pass', () => {
+    const log = []
+    const ctx = {}
+    for (const name of ['clearRect', 'beginPath', 'moveTo', 'bezierCurveTo', 'setLineDash', 'stroke']) {
+      ctx[name] = (...args) => log.push([name, ...args.map(a => (typeof a === 'number' ? Math.round(a) : a))])
+    }
+    for (const name of ['lineJoin', 'lineCap', 'lineWidth', 'strokeStyle']) {
+      Object.defineProperty(ctx, name, { set: value => { log.push([name, value]) } })
+    }
+    const points = [0, 0.5, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, -0.1, 0.8, -0.2, 0.9, -0.3, 1]
+    drawChevron(ctx, points, { width: 100, height: 200, color: 'gold', thread: 'cream', thickness: 10 })
+    expect(log.slice(0, 2)).toEqual([['clearRect', 0, 0, 100, 200], ['lineJoin', 'round']])
+    expect(log.slice(2, 14)).toEqual([
+      ['setLineDash', []], ['lineCap', 'round'], ['lineWidth', 12], ['strokeStyle', 'rgba(0, 0, 0, 0.3)'],
+      ['beginPath'], ['moveTo', 50, 100], ['bezierCurveTo', 60, 40, 80, 80, 100, 120], ['stroke'],
+      ['beginPath'], ['moveTo', 50, 100], ['bezierCurveTo', 40, 160, 30, 180, 20, 200], ['stroke']
+    ])
+    expect(log).toHaveLength(2 + 2 * 12)
+  })
+})

@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react'
 import { createPortal } from 'react-dom'
 import { FiDroplet, FiWind, FiEye, FiThermometer, FiX } from 'react-icons/fi'
+import { closeOnBackdrop, closeOnEscape } from '../../app/dialogEvents'
 import { WeatherIcon, iconToScene } from './WeatherIcon'
 import WeatherScene from './WeatherScene'
 import { buildForecastDays, tempColor, toCardinal } from './forecast'
@@ -14,6 +15,59 @@ function buildStats({ main = {}, wind = {}, visibility }, units) {
     ...(visibility ? [{ icon: <FiEye size={18} />, value: `${Math.round(visibility / 1000)} km`, label: 'Visibility' }] : []),
     { icon: <FiThermometer size={18} />, value: `${Math.round(main.feels_like ?? temp)}${units}`, label: 'Feels like' }
   ]
+}
+
+function Stats({ current, units }) {
+  return (
+    <div className={classes['stats']}>
+      {buildStats(current, units).map(s => (
+        <div key={s.label} className={classes['stat']}>
+          <span className={classes['stat-icon']}>{s.icon}</span>
+          <span className={classes['stat-val']}>{s.value}</span>
+          <span className={classes['stat-label']}>{s.label}</span>
+        </div>
+      ))}
+    </div>
+  )
+}
+
+function Conditions({ current, units }) {
+  const { main = {}, weather } = current
+  const temp = Math.round(main.temp ?? 0)
+  const high = Math.round(main.temp_max ?? temp)
+  const low = Math.round(main.temp_min ?? temp)
+  const { icon, description = '' } = weather?.[0] ?? {}
+  return (
+    <div className={classes['hero-body']}>
+      <div className={classes['hero-icon']}><WeatherIcon code={icon} size={80} /></div>
+      <div className={classes['hero-info']}>
+        <div className={classes['hero-temp']} style={{ color: tempColor(temp, units) }}>{temp}{units}</div>
+        <div className={classes['hero-desc']}>{description}</div>
+        <div className={classes['hero-hilo']}>
+          <span style={{ color: tempColor(high, units) }}>↑ {high}{units}</span>
+          <span style={{ opacity: 0.4, margin: '0 6px' }}>·</span>
+          <span style={{ color: tempColor(low, units) }}>↓ {low}{units}</span>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function Hero({ current, units, isStale, onClose }) {
+  const scene = iconToScene(current.weather?.[0]?.icon)
+  return (
+    <div className={`${classes['hero']} ${classes[`hero--${scene}`]}`}>
+      <WeatherScene scene={scene} />
+      <button type="button" className={classes['close']} onClick={onClose} aria-label="Close weather">
+        <FiX size={16} />
+      </button>
+      <div className={classes['hero-meta']}>
+        <span className={classes['city']}>{current.name ?? ''}</span>
+        {isStale && <span className={classes['stale-badge']}>Cached data</span>}
+      </div>
+      <Conditions current={current} units={units} />
+    </div>
+  )
 }
 
 function ForecastStrip({ days, units }) {
@@ -45,72 +99,24 @@ function useDialogFocus() {
 
 export default function WeatherModal({ current, forecast, units, maxDays, isStale, onClose }) {
   const dialogRef = useDialogFocus()
-  const { main = {}, weather } = current
-  const temp = Math.round(main.temp ?? 0)
-  const high = Math.round(main.temp_max ?? temp)
-  const low = Math.round(main.temp_min ?? temp)
-  const { icon, description = '' } = weather?.[0] ?? {}
-  const city = current.name ?? ''
   const days = buildForecastDays(forecast?.list, maxDays)
-  const scene = iconToScene(icon)
 
   // The whole backdrop listens so Esc works wherever focus ended up inside the dialog.
-  const onKeyDown = e => {
-    if (e.key !== 'Escape') return
-    e.preventDefault()
-    onClose()
-  }
-
   return createPortal(
     <div
       className={classes['backdrop']}
-      onPointerDown={e => {
-        if (e.target !== e.currentTarget) return
-        e.preventDefault()
-        onClose()
-      }}
-      onKeyDown={onKeyDown}
+      onPointerDown={e => closeOnBackdrop(e, onClose)}
+      onKeyDown={e => closeOnEscape(e, onClose)}
       data-keep-focus="true">
       <div
         ref={dialogRef}
         role="dialog"
         aria-modal="true"
-        aria-label={`Weather in ${city}`}
+        aria-label={`Weather in ${current.name ?? ''}`}
         tabIndex={-1}
         className={classes['modal']}>
-        <div className={`${classes['hero']} ${classes[`hero--${scene}`]}`}>
-          <WeatherScene scene={scene} />
-          <button type="button" className={classes['close']} onClick={onClose} aria-label="Close weather">
-            <FiX size={16} />
-          </button>
-          <div className={classes['hero-meta']}>
-            <span className={classes['city']}>{city}</span>
-            {isStale && <span className={classes['stale-badge']}>Cached data</span>}
-          </div>
-          <div className={classes['hero-body']}>
-            <div className={classes['hero-icon']}><WeatherIcon code={icon} size={80} /></div>
-            <div className={classes['hero-info']}>
-              <div className={classes['hero-temp']} style={{ color: tempColor(temp, units) }}>{temp}{units}</div>
-              <div className={classes['hero-desc']}>{description}</div>
-              <div className={classes['hero-hilo']}>
-                <span style={{ color: tempColor(high, units) }}>↑ {high}{units}</span>
-                <span style={{ opacity: 0.4, margin: '0 6px' }}>·</span>
-                <span style={{ color: tempColor(low, units) }}>↓ {low}{units}</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div className={classes['stats']}>
-          {buildStats(current, units).map(s => (
-            <div key={s.label} className={classes['stat']}>
-              <span className={classes['stat-icon']}>{s.icon}</span>
-              <span className={classes['stat-val']}>{s.value}</span>
-              <span className={classes['stat-label']}>{s.label}</span>
-            </div>
-          ))}
-        </div>
-
+        <Hero current={current} units={units} isStale={isStale} onClose={onClose} />
+        <Stats current={current} units={units} />
         {days.length > 0 && <ForecastStrip days={days} units={units} />}
       </div>
     </div>,

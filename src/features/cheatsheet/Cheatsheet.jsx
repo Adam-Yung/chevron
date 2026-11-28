@@ -1,5 +1,6 @@
 import { memo, useEffect, useRef } from 'react'
 import { FiX } from 'react-icons/fi'
+import { closeOnBackdrop, closeOnEscape } from '../../app/dialogEvents'
 import ShortcutTable from './ShortcutTable'
 import { SHORTCUT_SECTIONS } from './shortcuts'
 import classes from './Cheatsheet.module.css'
@@ -34,30 +35,20 @@ function wrapTab(e, dialog) {
   ;(e.shiftKey ? stops[stops.length - 1] : stops[0]).focus()
 }
 
-// preventDefault keeps the browser from moving focus to <body> after our handler returned focus to the search field.
-const onBackdropPointerDown = onClose => e => {
-  if (e.target !== e.currentTarget) return
-  e.preventDefault()
-  onClose()
+const onDialogKeyDown = (dialogRef, onClose) => e => {
+  if (e.key === 'Tab') return wrapTab(e, dialogRef.current)
+  closeOnEscape(e, onClose)
 }
 
 function Cheatsheet({ open, onClose }) {
   const dialogRef = useDialogFocus(open)
   if (!open) return null
 
-  const onKeyDown = e => {
-    if (e.key === 'Tab') return wrapTab(e, dialogRef.current)
-    if (e.key !== 'Escape') return
-    e.preventDefault()
-    onClose()
-  }
-
-  // pointerdown, not click: a text selection dragged out of the dialog ends on the backdrop and must not close it.
   return (
     <div
       className={classes['backdrop']}
-      onPointerDown={onBackdropPointerDown(onClose)}
-      onKeyDown={onKeyDown}
+      onPointerDown={e => closeOnBackdrop(e, onClose)}
+      onKeyDown={onDialogKeyDown(dialogRef, onClose)}
       data-keep-focus="true">
       <div ref={dialogRef} role="dialog" aria-modal="true" aria-label="Keyboard shortcuts" tabIndex={-1} className={classes['dialog']}>
         <header className={classes['header']}>

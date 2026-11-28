@@ -2,11 +2,13 @@
 const BASE = 'https://api.openweathermap.org'
 const TIMEOUT_MS = 8000
 
+const abortWith = (controller, signal) => () => controller.abort(signal.reason)
+
 // A start page must never wait on a slow API, so every request carries its own deadline in addition to the caller's signal.
 async function getJson(url, label, signal) {
   const controller = new AbortController()
   const timer = setTimeout(() => controller.abort(new Error(`${label} timed out`)), TIMEOUT_MS)
-  const forward = () => controller.abort(signal.reason)
+  const forward = abortWith(controller, signal)
   if (signal?.aborted) forward()
   signal?.addEventListener('abort', forward, { once: true })
   try {

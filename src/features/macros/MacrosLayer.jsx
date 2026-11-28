@@ -10,10 +10,8 @@ const MacrosMenu = lazy(loadMenu)
 if (typeof requestIdleCallback === 'function') requestIdleCallback(() => loadMenu())
 else setTimeout(loadMenu, 300)
 
-/**
- * Clock above the bar, sites below it. Mounted from the first open on and kept, so reopening is instant; `inert` while closed so
- * hidden cards can never take focus or clicks.
- */
+// Clock above the bar, sites below it. Mounted from the first open on and kept, so reopening is instant; `inert` while closed so
+// hidden cards can never take focus or clicks.
 export default function MacrosLayer({ view, onOpenMacro }) {
   const open = view === 'macros'
   const epoch = useUi(s => s.epoch)

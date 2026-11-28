@@ -1,8 +1,9 @@
 import { createChevronPainter } from './chevronPainter'
 import parseStages from './parseStages'
 
+const noop = () => {}
+
 function fakeCanvas() {
-  const noop = () => {}
   const ctx = { clearRect: noop, beginPath: noop, moveTo: noop, bezierCurveTo: noop, setLineDash: noop, stroke: noop }
   return { width: 0, height: 0, getContext: () => ctx }
 }

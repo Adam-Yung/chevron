@@ -10,6 +10,7 @@ import useTouchGestures from '../input/useTouchGestures'
 import useNavigationRelease from '../navigation/useNavigationRelease'
 import Stage from '../features/stage/Stage'
 import QueryField from '../features/search/QueryField'
+import { getQueryField } from '../features/search/queryFieldId'
 import Dock from '../features/macros/Dock'
 import OfflineIndicator from '../features/status/OfflineIndicator'
 import GestureHints from '../features/onboarding/GestureHints'
@@ -65,7 +66,7 @@ export default function App() {
   useEffect(() => {
     const closed = previousOverlay.current && !overlay
     previousOverlay.current = overlay
-    if (closed && !isTouch) document.getElementById('chevron-query')?.focus({ preventScroll: true })
+    if (closed && !isTouch) getQueryField()?.focus({ preventScroll: true })
   }, [overlay])
 
   return (

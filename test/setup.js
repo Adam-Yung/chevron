@@ -30,8 +30,7 @@ if (!window.CONFIG) {
   }
 }
 
-// jsdom lacks matchMedia; several components query it (reduced-motion,
-// pointer:coarse). Provide a minimal stub that defaults to "no match".
+// jsdom lacks matchMedia; this stub matches nothing.
 if (!window.matchMedia) {
   window.matchMedia = vi.fn().mockImplementation((query) => ({
     matches: false,

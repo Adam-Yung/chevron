@@ -7,3 +7,5 @@ One completion per `query`. Returns `{ text, error, waiting }`.
 - Missing config short-circuits to a hint with no request; disabled AI or an empty query clears the state.
 - Conversation history (last 12 messages) is only extended when a reply completes, never by aborted or failed turns.
 - An error after partial text keeps the partial text so the user does not lose what had streamed.
+
+Reviewed: 906cde79

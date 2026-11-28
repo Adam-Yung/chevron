@@ -1,6 +1,6 @@
 # Keyboard shortcuts
 
-> Verified: 2026-11-27 23:40 · Sources: `src/features/cheatsheet/Cheatsheet.jsx`, `src/features/cheatsheet/shortcuts.js`, `src/features/cheatsheet/ShortcutTable.jsx`
+> Verified: 2026-11-28 00:04 · Sources: `src/features/cheatsheet/Cheatsheet.jsx`, `src/features/cheatsheet/shortcuts.js`, `src/features/cheatsheet/ShortcutTable.jsx`
 
 The cheatsheet is a dialog listing every shortcut. Its content is data in `src/features/cheatsheet/shortcuts.js`; the key router
 (`src/input/keyRouter.js`) decides what the keys do, and the two must be edited together.

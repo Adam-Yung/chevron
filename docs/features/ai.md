@@ -1,6 +1,6 @@
 # AI answers
 
-> Verified: 2026-11-26 00:23 · Sources: `src/features/ai/AIcompletion.jsx`, `src/features/ai/useCompletion.js`, `src/features/ai/createCompletion.js`, `src/features/ai/providerConfig.js`, `src/features/ai/sse.js`
+> Verified: 2026-11-28 00:04 · Sources: `src/features/ai/AIcompletion.jsx`, `src/features/ai/useCompletion.js`, `src/features/ai/createCompletion.js`, `src/features/ai/providerConfig.js`, `src/features/ai/sse.js`
 
 Double-tap Space in the search field to send the query to an OpenAI-compatible chat endpoint and read the answer, streamed, beside
 the field. Nothing is sent otherwise.

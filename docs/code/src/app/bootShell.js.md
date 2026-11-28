@@ -29,3 +29,5 @@ The handover:
   (the true state) rather than a static one that ignores later theme or colour-scheme changes.
 - **Accepted trade-off:** text typed before mount is not shown until the app takes over (up to several seconds on Slow 4G); the
   field is invisible because echoing it would mean styling text outside the app. Escape before mount clears what was typed.
+
+Reviewed: 0c3fd0cc

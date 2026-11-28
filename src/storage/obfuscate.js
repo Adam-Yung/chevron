@@ -1,13 +1,5 @@
-// Lightweight reversible obfuscation for API keys stored in localStorage.
-// NOT encryption — provides no real secrecy against a determined attacker
-// with devtools access. The goal is simply to prevent casual exposure of
-// raw API keys when someone inspects browser storage.
-//
-// Format: "OBF1:<base64(xor(plaintext, key))>"
-// The XOR key is derived from a fixed salt so the same plaintext always
-// produces the same ciphertext (no nonce). This is intentional: settings
-// are written on every debounced save, and we don't want the stored value
-// to churn on each write.
+// Keeps API keys from being readable at a glance in localStorage. Reversible obfuscation, NOT encryption: no real secrecy.
+// Deterministic on purpose, so saving unchanged settings does not change the stored text.
 
 const PREFIX = 'OBF1:'
 const SALT = 'chevron.local.obfuscation'
@@ -35,9 +27,7 @@ export function deobfuscate(stored) {
     const raw = Uint8Array.from(atob(b64), c => c.charCodeAt(0))
     const xored = xorBytes(raw, SALT)
     const decoded = new TextDecoder().decode(xored)
-    // If decoding produced non-printable characters, the salt doesn't match
-    // (legacy obfuscation from an older patch). Return empty so the user
-    // is prompted to re-enter the key.
+    // Non-printable output means another salt wrote it: return empty so the user is asked for the key again.
     if (/[^\x20-\x7e]/.test(decoded)) return ''
     return decoded
   } catch {
@@ -45,6 +35,6 @@ export function deobfuscate(stored) {
   }
 }
 
-export function isObfuscated(value) {
+function isObfuscated(value) {
   return typeof value === 'string' && value.startsWith(PREFIX)
 }

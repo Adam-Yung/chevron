@@ -4,11 +4,8 @@ import { useDispatch } from '../state/UiStore'
 import { ui } from '../state/ui'
 import { openDestination } from '../navigation/navigate'
 
-/**
- * Open a URL the way the user asked, and leave the start page in a state that cannot get stuck: a new tab resets it at once,
- * a same-tab navigation marks it leaving (released by useNavigationRelease if the page never unloads).
- * @returns {(url: string, options?: { newTab?: boolean, macro?: string }) => void}
- */
+// Opens a URL and leaves the page unable to get stuck: a new tab resets it at once, a same-tab navigation marks it leaving.
+/** @returns {(url: string, options?: { newTab?: boolean, macro?: string }) => void} */
 export default function useLaunch() {
   const settings = useContext(SettingsContext)
   const dispatch = useDispatch()

@@ -6,3 +6,5 @@ router. Empty, it is transparent but still focused so the first keystroke lands 
 
 On mount it takes over from the first-paint shell's field (`src/app/bootShell.js`) in a layout effect: what was typed before
 the app ran becomes the query, and focus moves in the same task, so no keystroke is dropped in between.
+
+Reviewed: 6167eae7

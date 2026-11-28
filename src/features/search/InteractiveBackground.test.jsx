@@ -35,3 +35,29 @@ describe('InteractiveBackground pause control', () => {
     expect(paused).not.toBeNull()
   })
 })
+
+const rows = container => container.querySelectorAll(`.${classes['row'].split(' ')[0]}`)
+
+describe('InteractiveBackground markup', () => {
+  it('lays out two halves of rows and lines, and sets its variables', () => {
+    const { container } = renderBg({ marqueeText: 'github', textColor: 'red' })
+    expect(rows(container)).toHaveLength(12)
+    expect(rows(container)[0].children).toHaveLength(15)
+    expect(rows(container)[0].children[0].textContent).toBe('github')
+    expect(container.firstChild.getAttribute('style')).toBe(
+      '--diagonal: 1000px; --rotation-angle: 330deg; --text-color: red; --text-size: 5vmin; --text-opacity: 0.2; --secondary: #123456;')
+    const marquee = rows(container)[0].parentElement.parentElement
+    expect(marquee.getAttribute('style')).toBe('--marquee-duration: 14.4s;')
+    expect(marquee.getAttribute('aria-hidden')).toBe('true')
+  })
+
+  it('doubles the rows for a short word', () => {
+    const { container } = renderBg({ marqueeText: 'gh' })
+    expect(rows(container)).toHaveLength(24)
+  })
+
+  it('draws no marquee without text', () => {
+    const { container } = renderBg()
+    expect(rows(container)).toHaveLength(0)
+  })
+})

@@ -40,9 +40,4 @@ export default class LocalStorageObject {
     try { localStorage.setItem(this.name, JSON.stringify(defaultValue)) } catch { /* in-memory only */ }
     return copy(defaultValue)
   }
-
-  // sync localStorage with this.object
-  sync() {
-    LocalStorageObject.write(this.name, this.object)
-  }
 }

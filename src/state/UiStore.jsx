@@ -19,10 +19,8 @@ export function useUiStore() {
   return store
 }
 
-/**
- * Subscribe to one slice of UI state. Return a primitive or a stable reference: a new object every call re-renders on every
- * dispatch.
- */
+// Subscribes to one slice of UI state. The selector must return a primitive or a stable reference: a new object every call
+// re-renders on every dispatch.
 export function useUi(selector) {
   const store = useUiStore()
   return useSyncExternalStore(store.subscribe, () => selector(store.getState()))

@@ -1,6 +1,6 @@
 # Weather
 
-> Verified: 2026-11-26 00:23 · Sources: `src/features/weather/Weather.jsx`, `src/features/weather/useWeather.js`, `src/features/weather/openWeather.js`, `src/features/weather/weatherCache.js`, `src/features/weather/WeatherModal.jsx`, `src/features/weather/forecast.js`
+> Verified: 2026-11-28 00:04 · Sources: `src/features/weather/Weather.jsx`, `src/features/weather/useWeather.js`, `src/features/weather/openWeather.js`, `src/features/weather/weatherCache.js`, `src/features/weather/WeatherModal.jsx`, `src/features/weather/forecast.js`
 
 An optional temperature chip next to the clock, with a forecast dialog behind it. Off until the user supplies an OpenWeatherMap key and a place.
 

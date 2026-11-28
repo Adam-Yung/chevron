@@ -8,3 +8,5 @@ Owns the weather data flow for the chip.
 - Nothing is fetched while offline, without a 32-hex key, or without coordinates. Going back online re-runs the effect.
 - A `visibilitychange` to visible re-checks the TTL, so a tab left open for days catches up when looked at.
 - The effect's abort signal is checked before applying results, so a superseded place (user edited lat/lon) cannot overwrite newer data.
+
+Reviewed: 47805a62

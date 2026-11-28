@@ -8,7 +8,7 @@ import { sameSuggestion } from '../../search/suggestions'
 import Suggestions, { SUGGESTIONS_LISTBOX_ID, suggestionOptionId } from './Suggestions'
 import useAdaptiveFontSize from './useAdaptiveFontSize'
 import usePick from './usePick'
-import { QUERY_FIELD_ID } from './queryFieldId'
+import { getQueryField, QUERY_FIELD_ID } from './queryFieldId'
 import classes from './QueryField.module.css'
 
 const AIcompletion = lazy(() => import('../ai/AIcompletion'))
@@ -17,7 +17,7 @@ const AIcompletion = lazy(() => import('../ai/AIcompletion'))
 // between is lost.
 function useBootHandoff(dispatch) {
   useLayoutEffect(() => {
-    const field = document.getElementById(QUERY_FIELD_ID)
+    const field = getQueryField()
     const early = takeBootInput()
     if (early) dispatch(ui.typed(early))
     // On touch screens focusing at load would pop the on-screen keyboard unasked.

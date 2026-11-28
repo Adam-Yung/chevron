@@ -98,10 +98,6 @@ function enforceInvariants(state) {
 // A user acting again means any pending navigation did not happen (or happened in another tab): stop showing it.
 const CANCELS_LEAVING = new Set(['typed', 'escaped', 'macrosToggled', 'overlayOpened'])
 
-/**
- * @param {typeof initialUiState} state
- * @param {{ type: keyof typeof handlers } & Record<string, unknown>} action
- */
 export function uiReducer(state, action) {
   const handler = handlers[action.type]
   if (!handler) return state

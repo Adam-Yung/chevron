@@ -6,10 +6,7 @@ const HAS_SCHEME = /^[a-z][a-z\d+.-]*:(?!\d)/i
 // Local hosts rarely serve TLS; guessing https for them fails where http works.
 const LOCAL_HOST = /^(localhost|127\.|10\.|192\.168\.|172\.(1[6-9]|2\d|3[01])\.|\[::1\]|[\w-]+\.local\b)/i
 
-/**
- * Turn a resolved destination into something window.open accepts, or null when it must not be opened.
- * @param {string | null | undefined} url
- */
+/** Turns a resolved destination into something window.open accepts, or null when it must not be opened. */
 export function toHref(url) {
   const trimmed = url?.trim()
   if (!trimmed || FORBIDDEN_SCHEME.test(trimmed)) return null
@@ -17,11 +14,7 @@ export function toHref(url) {
   return (LOCAL_HOST.test(trimmed) ? 'http://' : 'https://') + trimmed
 }
 
-/**
- * @param {string} url
- * @param {{ newTab?: boolean, win?: Window }} [options]
- * @returns {'new-tab' | 'leaving' | 'blocked'}
- */
+/** @returns {'new-tab' | 'leaving' | 'blocked'} */
 export function openDestination(url, { newTab = false, win = window } = {}) {
   const href = toHref(url)
   if (!href) return 'blocked'

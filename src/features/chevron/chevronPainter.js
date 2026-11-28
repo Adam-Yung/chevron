@@ -2,17 +2,16 @@
 import { createMorph } from './morph'
 import { drawChevron } from './drawChevron'
 
-/**
- * @param {HTMLCanvasElement | OffscreenCanvas} canvas
- * @param {{ raf: (cb: () => void) => unknown, now: () => number }} clock
- * @param {() => void} [onFirstFrame]  called one frame after the first drawing, when it is on screen
- */
+const strokeOnto = (ctx, style) => points => drawChevron(ctx, points, style)
+
+// `clock` is { raf, now }; `onFirstFrame` is called one frame after the first drawing, when it is on screen.
+/** @param {HTMLCanvasElement | OffscreenCanvas} canvas */
 export function createChevronPainter(canvas, clock, onFirstFrame) {
   const ctx = canvas.getContext('2d')
   const style = { width: canvas.width, height: canvas.height, color: '#000', thread: '#fff', thickness: 10 }
   let morph = null
 
-  const draw = points => drawChevron(ctx, points, style)
+  const draw = strokeOnto(ctx, style)
 
   const handlers = {
     init(m) {

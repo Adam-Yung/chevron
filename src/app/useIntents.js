@@ -9,7 +9,7 @@ import { isAnswerType } from '../search/useSuggestions'
 import { history } from '../search/history'
 import { usePinnedMacros } from '../search/useConfig'
 import { filterMacros } from '../features/macros/filterMacros'
-import { QUERY_FIELD_ID } from '../features/search/queryFieldId'
+import { getQueryField } from '../features/search/queryFieldId'
 import { copyText } from './copyText'
 import useLaunch from './useLaunch'
 
@@ -45,25 +45,27 @@ function useSearchActions(live) {
       if (settings.query.AI.enabled) dispatch(ui.aiAsked())
     },
     focusQuery() {
-      document.getElementById(QUERY_FIELD_ID)?.focus()
+      getQueryField()?.focus()
     }
   }
 }
 
+function launchMacro(live, macro, newTab) {
+  if (macro) live.current.launch(macro.url, { newTab, macro: macro.name })
+}
+
+const visibleMacros = ({ pinned, state }) => filterMacros(pinned, state.macroFilter)
+
 function useMenuActions(live) {
-  const openMacro = (macro, newTab) => {
-    if (macro) live.current.launch(macro.url, { newTab, macro: macro.name })
-  }
-  const visible = () => filterMacros(live.current.pinned, live.current.state.macroFilter)
   return {
     menuSubmit({ newTab }) {
-      openMacro(visible()[live.current.state.menuCursor ?? 0], newTab)
+      launchMacro(live, visibleMacros(live.current)[live.current.state.menuCursor ?? 0], newTab)
     },
     menuHotkey({ code }) {
-      openMacro(live.current.pinned.find(m => m.key === code), false)
+      launchMacro(live, live.current.pinned.find(m => m.key === code), false)
     },
     menuMove({ delta }) {
-      live.current.dispatch(ui.menuCursorMoved(delta, visible().length))
+      live.current.dispatch(ui.menuCursorMoved(delta, visibleMacros(live.current).length))
     },
     filterInput({ char }) {
       const { state, dispatch } = live.current
@@ -73,15 +75,12 @@ function useMenuActions(live) {
       const { state, dispatch } = live.current
       if (state.macroFilter) dispatch(ui.filterChanged(state.macroFilter.slice(0, -1)))
     },
-    openMacro
+    openMacro: launchMacro.bind(null, live)
   }
 }
 
-/**
- * Carries out what the key router decided. Handlers read everything through `live`, refreshed every render, so they are never
- * stale and the global listeners never need re-binding.
- * @returns {{ perform: (intent: { intent: string }) => void, openMacro: (macro: object, newTab?: boolean) => void }}
- */
+// Carries out what the key router decided. Handlers read everything through `live`, so listeners never need re-binding.
+/** @returns {{ perform: (intent: { intent: string }) => void, openMacro: (macro: object, newTab?: boolean) => void }} */
 export default function useIntents() {
   const store = useUiStore()
   const settings = useContext(SettingsContext)

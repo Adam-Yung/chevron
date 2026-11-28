@@ -10,3 +10,5 @@ element size times devicePixelRatio (capped), not a fixed 1920 square.
 frame of its own, because a message can arrive before the worker's canvas has been composited.
 
 Resizes come from the same `useViewportSize` value the stages are built from, so shape and canvas pixels cannot disagree.
+
+Reviewed: 2391d3dc

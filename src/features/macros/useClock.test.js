@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { renderHook, act } from '@testing-library/react'
 import useClock from './useClock'
 
-describe('useClock', () => {
+function useFakeClock() {
   beforeEach(() => {
     vi.useFakeTimers()
     // Start at a known instant 500ms past a second boundary.
@@ -17,6 +17,10 @@ describe('useClock', () => {
   afterEach(() => {
     vi.useRealTimers()
   })
+}
+
+describe('useClock ticking', () => {
+  useFakeClock()
 
   it('aligns the first tick to the next whole second (not a fixed 1000ms)', () => {
     const { result } = renderHook(() => useClock())
@@ -37,6 +41,10 @@ describe('useClock', () => {
     act(() => { vi.advanceTimersByTime(1000) }) // to :02.000
     expect(result.current.getTime()).toBe(new Date('2026-01-01T00:00:02.000Z').getTime())
   })
+})
+
+describe('useClock pausing and cleanup', () => {
+  useFakeClock()
 
   it('pauses while hidden and resumes on visibility', () => {
     let visibility = 'visible'

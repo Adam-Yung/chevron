@@ -5,3 +5,5 @@ The only way the app opens a URL. Its job is that no path leaves the start page 
   a blank page. The old code kept the page frozen until a visibility event that does not always fire.
 - same tab: mark `leaving`; `src/navigation/useNavigationRelease.js` clears it if the page is restored or never unloads.
 - blocked scheme: a notice, nothing else.
+
+Reviewed: dbad3c36

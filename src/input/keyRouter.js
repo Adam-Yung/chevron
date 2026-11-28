@@ -4,28 +4,6 @@ export const DOUBLE_SPACE_MS = 300
 const FILTER_CHAR = /^[\p{L}\p{N} \-_.]$/u
 const PRINTABLE = /^.$/u
 
-/**
- * @typedef {object} KeyInput
- * @property {'keydown' | 'shiftTap'} type
- * @property {string} [key]
- * @property {string} [code]
- * @property {boolean} [shift]
- * @property {boolean} [ctrl]
- * @property {boolean} [meta]
- * @property {boolean} [alt]
- * @property {boolean} [repeat]
- *
- * @typedef {object} KeyContext
- * @property {boolean} inPanel       focus is inside a [data-keep-focus] panel or another editor that owns its keys
- * @property {boolean} inQuery       focus is in the search field
- * @property {boolean} [onControl]   focus is on a button or link, which activates itself with Enter and Space
- * @property {boolean} hasSuggestions
- * @property {number} sinceSpace     ms since the previous Space press in the search field
- * @property {Set<string>} hotkeys   KeyboardEvent.code values bound to a site card
- *
- * @typedef {{ intent: string, prevent?: boolean } & Record<string, unknown>} Intent
- */
-
 const intent = (name, extra = {}) => ({ intent: name, prevent: true, ...extra })
 const newTab = k => Boolean(k.meta || k.alt)
 
@@ -92,12 +70,7 @@ function routeSearch(state, k, ctx) {
   return PRINTABLE.test(k.key) ? intent('focusQuery', { prevent: false }) : null
 }
 
-/**
- * @param {import('../state/ui').initialUiState} state
- * @param {KeyInput} k
- * @param {KeyContext} ctx
- * @returns {Intent | null}
- */
+// The shapes of `state`, `k`, `ctx` and the returned intent (or null) are listed in the doc named at the top.
 export function routeKey(state, k, ctx) {
   if (k.type === 'shiftTap') return routeShiftTap(state, ctx)
   if (ctx.inPanel) return null

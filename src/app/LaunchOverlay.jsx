@@ -47,10 +47,8 @@ function Badge({ macro, named }) {
   )
 }
 
-/**
- * While a same-tab navigation loads, a disc of the destination's colour grows from where it was launched until it covers the
- * screen, carrying the blob's banner with it. Purely decorative: the navigation started before this rendered.
- */
+// While a same-tab navigation loads, a disc of the destination's colour grows from where it was launched until it covers the
+// screen. Purely decorative: the navigation started before this rendered.
 export default function LaunchOverlay() {
   const leaving = useUi(s => s.leaving)
   const fromSearch = useUi(s => s.view === 'search')

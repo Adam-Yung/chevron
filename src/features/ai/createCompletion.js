@@ -53,10 +53,8 @@ async function readAnswer(body, onText) {
   return answer
 }
 
-/**
- * Stream one completion. `onText` receives the full answer so far; resolves with the assistant message. Rejects with
- * `{ code, message }` for failures worth showing, or with an AbortError when `signal` fires (callers ignore that one).
- */
+// Streams one completion: `onText` receives the full answer so far; resolves with the assistant message. Rejects with
+// `{ code, message }` for failures worth showing, or with an AbortError when `signal` fires (callers ignore that one).
 export default async function createCompletion({ messages, temperature, config, signal, onText }) {
   const response = await send(config, messages, temperature, signal)
   if (!response.ok) throw parseErrorBody(await response.text(), response.status)

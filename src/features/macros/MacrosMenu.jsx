@@ -5,6 +5,7 @@ import { SettingsContext } from '../../settings/SettingsProvider'
 import { useUi } from '../../state/UiStore'
 import { usePinnedMacros } from '../../search/useConfig'
 import { GESTURE_MACRO_PAGE } from '../../input/gestureEvents'
+import { createWheelAccumulator } from '../../input/wheelAccumulator'
 import { isTouch } from '../../lib/isMobile'
 import Card from './Card'
 import { filterMacros } from './filterMacros'
@@ -15,37 +16,38 @@ import '@splidejs/react-splide/css'
 const WHEEL = { threshold: 160, decayMs: 380 }
 
 // Horizontal trackpad scroll pages the grid one page per deliberate swipe; vertical scroll is left to the open/close toggle.
+const pagingWheelHandler = (sliderRef, scroll) => e => {
+  if (Math.abs(e.deltaY) > Math.abs(e.deltaX) * 1.5) return
+  e.preventDefault()
+  const total = scroll.add(e.deltaX)
+  if (Math.abs(total) < WHEEL.threshold) return
+  sliderRef.current?.splide?.go(total > 0 ? '+' : '-')
+  scroll.reset()
+}
+
 function useWheelPaging(containerRef, sliderRef, enabled) {
   useEffect(() => {
     const el = containerRef.current
     if (!el || !enabled) return undefined
-    let acc = 0
-    let decay = 0
-    const onWheel = e => {
-      if (Math.abs(e.deltaY) > Math.abs(e.deltaX) * 1.5) return
-      e.preventDefault()
-      clearTimeout(decay)
-      decay = setTimeout(() => { acc = 0 }, WHEEL.decayMs)
-      acc += e.deltaX
-      if (Math.abs(acc) < WHEEL.threshold) return
-      sliderRef.current?.splide?.go(acc > 0 ? '+' : '-')
-      acc = 0
-    }
+    const scroll = createWheelAccumulator(WHEEL.decayMs)
+    const onWheel = pagingWheelHandler(sliderRef, scroll)
     el.addEventListener('wheel', onWheel, { passive: false })
     return () => {
       el.removeEventListener('wheel', onWheel)
-      clearTimeout(decay)
+      scroll.stop()
     }
   }, [containerRef, sliderRef, enabled])
+}
+
+const gesturePageHandler = sliderRef => e => {
+  const dir = e.detail?.dir
+  if (dir === '+' || dir === '-') sliderRef.current?.splide?.go(dir)
 }
 
 function useGesturePaging(sliderRef, active) {
   useEffect(() => {
     if (!active) return undefined
-    const onPage = e => {
-      const dir = e.detail?.dir
-      if (dir === '+' || dir === '-') sliderRef.current?.splide?.go(dir)
-    }
+    const onPage = gesturePageHandler(sliderRef)
     window.addEventListener(GESTURE_MACRO_PAGE, onPage)
     return () => window.removeEventListener(GESTURE_MACRO_PAGE, onPage)
   }, [sliderRef, active])

@@ -5,3 +5,6 @@ The single global key listener, in the capture phase so it decides before any fi
   menu whenever someone typed a capital letter.
 - Ctrl held is mirrored into the store (`forceEngine`) and cleared on window blur, so it cannot stick after Ctrl+Tab.
 - IME composition keys are ignored.
+
+The three listeners are built once per mount around a `session` object holding the store, the latest options (`live`, a ref) and
+the times of the last Shift and Space presses. They read `live` at event time, so a re-render never re-binds them.

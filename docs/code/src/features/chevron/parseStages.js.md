@@ -6,3 +6,6 @@ The value after the points is a stroke-width factor, interpolated by the same mo
 full-width stripe around the blob swamps the screen. The search stage's points come from `blobPoints`.
 
 `stagesFor` must never return NaN: the chevron now depends on the viewport, a tab can load with none, and NaN points draw nothing.
+
+`size` is the chevron's size as a fraction of the canvas side. A page with no size yet (a tab loading in the background) gets the
+default shapes.
