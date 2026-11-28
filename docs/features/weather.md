@@ -1,12 +1,12 @@
 # Weather
 
-> Verified: 2026-11-28 00:04 · Sources: `src/features/weather/Weather.jsx`, `src/features/weather/useWeather.js`, `src/features/weather/openWeather.js`, `src/features/weather/weatherCache.js`, `src/features/weather/WeatherModal.jsx`, `src/features/weather/forecast.js`
+> Verified: 2026-11-28 00:06 · Sources: `src/features/weather/Weather.jsx`, `src/features/weather/useWeather.js`, `src/features/weather/openWeather.js`, `src/features/weather/weatherCache.js`, `src/features/weather/WeatherModal.jsx`, `src/features/weather/forecast.js`
 
 An optional temperature chip next to the clock, with a forecast dialog behind it. Off until the user supplies an OpenWeatherMap key and a place.
 
 ## What the user sees
 - The top row shows the clock; with weather configured and data available it becomes `clock · 14°C [icon]`, one button.
-- Clicking it opens a dialog: city, current conditions with an animated backdrop, humidity, wind, visibility, feels-like, and a
+- Clicking it opens a dialog: city, current conditions with an animated backdrop, humidity, wind (mph with imperial units, else m/s), visibility (km), feels-like, and a
   per-day high/low strip (up to the "forecast days" setting, 5 at most, 0 hides the strip).
 - The dialog closes with Esc, the X, or a click on the backdrop; focus goes back to where it was.
 - "Cached data" appears in the dialog when the data is older than its TTL or the browser is offline.

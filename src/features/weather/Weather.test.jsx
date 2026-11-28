@@ -53,7 +53,7 @@ describe('Weather row', () => {
     expect(dialog.getAttribute('aria-label')).toBe('Weather in Oslo')
     expect(document.activeElement).toBe(dialog)
     expect(dialog.textContent.replace(/\s*\n\s*/g, '')).toBe(
-      'Oslo50°Fclear sky↑ 55°F·↓ 41°F60%Humidity3 m/s EWind9 kmVisibility48°FFeels like' +
+      'Oslo50°Fclear sky↑ 55°F·↓ 41°F60%Humidity3 mph EWind9 kmVisibility48°FFeels like' +
       'WedNov 25↑ 40°F↓ 40°FThuNov 26↑ 42°F↓ 42°F')
   })
 

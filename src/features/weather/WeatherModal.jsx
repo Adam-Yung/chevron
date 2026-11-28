@@ -9,9 +9,11 @@ import classes from './WeatherModal.module.css'
 
 function buildStats({ main = {}, wind = {}, visibility }, units) {
   const temp = Math.round(main.temp ?? 0)
+  // OpenWeatherMap answers imperial requests in mph; metric and standard in m/s.
+  const speedUnit = units === '°F' ? 'mph' : 'm/s'
   return [
     { icon: <FiDroplet size={18} />, value: `${main.humidity ?? 0}%`, label: 'Humidity' },
-    { icon: <FiWind size={18} />, value: `${Math.round(wind.speed ?? 0)} m/s ${toCardinal(wind.deg ?? 0)}`, label: 'Wind' },
+    { icon: <FiWind size={18} />, value: `${Math.round(wind.speed ?? 0)} ${speedUnit} ${toCardinal(wind.deg ?? 0)}`, label: 'Wind' },
     ...(visibility ? [{ icon: <FiEye size={18} />, value: `${Math.round(visibility / 1000)} km`, label: 'Visibility' }] : []),
     { icon: <FiThermometer size={18} />, value: `${Math.round(main.feels_like ?? temp)}${units}`, label: 'Feels like' }
   ]

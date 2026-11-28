@@ -21,10 +21,7 @@ function useReloadOnRevision(revision, { markClean, setCfg, setRawError, setActi
   }, [revision, markClean, setCfg, setRawError, setActiveTab, setStatus])
 }
 
-/**
- * Editing state for the macros editor: the working config (`cfg`), the raw JSON text, the active tab, validation and the
- * autosave. The actions on it are in draftActions.js. `cfg` is the single source of truth.
- */
+// Editor state only; the actions on it are in draftActions.js. `cfg` is the single source of truth.
 export function useConfigDraft({ revision, onSaved }) {
   const [cfg, setCfg] = useState(() => loadConfig())
   const [rawText, setRawText] = useState('')

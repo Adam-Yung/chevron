@@ -1,6 +1,6 @@
 # Macros editor
 
-> Verified: 2026-11-28 00:03 · Sources: `src/features/macros-editor/MacrosEditorBody.jsx`, `src/features/macros-editor/useConfigDraft.js`, `src/features/macros-editor/draftActions.js`, `src/features/macros-editor/useAutosave.js`, `src/features/macros-editor/validateConfig.js`, `src/features/macros-editor/configDraft.js`, `src/storage/macrosConfig.js`, `public/config.js`, `public/icons.js`
+> Verified: 2026-11-28 00:06 · Sources: `src/features/macros-editor/MacrosEditorBody.jsx`, `src/features/macros-editor/useConfigDraft.js`, `src/features/macros-editor/draftActions.js`, `src/features/macros-editor/useAutosave.js`, `src/features/macros-editor/validateConfig.js`, `src/features/macros-editor/configDraft.js`, `src/storage/macrosConfig.js`, `public/config.js`, `public/icons.js`
 
 Edit the macros, global commands and search engines without touching files. Open **Settings** (gear, top right, `aria-label` "Open settings"), then **Macros** in the sidebar.
 
