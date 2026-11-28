@@ -1,0 +1,132 @@
+docs/code/src/answers/currency.js.md
+  s_21734926ab93ce::t_4dfa5f32cb3f4c 11-12
+src/answers/query.js
+  s_21734926ab93ce::t_4dfa5f32cb3f4c 6,8
+src/search/suggestions.js
+  s_21734926ab93ce::t_4dfa5f32cb3f4c 6,26,42,50
+src/answers/timezones.js
+  s_21734926ab93ce::t_4dfa5f32cb3f4c 147
+docs/code/src/answers/cityZones.js.md
+  s_21734926ab93ce::t_4dfa5f32cb3f4c 6
+docs/code/src/search/useDestination.js.md
+  s_21734926ab93ce::t_4dfa5f32cb3f4c 4-5
+src/lib/renderMarkdown.jsx
+  s_21734926ab93ce::t_4dfa5f32cb3f4c 1-2,10,62-66,71
+src/search/resolve.js
+  s_21734926ab93ce::t_4dfa5f32cb3f4c 29-30,35,42-48,93
+docs/code/src/answers/format.js.md
+  s_21734926ab93ce::t_4dfa5f32cb3f4c 9-10
+docs/code/src/lib/isMobile.js.md
+  s_21734926ab93ce::t_4dfa5f32cb3f4c 3
+docs/code/src/search/suggestions.js.md
+  s_21734926ab93ce::t_4dfa5f32cb3f4c 6-9
+docs/code/src/answers/units/index.js.md
+  s_21734926ab93ce::t_4dfa5f32cb3f4c 9
+docs/code/src/search/useSuggestions.js.md
+  s_21734926ab93ce::t_4dfa5f32cb3f4c 6-8
+src/answers/index.js
+  s_21734926ab93ce::t_4dfa5f32cb3f4c 7,17
+src/search/useSuggestions.test.jsx
+  s_21734926ab93ce::t_4dfa5f32cb3f4c 1-123
+docs/code/src/answers/timezones.js.md
+  s_21734926ab93ce::t_4dfa5f32cb3f4c 13-14
+docs/code/src/answers/query.js.md
+  s_21734926ab93ce::t_4dfa5f32cb3f4c 8-9
+src/lib/color.test.js
+  s_21734926ab93ce::t_4dfa5f32cb3f4c 46
+src/search/useSuggestions.js
+  s_21734926ab93ce::t_4dfa5f32cb3f4c 27-39,44,49-52,65
+src/answers/currencies.js
+  s_21734926ab93ce::t_4dfa5f32cb3f4c 5
+src/search/history.js
+  s_21734926ab93ce::t_4dfa5f32cb3f4c 29,42-74,77-81,84-85,87-111
+src/search/history.test.js
+  s_21734926ab93ce::t_4dfa5f32cb3f4c 15,38,40,96-119
+docs/features/instant-answers.md
+  s_21734926ab93ce::t_ff489bef587891 3
+docs/code/src/lib/color.js.md
+  s_21734926ab93ce::t_4dfa5f32cb3f4c 9-10
+src/lib/color.js
+  s_21734926ab93ce::t_4dfa5f32cb3f4c 1-2,62,105,152,166,169-170,179
+src/search/useDestination.js
+  s_21734926ab93ce::t_4dfa5f32cb3f4c 23
+docs/code/src/search/autocomplete.js.md
+  s_21734926ab93ce::t_4dfa5f32cb3f4c 3
+docs/code/src/search/history.js.md
+  s_21734926ab93ce::t_4dfa5f32cb3f4c 8-9
+src/lib/fetchFromScriptTag.test.js
+  s_21734926ab93ce::t_4dfa5f32cb3f4c 6-9,11-13,15,26-32,74,76
+docs/code/src/search/resolve.js.md
+  s_21734926ab93ce::t_4dfa5f32cb3f4c 7-10
+src/search/autocomplete.js
+  s_21734926ab93ce::t_4dfa5f32cb3f4c 19
+docs/code/src/lib/renderMarkdown.jsx.md
+  s_21734926ab93ce::t_4dfa5f32cb3f4c 8-10
+src/answers/cityZones.js
+  s_21734926ab93ce::t_4dfa5f32cb3f4c 83,85,104
+scripts/gate/baselines/structure.json
+  s_21734926ab93ce::t_0b56ac6060d431 66,75
+src/answers/units/index.js
+  s_21734926ab93ce::t_4dfa5f32cb3f4c 33,43-44,47,58
+docs/code/src/answers/index.js.md
+  s_21734926ab93ce::t_4dfa5f32cb3f4c 10-12
+src/lib/fetchFromScriptTag.js
+  s_21734926ab93ce::t_4dfa5f32cb3f4c 1-10,20-21,26
+docs/code/src/answers/bases.js.md
+  s_21734926ab93ce::t_4dfa5f32cb3f4c 10
+src/answers/currency.js
+  s_21734926ab93ce::t_4dfa5f32cb3f4c 55,79,81-82,84-85,89-91,93,95,100,104-119
+docs/code/src/lib/getCssGradient.js.md
+  s_21734926ab93ce::t_4dfa5f32cb3f4c 7-8
+docs/code/src/answers/percent.js.md
+  s_21734926ab93ce::t_4dfa5f32cb3f4c 8-9
+docs/code/src/lib/fetchFromScriptTag.js.md
+  s_21734926ab93ce::t_4dfa5f32cb3f4c 8-9
+src/answers/percent.js
+  s_21734926ab93ce::t_4dfa5f32cb3f4c 19
+src/lib/renderMarkdown.test.jsx
+  s_21734926ab93ce::t_4dfa5f32cb3f4c 94-105
+src/answers/currency.test.js
+  s_21734926ab93ce::t_4dfa5f32cb3f4c 28,30-33,35-37,39,59,61,82,84,103,105,116-126
+  s_21734926ab93ce::t_54975a0ad67d64 127-128
+src/lib/isMobile.js
+  s_21734926ab93ce::t_4dfa5f32cb3f4c 9,11
+docs/code/src/answers/currencies.js.md
+  s_21734926ab93ce::t_4dfa5f32cb3f4c 6-7
+src/search/suggestions.test.js
+  s_21734926ab93ce::t_4dfa5f32cb3f4c 18,20,27,73,77,81-82
+src/answers/calculator.js
+  s_21734926ab93ce::t_4dfa5f32cb3f4c 195
+docs/code/src/answers/calculator.js.md
+  s_21734926ab93ce::t_4dfa5f32cb3f4c 20
+src/lib/getCssGradient.js
+  s_21734926ab93ce::t_4dfa5f32cb3f4c 28
+docs/features/search.md
+  s_21734926ab93ce::t_ff489bef587891 3
+docs/code/src/search/googleAutocomplete.js.md
+  s_21734926ab93ce::t_4dfa5f32cb3f4c 4-5
+src/answers/format.js
+  s_21734926ab93ce::t_4dfa5f32cb3f4c 5
+src/answers/bases.js
+  s_21734926ab93ce::t_4dfa5f32cb3f4c 25
+src/search/resolve.test.js
+  s_21734926ab93ce::t_4dfa5f32cb3f4c 69-75
+src/answers/units/index.test.js
+  s_21734926ab93ce::t_4dfa5f32cb3f4c 86
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.24",
+  "base_commit_sha": "d06eda3a3684fe1eaa3227c9db236173849a7c27",
+  "prompts": {},
+  "sessions": {
+    "s_21734926ab93ce": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a2b063db-2489-4588-a3b5-1810c9e2d4a1",
+        "model": "claude-sonnet-5-5"
+      },
+      "human_author": "Adam Yung <adyung@paloaltonetworks.com>"
+    }
+  }
+}
