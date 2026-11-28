@@ -1,0 +1,41 @@
+scripts/verify.sh
+  s_21734926ab93ce::t_e9eb249dcda6ac 34-38
+scripts/README.md
+  s_21734926ab93ce::t_6e47cb50e52d96 1-15
+docs/brief.md
+  s_21734926ab93ce::t_6a29d6bd390771 30-44
+.deslop.json
+  s_21734926ab93ce::t_4c174036536bc7 3-4
+  s_21734926ab93ce::t_428997a493a6cb 1-2,5
+scripts/gate/lint/package.json
+  s_21734926ab93ce::t_2ae0f8f92e2f52 1-6
+docs/code/scripts/verify.sh.md
+  s_21734926ab93ce::t_41dc53f6290109 10-12
+docs/guides/development.md
+  s_21734926ab93ce::t_33bf0677455366 15-17
+  s_21734926ab93ce::t_b73f029d2cb194 3
+scripts/gate/baselines/duplication.json
+  s_21734926ab93ce::t_75b27f077bfa60 1-10
+scripts/gate/baselines/deadcode.json
+  s_21734926ab93ce::t_75b27f077bfa60 1-11
+scripts/gate/baselines/structure.json
+  s_21734926ab93ce::t_59ac82387c9ba2 1-165
+scripts/gate/lint/package-lock.json
+  s_21734926ab93ce::t_9913900f686a68 1-1247
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.24",
+  "base_commit_sha": "c034ec908636118a25fce05fbe846163b0878438",
+  "prompts": {},
+  "sessions": {
+    "s_21734926ab93ce": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a2b063db-2489-4588-a3b5-1810c9e2d4a1",
+        "model": "claude-sonnet-5-5"
+      },
+      "human_author": "Adam Yung <adyung@paloaltonetworks.com>"
+    }
+  }
+}
