@@ -1,0 +1,84 @@
+docs/code/tools/vite/htmlTransforms.js.md
+  s_21734926ab93ce::t_1550c98ff21cf0 28-29
+docs/code/scripts/add-icon.mjs.md
+  s_21734926ab93ce::t_1550c98ff21cf0 3-10
+docs/code/scripts/icons/sources.mjs.md
+  s_21734926ab93ce::t_1550c98ff21cf0 1-19
+docs/code/scripts/icons/fetch.mjs.md
+  s_21734926ab93ce::t_1550c98ff21cf0 1-5
+test/installService.test.js
+  s_21734926ab93ce::t_1550c98ff21cf0 1-43
+scripts/gate/baselines/duplication.json
+  s_21734926ab93ce::t_d41e20c5956062 2-3
+docs/code/scripts/owner/install-deps.sh.md
+  s_21734926ab93ce::t_1550c98ff21cf0 5-9
+services/serviceFiles.cjs
+  s_21734926ab93ce::t_1550c98ff21cf0 1-33
+tools/vite/serviceWorker.js
+  s_21734926ab93ce::t_1550c98ff21cf0 8
+docs/guides/development.md
+  s_21734926ab93ce::t_d41e20c5956062 3
+scripts/add-icon.mjs
+  s_21734926ab93ce::t_1550c98ff21cf0 5-8,12,32,34,45,48,52-59,62-72,74-80,82,94-123
+docs/code/scripts/icons/names.mjs.md
+  s_21734926ab93ce::t_1550c98ff21cf0 1-5
+scripts/icons/fetch.mjs
+  s_21734926ab93ce::t_1550c98ff21cf0 1-41
+docs/code/tools/vite/serviceWorker.js.md
+  s_21734926ab93ce::t_1550c98ff21cf0 15-16
+README.md
+  s_21734926ab93ce::t_791eda1768fef8 190,193,196
+scripts/icons/names.mjs
+  s_21734926ab93ce::t_1550c98ff21cf0 1-38
+docs/code/scripts/verify.sh.md
+  s_21734926ab93ce::t_1550c98ff21cf0 10-11
+scripts/gate/baselines/structure.json
+  s_21734926ab93ce::t_d41e20c5956062 31
+scripts/e2e/specs/panels.mjs
+  s_21734926ab93ce::t_1550c98ff21cf0 70-71,86,94,132-134,355,357,362,369
+scripts/icons/sources.mjs
+  s_21734926ab93ce::t_1550c98ff21cf0 1-147
+docs/code/scripts/icons/iconsFile.mjs.md
+  s_21734926ab93ce::t_1550c98ff21cf0 1-5
+docs/code/scripts/icons/svg.mjs.md
+  s_21734926ab93ce::t_1550c98ff21cf0 1-5
+services/install.cjs
+  s_21734926ab93ce::t_1550c98ff21cf0 1,5,10-14,27,33-34,37,39-41,43-47,49-50,55-57,59,69-70,72,92-105,107-108,110,112-114,116,119,133,135,137-138,156-163,177-180
+scripts/e2e/specs/boot.mjs
+  s_21734926ab93ce::t_1550c98ff21cf0 6-19,41-43,55,57,59
+test/setup.js
+  s_21734926ab93ce::t_1550c98ff21cf0 4,24
+docs/features/macros-editor.md
+  s_21734926ab93ce::t_d41e20c5956062 3
+  s_21734926ab93ce::t_791eda1768fef8 28
+scripts/README.md
+  s_21734926ab93ce::t_1550c98ff21cf0 6
+tools/vite/htmlTransforms.js
+  s_21734926ab93ce::t_1550c98ff21cf0 9,17,29-30,39-40,50-51,61
+scripts/verify.sh
+  s_21734926ab93ce::t_1550c98ff21cf0 20-23
+scripts/icons/iconsFile.mjs
+  s_21734926ab93ce::t_1550c98ff21cf0 1-22
+test/addIcon.test.js
+  s_21734926ab93ce::t_1550c98ff21cf0 1-152
+scripts/icons/svg.mjs
+  s_21734926ab93ce::t_1550c98ff21cf0 1-38
+scripts/owner/install-deps.sh
+  s_21734926ab93ce::t_1550c98ff21cf0 7-8
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.24",
+  "base_commit_sha": "6a15bf3e8d8dd8e0e247afeaff16f4d534337648",
+  "prompts": {},
+  "sessions": {
+    "s_21734926ab93ce": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a2b063db-2489-4588-a3b5-1810c9e2d4a1",
+        "model": "claude-sonnet-5-5"
+      },
+      "human_author": "Adam Yung <adyung@paloaltonetworks.com>"
+    }
+  }
+}
