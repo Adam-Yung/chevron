@@ -1,0 +1,28 @@
+scripts/e2e/specs/macros-editor.mjs
+  s_21734926ab93ce::t_c8ce0838d5e5fc 117,120
+docs/features/macros-editor.md
+  s_21734926ab93ce::t_65857a6a61e56f 9
+  s_21734926ab93ce::t_7a4a826f30e152 3
+test/bundledConfig.test.js
+  s_21734926ab93ce::t_633c62a267edf3 1-25
+public/config.js
+  s_21734926ab93ce::t_5b34dc40be5a49 610,722-806
+public/icons.js
+  s_21734926ab93ce::t_b5424c794e0632 29-34
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.24",
+  "base_commit_sha": "f3f83fbb083b980fe7f74f27a0b48f2e431becf7",
+  "prompts": {},
+  "sessions": {
+    "s_21734926ab93ce": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a2b063db-2489-4588-a3b5-1810c9e2d4a1",
+        "model": "claude-sonnet-5-5"
+      },
+      "human_author": "Adam Yung <adyung@paloaltonetworks.com>"
+    }
+  }
+}
